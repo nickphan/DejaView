@@ -1,8 +1,15 @@
 package com.deja11.dejaphoto;
 
+import android.app.WallpaperManager;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.CountDownTimer;
 
 import java.util.LinkedList;
+import java.io.InputStream;
 
 /**
  * Created by shuai9532 on 5/6/17.
@@ -20,6 +27,11 @@ public class Controller {
 
     // cache that stores the previous 10 photos
     LinkedList<Photo> cache = new LinkedList<Photo>();
+
+
+    public Controller(){
+
+    }
 
     /**
      * Get the next photo to display
@@ -49,11 +61,23 @@ public class Controller {
     /**
      * Set the desired photo to be the wallpaper
      * @param photo the photo acquired from getNextPhoto()
+     *        context the Activity context
+     *        contentResolver ...
+     * @return true if the wallpaper was set. false otherwise
      */
-    void setWallpaper(Photo photo){
-        // get current wallpaper
-        // if cache.size() == 10, cache.removeFirst()
-        // add wallpaper to cache using cache.addLast(photo)
+
+    boolean setWallpaper(Photo photo, Context context, ContentResolver contentResolver){
+        Uri data = Uri.parse(photo.getPhotoLocation());
+        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        try {
+            InputStream inputStream = contentResolver.openInputStream(data);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            myWallpaperManager.setBitmap(bitmap);
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**

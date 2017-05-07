@@ -15,11 +15,14 @@ import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 
+    DatabaseHelper myDb;
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myDb = new DatabaseHelper(this);
 
         //set the icon and time and build the notification of deja photo
         int icon = R.drawable.ic_wallpaper;
@@ -43,5 +46,6 @@ public class MainActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         mNotificationManager.notify(1, notification);
+
     }
 }
