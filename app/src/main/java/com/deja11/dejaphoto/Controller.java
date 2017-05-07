@@ -37,6 +37,7 @@ public class Controller {
      * @return the next photo in the cache
      */
     public Photo getNextPhoto(){
+
         return null;
     }
 
@@ -48,8 +49,18 @@ public class Controller {
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo, Context context, ContentResolver contentResolver){
-        Uri data = Uri.parse(photo.getPhotoLocation());
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        if(photo == null){
+            try{
+                myWallpaperManager.setResource(+R.drawable.default_image);
+                return false;
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        Uri data = Uri.parse(photo.getPhotoLocation());
+
         try {
             InputStream inputStream = contentResolver.openInputStream(data);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
