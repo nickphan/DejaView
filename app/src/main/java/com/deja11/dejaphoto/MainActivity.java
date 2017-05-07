@@ -10,8 +10,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.NotificationCompat;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -43,5 +47,37 @@ public class MainActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         mNotificationManager.notify(1, notification);
+
+        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View vi = inflater.inflate(R.layout.notification,null);
+
+        Button karmaButton = (Button)vi.findViewById(R.id.karma);
+        String name = karmaButton.getText().toString();
+        System.err.println(name);
+
+        karmaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.err.print("we are here");
+                Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
+/*
+    public void release(View view){
+
+        Toast.makeText(this, "the photo is released", Toast.LENGTH_SHORT).show();
+    }
+
+    public void previous(View view){
+        Toast.makeText(this, "switch the previous photo", Toast.LENGTH_SHORT).show();
+    }
+
+    public void next(View view){
+        Toast.makeText(this, "switch to next photo", Toast.LENGTH_SHORT).show();
+    }
+    */
+
 }
