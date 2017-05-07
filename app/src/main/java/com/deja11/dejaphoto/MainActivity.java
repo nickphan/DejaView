@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.NotificationCompat;
 import android.view.Menu;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -23,6 +24,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         myDb = new DatabaseHelper(this);
+        boolean isInserted = myDb.insertData("expectedlocatikkon",10.01,10.02,999,10,1,1);
+        if (isInserted)
+            Toast.makeText(MainActivity.this, "Data Insert", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(MainActivity.this, "Data not Insert", Toast.LENGTH_LONG).show();
 
         //set the icon and time and build the notification of deja photo
         int icon = R.drawable.ic_wallpaper;
