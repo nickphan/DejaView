@@ -11,15 +11,16 @@ public class Photo {
     private String phoneLocation;
     private GeoLocation geoLocation;
     private Date date;
-    private int dejaPoint;
+    private int dejaPoints;
     private boolean released;
     private boolean karma;
 
-    public Photo(String phoneLocation, GeoLocation geoLocation, Date date){
+    public Photo(String phoneLocation){
         this.phoneLocation = phoneLocation;
-        this.geoLocation = geoLocation;
-        this.date = date;
-        this.dejaPoint = 0;
+
+        // have a method to extract information from the photo
+
+        this.dejaPoints = 0;
         this.karma = false;
         this.released = false;
     }
@@ -68,8 +69,8 @@ public class Photo {
      * Get the dejaPoints of the current photo
      * @return the dejaPoints of the current phone
      */
-    public int getDejaPoint() {
-        return dejaPoint;
+    public int getDejaPoints() {
+        return dejaPoints;
     }
 
     /**
