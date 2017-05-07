@@ -6,24 +6,33 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "student.db";
-    public static final String TABLE_NAME = "student_table";
-    public static final String COL_1 = "ID";
-    public static final String COL_2 = "NAME";
-    public static final String COL_3 = "SURNAME";
-    public static final String COL_4 = "MARKS";
+    public static final String DATABASE_NAME = "deja.db";
+    public static final String TABLE_NAME = "photo_table";
 
-    public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public static final String COL_1 = "ID";
+    public static final String COL_2 = "PHONELOCATION";
+    public static final String COL_3 = "GEOLOCATION";
+    public static final String COL_4 = "DATE";
+    public static final String COL_5 = "DEJAPOINTS";
+    public static final String COL_6 = "RELEASED";
+    public static final String COL_7 = "KARMA";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        db.execSQL("create table " + TABLE_NAME +
+                " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "PHONELOCATION TEXT, GEOLOCATIONLAT DECIMAL(10, 8)," +
+                " GEOLOCATIONLONG FLOAT DECIMAL(11, 8), DATE INTEGER, DEJAPOINTS INTEGER," +
+                " RELEASED BOOL, KARMA BOOL)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
     }
 }
