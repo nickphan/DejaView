@@ -12,15 +12,12 @@ public class Controller {
     String albumLocation = "cameraAlbum";
 
     // database that contains the photo locations on the phone
+    // someDataBase photoDatabase;
 
     CountDownTimer countDown;
 
-    /**
-     * Store the next 10 photos to display
-     */
-    public void cache(){
-
-    }
+    // cache that stores the previous 10 photos
+    // someDataStructure cache;
 
     /**
      * Get the next photo in the cache
@@ -34,23 +31,21 @@ public class Controller {
      * Set the desired photo to be the wallpaper
      * @param photo the photo acquired from getNextPhoto()
      */
-    void setWallPaper(Photo photo){
+    void setWallpaper(Photo photo){
 
     }
 
     /**
-     * Give the desired photo priority of appearance
-     * @param photo the photo to be boosted
+     * Give the current photo priority of appearance
      */
-    void karmaPhoto(Photo photo){
+    void karmaPhoto(){
 
     }
 
     /**
      * Remove the current photo shown on the homepage from the cycle
-     * @param photo the photo shown on the screen
      */
-    void releasePhoto(Photo photo){
+    void releasePhoto(){
 
     }
 }
