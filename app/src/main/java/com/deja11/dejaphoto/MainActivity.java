@@ -19,11 +19,14 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
+    DatabaseHelper myDb;
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myDb = new DatabaseHelper(this);
 
         //set the icon and time and build the notification of deja photo
         int icon = R.drawable.ic_wallpaper;
@@ -73,6 +76,8 @@ public class MainActivity extends Activity {
 
     public void previous(View view){
         Toast.makeText(this, "switch the previous photo", Toast.LENGTH_SHORT).show();
+=======
+>>>>>>> 6c64d701a9c03a9eec152f581c456e92489ca959
     }
 
     public void next(View view){
