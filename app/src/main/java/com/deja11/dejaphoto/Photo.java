@@ -8,12 +8,12 @@ import java.util.Date;
 
 public class Photo {
 
-    private String phoneLocation;
-    private GeoLocation geoLocation;
-    private Date date;
-    private int dejaPoints;
-    private boolean released;
-    private boolean karma;
+    String phoneLocation;
+    GeoLocation geoLocation;
+    Date date;
+    int dejaPoints;
+    boolean released;
+    boolean karma;
 
     public Photo(String phoneLocation){
         this.phoneLocation = phoneLocation;

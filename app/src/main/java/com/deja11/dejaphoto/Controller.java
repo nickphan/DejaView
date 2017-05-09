@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.CountDownTimer;
 
+import java.util.LinkedList;
 import java.io.InputStream;
 
 /**
@@ -16,7 +17,7 @@ import java.io.InputStream;
 
 public class Controller {
 
-    // replace the string with the real location as the deault value
+    // replace the string with the real location as the default value
     String albumLocation = "cameraAlbum";
 
     // database that contains the photo locations on the phone
@@ -25,7 +26,7 @@ public class Controller {
     CountDownTimer countDown;
 
     // cache that stores the previous 10 photos
-    // someDataStructure cache;
+    LinkedList<Photo> cache = new LinkedList<Photo>();
 
 
     public Controller(){
@@ -33,10 +34,27 @@ public class Controller {
     }
 
     /**
-     * Get the next photo in the cache
-     * @return the next photo in the cache
+     * Get the next photo to display
+     * @return the next photo
      */
     public Photo getNextPhoto(){
+
+        return null;
+    }
+
+    /**
+     * Get the previous photo displayed
+     * @return the previous photo
+     */
+    public Photo getPreviousPhoto() {
+        return cache.removeLast();
+    }
+
+    /**
+     * Get the current photo that is displayed as the wallpaper
+     * @return the current wallpaper as a photo
+     */
+    public Photo getCurrentWallpaper() {
         return null;
     }
 
@@ -47,6 +65,7 @@ public class Controller {
      *        contentResolver ...
      * @return true if the wallpaper was set. false otherwise
      */
+
     boolean setWallpaper(Photo photo, Context context, ContentResolver contentResolver){
         Uri data = Uri.parse(photo.getPhotoLocation());
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
@@ -65,13 +84,15 @@ public class Controller {
      * Give the current photo priority of appearance
      */
     void karmaPhoto(){
-
+        // get current wallpaper
+        // delegate to photo's setKarma()
     }
 
     /**
      * Remove the current photo shown on the homepage from the cycle
      */
     void releasePhoto(){
-
+        // get current wallpaper
+        // delegate to photo's setReleased()
     }
 }
