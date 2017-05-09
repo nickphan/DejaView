@@ -27,12 +27,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create database object
         myDb = new DatabaseHelper(this);
-        boolean isInserted = myDb.insertData("expectedlocatikkon",10.01,10.02,999,10,1,1);
-        if (isInserted)
-            Toast.makeText(MainActivity.this, "Data Insert", Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(MainActivity.this, "Data not Insert", Toast.LENGTH_LONG).show();
+        myDb.initialize(this);
+        boolean isInserted = myDb.insertData("expectedlocatikkon",10.01,10.02,"999",10,1,1);
+
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),

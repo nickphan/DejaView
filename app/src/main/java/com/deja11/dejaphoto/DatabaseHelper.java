@@ -1,15 +1,29 @@
 /*
 This DatabaseHelper class was based on the video series "Android SQLite Database Tutorial"
 made by the youtube channel "ProgrammingKnowledge"
+
  */
 
 package com.deja11.dejaphoto;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.deja11.dejaphoto.R.id.release;
 
@@ -36,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + TABLE_NAME +
                 " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "PHONELOCATION TEXT, GEOLOCATIONLAT DECIMAL(10, 8)," +
-                " GEOLOCATIONLONG FLOAT DECIMAL(11, 8), DATE INTEGER, DEJAPOINTS INTEGER," +
+                " GEOLOCATIONLONG FLOAT DECIMAL(11, 8), DATE TEXT, DEJAPOINTS INTEGER," +
                 " RELEASED BOOL, KARMA BOOL)");
     }
 
@@ -49,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
         Insert a new photo into the database
      */
-    public boolean insertData(String phoneLocation, double geoLat, double geoLong, int date, int dejapoints, int isReleased, int isKarma) {
+    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_2, phoneLocation);
@@ -69,7 +83,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     /*
-
         Return the path of a photo
      */
     public Cursor getAllData(){
@@ -77,4 +90,72 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
         return res;
     }
+
+    /*
+        Add photos all the photo in the camera album to the database
+     */
+    public void initialize(Context context){
+        if(ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions((Activity) context,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+        }else {
+
+            Cursor cursor = gatherPhotoInfo(context);
+            int columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            int columnIndexDate = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN);
+            int columnIndexLat = cursor.getColumnIndex(MediaStore.Images.Media.LATITUDE);
+            int columnIndexLong = cursor.getColumnIndex(MediaStore.Images.Media.LONGITUDE);
+
+
+            String absolutePath = null;
+            String dateAdded = null;
+            double latitude = 0.0;
+            double longitude = 0.0;
+
+            while (cursor.moveToNext()) {
+                absolutePath = cursor.getString(columnIndexData); //path to the photo
+                dateAdded = cursor.getString(columnIndexDate); //date in string format
+                latitude = cursor.getDouble(columnIndexLat);
+                longitude = cursor.getDouble(columnIndexLong);
+                //Toast.makeText(context,absolutePath + " " + dateAdded + " " + latitude,Toast.LENGTH_LONG).show();
+
+                //this.insertData("expectedlocatikkon",10.01,10.02,999,10,1,1);
+                //this.insertData(absolutePath,latitude,longitude, Integer.parseInt(dateAdded),0,0,0);
+            }
+        }
+    }
+
+
+    /*
+        This function was based on the website
+        http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
+     */
+    //////////////////////////////////////////////////////////
+    public Cursor gatherPhotoInfo(Context context){
+        Uri uri;
+        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {
+                MediaStore.MediaColumns.DATA,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.LATITUDE,
+                MediaStore.Images.Media.LONGITUDE
+
+        };
+
+        return context.getContentResolver().query(uri, projection, null, null, null);
+
+    }
+
+    // for displaying a message board
+    public void showMessage(String title, String message,Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
 }
+
+
+
