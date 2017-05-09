@@ -81,7 +81,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
-
     /*
         Return the path of a photo
      */
@@ -100,11 +99,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }else {
 
             Cursor cursor = gatherPhotoInfo(context);
-            int columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            int columnIndexPath = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
             int columnIndexDate = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN);
             int columnIndexLat = cursor.getColumnIndex(MediaStore.Images.Media.LATITUDE);
             int columnIndexLong = cursor.getColumnIndex(MediaStore.Images.Media.LONGITUDE);
-
 
             String absolutePath = null;
             String dateAdded = null;
@@ -112,14 +110,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             double longitude = 0.0;
 
             while (cursor.moveToNext()) {
-                absolutePath = cursor.getString(columnIndexData); //path to the photo
+                absolutePath = cursor.getString(columnIndexPath); //path to the photo
                 dateAdded = cursor.getString(columnIndexDate); //date in string format
                 latitude = cursor.getDouble(columnIndexLat);
                 longitude = cursor.getDouble(columnIndexLong);
-                //Toast.makeText(context,absolutePath + " " + dateAdded + " " + latitude,Toast.LENGTH_LONG).show();
-
-                //this.insertData("expectedlocatikkon",10.01,10.02,999,10,1,1);
-                //this.insertData(absolutePath,latitude,longitude, Integer.parseInt(dateAdded),0,0,0);
+                this.insertData(absolutePath,latitude,longitude, dateAdded,0,0,0);
             }
         }
     }
@@ -129,32 +124,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         This function was based on the website
         http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
      */
-    //////////////////////////////////////////////////////////
     public Cursor gatherPhotoInfo(Context context){
         Uri uri;
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = {
                 MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
                 MediaStore.Images.Media.DATE_TAKEN,
                 MediaStore.Images.Media.LATITUDE,
                 MediaStore.Images.Media.LONGITUDE
 
         };
-
         return context.getContentResolver().query(uri, projection, null, null, null);
 
     }
 
-    // for displaying a message board
-    public void showMessage(String title, String message,Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(true);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.show();
-    }
+
 }
 
 

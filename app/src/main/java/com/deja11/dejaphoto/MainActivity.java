@@ -7,9 +7,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +19,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
 
@@ -30,8 +36,6 @@ public class MainActivity extends Activity {
         // Create database object
         myDb = new DatabaseHelper(this);
         myDb.initialize(this);
-        boolean isInserted = myDb.insertData("expectedlocatikkon",10.01,10.02,"999",10,1,1);
-
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
@@ -108,5 +112,4 @@ public class MainActivity extends Activity {
             Toast.makeText(context, "Release Button Clicked", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
