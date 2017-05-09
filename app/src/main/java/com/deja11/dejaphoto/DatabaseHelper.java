@@ -24,7 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
+import static android.R.attr.format;
+import static android.R.attr.name;
 import static com.deja11.dejaphoto.R.id.release;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -51,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "PHONELOCATION TEXT, GEOLOCATIONLAT DECIMAL(10, 8)," +
                 " GEOLOCATIONLONG FLOAT DECIMAL(11, 8), DATE TEXT, DEJAPOINTS INTEGER," +
-                " RELEASED BOOL, KARMA BOOL)");
+                " RELEASED INTEGER, KARMA INTEGER)");
     }
 
     @Override
@@ -90,6 +93,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    public void test(Context context){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
+        String query = "SELECT * FROM photo_table WHERE id not in (7,10)";
+        StringBuffer buffer = new StringBuffer();
+        for(int i = 0 ; i< 1 ; i++){
+            //res = db.rawQuery("SELECT * FROM photo_table WHERE karma = 0 '"+i+"'", null);
+            if(res.getCount()==0)
+            buffer.append(i+"\n");
+        }
+        //Cursor res = myDb.getAllData();
+
+
+        String pathToPhoto = "/storage/emulated/0/DCIM/Camera/corgi2.jpg";
+        //res = db.rawQuery("SELECT id FROM photo_table WHERE phonelocation = '" + pathToPhoto + "'", null);
+
+        res = db.rawQuery("SELECT * FROM photo_table", null);
+
+
+        //buffer.append(res.getCount() + " " + res.getColumnCount());
+        Random rand = new Random();
+
+        int  n;
+        do{
+            n= rand.nextInt(res.getCount()) + 1;
+        }while (db.rawQuery("SELECT id FROM photo_table WHERE id = '" + n + "'", null).getCount()==0);
+
+        res = db.rawQuery("SELECT phonelocation FROM photo_table WHERE id = " + n, null);
+        while (res.moveToNext()) {
+            buffer.append(res.getString(0)+" ");}
+
+
+
+
+/*
+        while (res.moveToNext()) {
+
+                String format = "MM-dd-yyyy HH:mm:ss";
+                SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
+
+                String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
+
+                buffer.append("\n\nId :" + res.getString(0));
+                buffer.append("\nphone location:" + res.getString(1));
+                buffer.append("\ngeoLat :" + res.getString(2));
+                buffer.append("\ngeoLong :" + res.getString(3));
+                buffer.append("\n\ndate :" + dateTime);
+                buffer.append("\ndejapoints:" + res.getString(5));
+                buffer.append("\nrelease :" + res.getString(6));
+                buffer.append("\nkarma :" + res.getString(7));
+        }
+*/
+
+
+        // show all data
+        showMessage("Data", buffer.toString(),context);
+    }
+
     /*
         Add photos all the photo in the camera album to the database
      */
@@ -98,6 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ActivityCompat.requestPermissions((Activity) context,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
         }else {
 
+            SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = gatherPhotoInfo(context);
             int columnIndexPath = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
             int columnIndexDate = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN);
@@ -114,7 +176,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 dateAdded = cursor.getString(columnIndexDate); //date in string format
                 latitude = cursor.getDouble(columnIndexLat);
                 longitude = cursor.getDouble(columnIndexLong);
-                this.insertData(absolutePath,latitude,longitude, dateAdded,0,0,0);
+
+                Cursor res = db.rawQuery("SELECT id FROM photo_table WHERE phonelocation = '" + absolutePath + "'", null);
+                if(res.getCount() ==0) {
+                    this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                }
             }
         }
     }
@@ -139,7 +205,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-
+    // for displaying a message board
+    public void showMessage(String title, String message,Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
 }
 
 
