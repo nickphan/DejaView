@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
+    DatabaseHelper myDb;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,28 +28,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.test_activity_main);
 
 
-        //Controller controller = new Controller(getApplicationContext());
-        Button button1 = (Button)findViewById(R.id.startButton);
-        button1.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent = new Intent(MainActivity.this, SetWallpaperService.class);
-                startService(intent);
-            }
-        });
 
-        Button button2 = (Button)findViewById(R.id.stopButton);
-        button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent = new Intent(MainActivity.this, SetWallpaperService.class);
-                stopService(intent);
-            }
-        });
-
-
-
-        /*myDb = new DatabaseHelper(this);
+        myDb = new DatabaseHelper(this);
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),

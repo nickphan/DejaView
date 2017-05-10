@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.InputStream;
@@ -22,8 +23,14 @@ import java.io.InputStream;
  * Created by shuai9532 on 5/6/17.
  */
 
-public class Controller {
+public class Controller implements Serializable{
 
+
+    /**
+     * TODO
+     *  - replace arraylists with databasehelper
+     *  - TEST THE SETWALLPAPER METHOD
+     * */
 
     // replace the string with the real location as the default value
     String albumLocation = "cameraAlbum";
@@ -71,7 +78,16 @@ public class Controller {
      * @return the previous photo
      */
     public Photo getPreviousPhoto() {
-        return null;
+        if(currIndex-1 < 0){
+            currIndex = queue.size()-1;
+        }else{
+            currIndex--;
+        }
+        if(queue.get(currIndex).isReleased()){
+            return getPreviousPhoto();
+        }else{
+            return queue.get(currIndex);
+        }
     }
 
     /**
@@ -129,7 +145,7 @@ public class Controller {
         }
     }
 
-    /**/
+    /*REPLACE WITH DATABASE WHEN READY*/
     private ArrayList<String> gatherPhotos(Context context) {
         Uri uri;
         Cursor cursor;
