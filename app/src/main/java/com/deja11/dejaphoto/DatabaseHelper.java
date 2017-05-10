@@ -18,31 +18,25 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
-
-import static android.R.attr.format;
-import static android.R.attr.name;
-import static com.deja11.dejaphoto.R.id.release;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "deja.db";
     public static final String TABLE_NAME = "photo_table";
 
-    public static final String COL_1 = "ID";
-    public static final String COL_2 = "PHONELOCATION";
-    public static final String COL_3 = "GEOLOCATIONLAT";
-    public static final String COL_4 = "GEOLOCATIONLONG";
-    public static final String COL_5 = "DATE";
-    public static final String COL_6 = "DEJAPOINTS";
-    public static final String COL_7 = "RELEASED";
-    public static final String COL_8 = "KARMA";
+    public static final String COL_ID_1 = "ID";
+    public static final String COL_PATH_2 = "PHONELOCATION";
+    public static final String COL_LAT_3 = "GEOLOCATIONLAT";
+    public static final String COL_LONG_4 = "GEOLOCATIONLONG";
+    public static final String COL_DATE_5 = "DATE";
+    public static final String COL_DEJA_6 = "DEJAPOINTS";
+    public static final String COL_REL_7 = "RELEASED";
+    public static final String COL_KARMA_8 = "KARMA";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -69,19 +63,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_2, phoneLocation);
-        contentValues.put(COL_3, geoLat);
-        contentValues.put(COL_4, geoLong);
-        contentValues.put(COL_5, date);
-        contentValues.put(COL_6, dejapoints);
-        contentValues.put(COL_7, isReleased);
-        contentValues.put(COL_8, isKarma);
+        contentValues.put(COL_PATH_2, phoneLocation);
+        contentValues.put(COL_LAT_3, geoLat);
+        contentValues.put(COL_LONG_4, geoLong);
+        contentValues.put(COL_DATE_5, date);
+        contentValues.put(COL_DEJA_6, dejapoints);
+        contentValues.put(COL_REL_7, isReleased);
+        contentValues.put(COL_KARMA_8, isKarma);
 
         long result = db.insert(TABLE_NAME, null, contentValues); // return -1 if not successful
         if (result == -1)
             return false;
         else
             return true;
+    }
+
+    /*
+        Update a field
+     */
+    public boolean updateField(String id, String point){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_ID_1,id);
+        contentValues.put(COL_DEJA_6,point);
+        db.update(TABLE_NAME,contentValues,"ID = ?", new String[]{id}); // update based on id
+
+        return true;
     }
 
     /*
@@ -94,14 +101,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void test(Context context){
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
-        StringBuffer buffer = new StringBuffer();
+        //SQLiteDatabase db = this.getWritableDatabase();
+        //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        //StringBuffer buffer = new StringBuffer();
 
-        buffer.append(chooseRandomPhoto());
+        //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
+        //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
+        /*
+        while (res.moveToNext()) {
+
+                String format = "MM-dd-yyyy HH:mm:ss";
+                SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
+
+                //String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
+
+                buffer.append("\n\nId :" + res.getString(0));
+                buffer.append("\nphone location:" + res.getString(1));
+                buffer.append("\ngeoLat :" + res.getString(2));
+                buffer.append("\ngeoLong :" + res.getString(3));
+                buffer.append("\n\ndate :" + dateTime);
+                buffer.append("\ndejapoints:" + res.getString(5));
+                buffer.append("\nrelease :" + res.getString(6));
+                buffer.append("\nkarma :" + res.getString(7));
+        }
+        */
+        //updateField("2","25");
+        //updateField("3","50");
+
+        //buffer.append(chooseRandomPhoto());
+        //buffer.append(res.getCount());
 
         // show all data
-        showMessage("Data", buffer.toString(),context);
+        //showMessage("Data", buffer.toString(),context);
     }
 
     /*

@@ -38,6 +38,9 @@ public class MainActivity extends Activity {
         myDb.initialize(this);
         myDb.test(this);
 
+
+gi
+
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
