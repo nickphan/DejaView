@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
         myDb.test(this);
 
 
-gi
+
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
