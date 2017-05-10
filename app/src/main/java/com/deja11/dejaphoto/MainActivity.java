@@ -19,14 +19,36 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    DatabaseHelper myDb;
+    //DatabaseHelper myDb;
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.test_activity_main);
 
-        myDb = new DatabaseHelper(this);
+
+        //Controller controller = new Controller(getApplicationContext());
+        Button button1 = (Button)findViewById(R.id.startButton);
+        button1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(MainActivity.this, SetWallpaperService.class);
+                startService(intent);
+            }
+        });
+
+        Button button2 = (Button)findViewById(R.id.stopButton);
+        button2.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(MainActivity.this, SetWallpaperService.class);
+                stopService(intent);
+            }
+        });
+
+
+
+        /*myDb = new DatabaseHelper(this);
 
         //set the icon and time and build the notification of deja photo
         int icon = R.drawable.ic_wallpaper;
@@ -65,7 +87,7 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
             }
         });
-
+        */
     }
 
 /*

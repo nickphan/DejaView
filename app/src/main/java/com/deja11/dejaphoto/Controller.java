@@ -3,11 +3,18 @@ package com.deja11.dejaphoto;
 import android.app.WallpaperManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.CountDownTimer;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.InputStream;
 
@@ -16,6 +23,7 @@ import java.io.InputStream;
  */
 
 public class Controller {
+
 
     // replace the string with the real location as the default value
     String albumLocation = "cameraAlbum";
@@ -26,11 +34,18 @@ public class Controller {
     CountDownTimer countDown;
 
     // cache that stores the previous 10 photos
-    LinkedList<Photo> cache = new LinkedList<Photo>();
+    ArrayList<Photo> queue = new ArrayList<Photo>();
+    ArrayList<String> queueStrings = new ArrayList<String>();
+    int currIndex;
 
 
-    public Controller(){
 
+    public Controller(Context context){
+        queueStrings = gatherPhotos(context);
+        for(int i = 0; i < queueStrings.size(); i++){
+            Photo photo = new Photo(queueStrings.get(i));
+            queue.add(photo);
+        }
     }
 
     /**
@@ -38,10 +53,17 @@ public class Controller {
      * @return the next photo
      */
     public Photo getNextPhoto(){
+        if(currIndex+1 < queue.size()){
+            currIndex++;
+        }else{
+            currIndex = 0;
+        }
 
-<<<<<<< HEAD
-=======
-        return null;
+        if(queue.get(currIndex).isReleased()){
+            return getNextPhoto();
+        }else{
+            return queue.get(currIndex);
+        }
     }
 
     /**
@@ -49,7 +71,7 @@ public class Controller {
      * @return the previous photo
      */
     public Photo getPreviousPhoto() {
-        return cache.removeLast();
+        return null;
     }
 
     /**
@@ -57,9 +79,25 @@ public class Controller {
      * @return the current wallpaper as a photo
      */
     public Photo getCurrentWallpaper() {
->>>>>>> 8346ea1ee6af00300a3829d9c5eaf75e33b0861a
-        return null;
+        return queue.get(currIndex);
     }
+
+    void karmaPhoto(){
+        Photo photo = getCurrentWallpaper();
+        if(!photo.isKarma()){
+            photo.setKarma(true);
+        }
+    }
+
+    /**
+     * Remove the current photo shown on the homepage from the cycle
+     */
+    void releasePhoto(){
+        Photo photo = getCurrentWallpaper();
+        photo.setReleased(true);
+    }
+
+
 
     /**
      * Set the desired photo to be the wallpaper
@@ -69,9 +107,9 @@ public class Controller {
      * @return true if the wallpaper was set. false otherwise
      */
 
-    boolean setWallpaper(Photo photo, Context context, ContentResolver contentResolver){
+    boolean setWallpaper(Photo photo, Context context){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
-        if(photo == null){
+        if(photo.getPhotoLocation() == null){
             try{
                 myWallpaperManager.setResource(+R.drawable.default_image);
                 return false;
@@ -81,11 +119,9 @@ public class Controller {
             }
         }
         Uri data = Uri.parse(photo.getPhotoLocation());
-
         try {
-            InputStream inputStream = contentResolver.openInputStream(data);
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            myWallpaperManager.setBitmap(bitmap);
+            FileInputStream photoStream = new FileInputStream(new File(queue.get(currIndex).getPhotoLocation()));
+            myWallpaperManager.setStream(photoStream);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -93,19 +129,32 @@ public class Controller {
         }
     }
 
-    /**
-     * Give the current photo priority of appearance
-     */
-    void karmaPhoto(){
-        // get current wallpaper
-        // delegate to photo's setKarma()
-    }
+    /**/
+    private ArrayList<String> gatherPhotos(Context context) {
+        Uri uri;
+        Cursor cursor;
+        int columnIndexData;
+        int columnIndexFolder;
 
-    /**
-     * Remove the current photo shown on the homepage from the cycle
-     */
-    void releasePhoto(){
-        // get current wallpaper
-        // delegate to photo's setReleased()
+        ArrayList<String> imageList = new ArrayList<String>();
+        String absolutePath = null;
+        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {
+                MediaStore.MediaColumns.DATA,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
+        };
+
+        cursor = context.getContentResolver().query(uri, projection, null, null, null);
+
+        columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        columnIndexFolder = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
+        while (cursor.moveToNext()) {
+            absolutePath = cursor.getString(columnIndexData);
+            imageList.add(absolutePath);
+        }
+
+        return imageList;
     }
 }
