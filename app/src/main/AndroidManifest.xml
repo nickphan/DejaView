@@ -19,6 +19,34 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name=".MainActivity$LeftReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="left_button_receiver" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".MainActivity$RightReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="right_button_receiver" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".MainActivity$KarmaReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="karma_button_receiver" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".MainActivity$ReleaseReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="release_button_receiver" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".SetWallpaperService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
