@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import static android.R.attr.format;
+import static android.R.attr.id;
 import static android.R.attr.path;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -84,46 +85,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
         Update a field
      */
-    public boolean updateField(String id, String point){
+    public boolean updateField(int id, String column, String newValue){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_ID_1,id);
-        contentValues.put(COL_DEJA_6,point);
-        db.update(TABLE_NAME,contentValues,"ID = ?", new String[]{id}); // update based on id
+        contentValues.put(column,newValue);
+        db.update(TABLE_NAME,contentValues,"ID = ?", new String[]{Integer.toString(id)}); // update based on id
+
+        return true;
+    }
+    public boolean updateField(int id, String column, int newValue){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_ID_1,id);
+        contentValues.put(column,newValue);
+        db.update(TABLE_NAME,contentValues,"ID = ?", new String[]{Integer.toString(id)}); // update based on id
 
         return true;
     }
 
-    /*
-        Return the path of a photo
-     */
-    public Cursor getAllData(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
-        return res;
-    }
 
     public void test(Context context){
+
         SQLiteDatabase db = this.getWritableDatabase();
-        //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
         StringBuffer buffer = new StringBuffer();
+        //buffer.append(res.getCount() + "");
+
+        //updateField(2,COL_KARMA_8,"1");
+        updateField(3,COL_DEJA_6,50);
+        updateField(2,COL_DEJA_6,25);
+        //updateField(3,COL_KARMA_8,1);
+
+        //buffer.append(chooseNextPath());
 
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
         //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
         //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
         //while (res.moveToNext()) {
     //res.moveToNext();
-                String format = "MM-dd-yyyy HH:mm:ss";
-                SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
 
 
+/*
         Photo p = getNextPhoto();
 
-
-
-
-                //String dateTime = formatter.format(date);
 
         buffer.append("\nphone location:" + p.getPhotoLocation());
         buffer.append("\ngeoLat :" + p.getGeoLocation().getLatitude());
@@ -132,22 +138,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         buffer.append("\ndejapoints:" + p.getDejaPoints());
         buffer.append("\nrelease :" + p.isReleased());
         buffer.append("\nkarma :" + p.isKarma());
+*/
         //}
         //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
 
 
 
-        //updateField("2","25");
-        //updateField("3","50");
 
-        //buffer.append("\n\n");
+
 
 
         //buffer.append(chooseNextPath());
         //buffer.append(res.getCount());
 
-        // show all data
         showMessage("Data", buffer.toString(),context);
+
     }
 
     /*
@@ -186,7 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     /*
-        This function was based on the website
+        This method was based on the website
         http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
      */
     public Cursor gatherPhotoInfo(Context context){
@@ -213,7 +218,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         builder.show();
     }
 /*
-    80% chances of displaying the top 10 deja point
+    80% chances of displaying the top 10 photo with highest deja point
     20% chances of displaying a random photo
 
  */
@@ -236,7 +241,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         randomNumber = rand.nextInt(10)+1;
 
-        pathToPhoto= randomNumber + "\n";
         if(randomNumber >7){
             res = db.rawQuery("SELECT * FROM photo_table", null);
 
@@ -294,6 +298,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return new Photo(photoLocation,geoLocation,date,dejapoint,isReleased,isKarma);
 
+    }
+
+    public void updatePoint(){
+        // loop throught all rows
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        //each row get the id then update that id
+
+        int newPoint = 0;
+        int id = 0;
+        GeoLocation geoLocation;
+        Date date ;
+        boolean isKarma;
+
+        while (res.moveToNext()) {
+
+            id = res.getInt(0);
+
+
+            // if location is nearby, add 2 points
+            geoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
+
+            // if date is same add 2 points
+            date = new Date(Long.parseLong(res.getString(4)));
+
+            // if it is karma add 1 point
+            isKarma = res.getInt(7) > 0 ? true : false;
+            if(isKarma) {newPoint+=10;}
+
+
+            updateField(id,COL_DEJA_6,newPoint);
+            newPoint = 0;
+
+        }
+    }
+
+    public String printAll(Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(res.getCount() + "");
+
+        while (res.moveToNext()) {
+
+
+            String format = "MM-dd-yyyy HH:mm:ss";
+            SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
+
+            String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
+
+            buffer.append("\n\nId :" + res.getString(0));
+            buffer.append("\nphone location:" + res.getString(1));
+            buffer.append("\ngeoLat :" + res.getString(2));
+            buffer.append("\ngeoLong :" + res.getString(3));
+            buffer.append("\ndate :" + dateTime);
+            buffer.append("\ndejapoints:" + res.getString(5));
+            buffer.append("\nrelease :" + res.getString(6));
+            buffer.append("\nkarma :" + res.getString(7));
+
+            // show all data
+
+        }
+        return buffer.toString();
     }
 }
 
