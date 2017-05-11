@@ -101,38 +101,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void test(Context context){
-        //SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
-        //StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
 
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
-        //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
-        /*
+        Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
+
         while (res.moveToNext()) {
 
-                String format = "MM-dd-yyyy HH:mm:ss";
-                SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
+                //String format = "MM-dd-yyyy HH:mm:ss";
+                //SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
                 //String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
 
                 buffer.append("\n\nId :" + res.getString(0));
                 buffer.append("\nphone location:" + res.getString(1));
-                buffer.append("\ngeoLat :" + res.getString(2));
+                buffer.append("\ngeoLat Point:" + res.getString(2));
+            /*
                 buffer.append("\ngeoLong :" + res.getString(3));
                 buffer.append("\n\ndate :" + dateTime);
                 buffer.append("\ndejapoints:" + res.getString(5));
                 buffer.append("\nrelease :" + res.getString(6));
-                buffer.append("\nkarma :" + res.getString(7));
+                buffer.append("\nkarma :" + res.getString(7));*/
         }
-        */
+        res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
+
+
+
         //updateField("2","25");
         //updateField("3","50");
 
-        //buffer.append(chooseRandomPhoto());
+        buffer.append("\n\n");
+
+
+        buffer.append(chooseNextPhoto());
         //buffer.append(res.getCount());
 
         // show all data
-        //showMessage("Data", buffer.toString(),context);
+        showMessage("Data", buffer.toString(),context);
     }
 
     /*
@@ -197,27 +204,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         builder.setMessage(message);
         builder.show();
     }
+/*
+    80% chances of displaying the top 10 deja point
+    20% chances of displaying a random photo
 
-    public String chooseRandomPhoto(){
+ */
+    public String chooseNextPhoto(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res;
 
-        res = db.rawQuery("SELECT * FROM photo_table", null);
+        final int TOP10 = 3;
 
+        /*
+        * Update score first before deciding what to choose
+        * */
+
+        //update all points
+
+
+        int  randomNumber;
+        String pathToPhoto = null;
         Random rand = new Random();
 
-        String pathToPhoto = null;
+        randomNumber = rand.nextInt(10)+1;
 
-        int  n;
-        do{
-            n= rand.nextInt(res.getCount()) + 1;
-        }while (db.rawQuery("SELECT id FROM photo_table WHERE id = '" + n + "'", null).getCount()==0);
+        pathToPhoto= randomNumber + "\n";
+        if(randomNumber >7){
+            res = db.rawQuery("SELECT * FROM photo_table", null);
 
-        res = db.rawQuery("SELECT phonelocation FROM photo_table WHERE id = " + n, null);
-        while (res.moveToNext()) {
-            pathToPhoto = res.getString(0);
+            // Do loop to make sure that the data actually exists
+            do{
+                randomNumber= rand.nextInt(res.getCount()) + 1;
+            }while (db.rawQuery("SELECT id FROM photo_table WHERE id = '" + randomNumber + "'", null).getCount()==0);
+
+            res = db.rawQuery("SELECT phonelocation FROM photo_table WHERE id = " + randomNumber, null);
+            while (res.moveToNext()) {
+                pathToPhoto = res.getString(0);
+            }
+            //pathToPhoto += "\n Random photo\n" + randomNumber;
         }
+        else {
+            /* Note to self, make sure top 10 is not going over the database size*/
 
+            // Select path from photo_table order by deja point descending Limit Top10
+
+
+            // Do loop to make sure that the data actually exists
+            do{
+                randomNumber= rand.nextInt(TOP10) + 1;
+                res = db.query(true, TABLE_NAME, new String[] {COL_PATH_2}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(TOP10));
+            }while (res.getCount()==0);
+
+            for (int i = 0 ; i< randomNumber;i++) {
+                if (!res.moveToNext()) {
+                    break;
+                }
+                pathToPhoto = res.getString(0);
+            }
+            //pathToPhoto += "\n Top 10\n" + randomNumber ;
+
+        }
         return pathToPhoto;
     }
 }
