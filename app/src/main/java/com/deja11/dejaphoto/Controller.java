@@ -45,10 +45,14 @@ public class Controller implements Serializable{
     ArrayList<String> queueStrings = new ArrayList<String>();
     int currIndex;
 
+    Context context;
 
-
+    /**
+     * Constructor with context
+     * */
     public Controller(Context context){
-        queueStrings = gatherPhotos(context);
+        this.context = context;
+        queueStrings = gatherPhotos(this.context);
         for(int i = 0; i < queueStrings.size(); i++){
             Photo photo = new Photo(queueStrings.get(i));
             queue.add(photo);
@@ -58,7 +62,7 @@ public class Controller implements Serializable{
     /**
      * Get the next photo to display
      * @return the next photo
-     */
+     * */
     public Photo getNextPhoto(){
         if(currIndex+1 < queue.size()){
             currIndex++;
@@ -76,7 +80,7 @@ public class Controller implements Serializable{
     /**
      * Get the previous photo displayed
      * @return the previous photo
-     */
+     * */
     public Photo getPreviousPhoto() {
         if(currIndex-1 < 0){
             currIndex = queue.size()-1;
@@ -98,6 +102,9 @@ public class Controller implements Serializable{
         return queue.get(currIndex);
     }
 
+    /**
+     * Set current photo karma field to true
+     */
     void karmaPhoto(){
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
@@ -113,8 +120,6 @@ public class Controller implements Serializable{
         photo.setReleased(true);
     }
 
-
-
     /**
      * Set the desired photo to be the wallpaper
      * @param photo the photo acquired from getNextPhoto()
@@ -122,10 +127,12 @@ public class Controller implements Serializable{
      *        contentResolver ...
      * @return true if the wallpaper was set. false otherwise
      */
-
-    boolean setWallpaper(Photo photo, Context context){
+    boolean setWallpaper(Photo photo){
+        return setWallpaper(photo.phoneLocation);
+    }
+    boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
-        if(photo.getPhotoLocation() == null){
+        if(photoPath == null){
             try{
                 myWallpaperManager.setResource(+R.drawable.default_image);
                 return false;
@@ -134,10 +141,14 @@ public class Controller implements Serializable{
                 return false;
             }
         }
-        Uri data = Uri.parse(photo.getPhotoLocation());
+        Uri data = Uri.parse(photoPath);
         try {
-            FileInputStream photoStream = new FileInputStream(new File(queue.get(currIndex).getPhotoLocation()));
-            myWallpaperManager.setStream(photoStream);
+            //FileInputStream photoStream = new FileInputStream(new File(queue.get(currIndex).getPhotoLocation()));
+            //myWallpaperManager.setStream(photoStream);
+
+            InputStream inputStream = context.getContentResolver().openInputStream(data);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            myWallpaperManager.setBitmap(bitmap);
             return true;
         }catch(Exception e){
             e.printStackTrace();
