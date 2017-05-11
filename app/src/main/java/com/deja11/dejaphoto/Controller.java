@@ -6,6 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Parcel;
@@ -58,7 +62,7 @@ public class Controller implements Serializable{
     public Photo getNextPhoto(){
         int currIndex = cache.indexOf(currPhoto);
         if(currIndex == cache.size()-1){
-            return databaseHelper.chooseNextPhoto();
+            return databaseHelper.getNextPhoto();
         }else{
             return cache.get(currIndex+1);
         }
@@ -128,9 +132,9 @@ public class Controller implements Serializable{
         }else{
 
         }
-        return setWallpaper(photo.phoneLocation);
+        return setWallpaper(photo.phoneLocation,photo.geoLocation.getLocationName());
     }
-    boolean setWallpaper(String photoPath){
+    boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
             try{
@@ -141,13 +145,15 @@ public class Controller implements Serializable{
                 return false;
             }
         }
-        //Uri data = Uri.parse(photoPath);
+        Uri data = Uri.parse(photoPath);
         try {
             FileInputStream photoStream = new FileInputStream(new File(photoPath));
             myWallpaperManager.setStream(photoStream);
 
-            //InputStream inputStream = context.getContentResolver().openInputStream(data);
-            //Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            InputStream inputStream = context.getContentResolver().openInputStream(data);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            BitmapDrawable drawble = writeTextOnWallpaper(bitmap,geoLocation);
+
             //myWallpaperManager.setBitmap(bitmap);
             return true;
         }catch(Exception e){
@@ -156,5 +162,12 @@ public class Controller implements Serializable{
         }
     }
 
-
+    private BitmapDrawable writeTextOnWallpaper(Bitmap bitmap, String text){
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(15);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawText(text, 0, 0, paint);
+        return new BitmapDrawable(context.getResources(),bitmap);
+    }
 }
