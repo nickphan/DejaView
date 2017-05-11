@@ -27,6 +27,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
     DatabaseHelper myDb;
+    Controller controller;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,13 +39,14 @@ public class MainActivity extends Activity {
         // Create database object
         myDb = new DatabaseHelper(this);
         myDb.initialize(this);
-        myDb.test(this);
+        //myDb.test(this);
 
-
+        // Create controller object
+        controller = new Controller(MainActivity.this);
 
 
         // create the view for the notification
-        RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
+        /*RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
 
         // add onClickListeners
@@ -77,7 +79,7 @@ public class MainActivity extends Activity {
                 .build();
 
         NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
+        */
         // TODO: Do we need this?
         /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
         notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
@@ -85,6 +87,24 @@ public class MainActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
         //mNotificationManager.notify(5, notification);
+
+        Button startButton = (Button)findViewById(R.id.startButton);
+        startButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                String photo = myDb.chooseNextPhoto();
+                controller.setWallpaper(photo);
+                Toast.makeText(MainActivity.this, photo, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Button stopButton = (Button)findViewById(R.id.stopButton);
+        stopButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+
+            }
+        });
     }
 
         /*karmaButton.setOnClickListener(new View.OnClickListener() {

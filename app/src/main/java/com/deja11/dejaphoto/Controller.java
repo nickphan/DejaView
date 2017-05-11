@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.InputStream;
+import java.util.Stack;
 
 /**
  * Created by shuai9532 on 5/6/17.
@@ -32,61 +34,47 @@ public class Controller implements Serializable{
      *  - TEST THE SETWALLPAPER METHOD
      * */
 
-    // replace the string with the real location as the default value
-    String albumLocation = "cameraAlbum";
 
-    // database that contains the photo locations on the phone
-    // someDataBase photoDatabase;
+    DatabaseHelper databaseHelper;
+    Context context;
+    Photo currPhoto;
 
-    CountDownTimer countDown;
+    //For prev
+    LinkedList<Photo> cache;
 
-    // cache that stores the previous 10 photos
-    ArrayList<Photo> queue = new ArrayList<Photo>();
-    ArrayList<String> queueStrings = new ArrayList<String>();
-    int currIndex;
-
-
-
+    /**
+     * Constructor with context
+     * */
     public Controller(Context context){
-        queueStrings = gatherPhotos(context);
-        for(int i = 0; i < queueStrings.size(); i++){
-            Photo photo = new Photo(queueStrings.get(i));
-            queue.add(photo);
-        }
+        this.context = context;
+        databaseHelper = new DatabaseHelper(this.context);
+        databaseHelper.initialize(this.context);
     }
 
     /**
      * Get the next photo to display
      * @return the next photo
-     */
+     * */
     public Photo getNextPhoto(){
-        if(currIndex+1 < queue.size()){
-            currIndex++;
+        int currIndex = cache.indexOf(currPhoto);
+        if(currIndex == cache.size()-1){
+            return databaseHelper.chooseNextPhoto();
         }else{
-            currIndex = 0;
-        }
-
-        if(queue.get(currIndex).isReleased()){
-            return getNextPhoto();
-        }else{
-            return queue.get(currIndex);
+            return cache.get(currIndex+1);
         }
     }
 
     /**
      * Get the previous photo displayed
      * @return the previous photo
-     */
+     * */
     public Photo getPreviousPhoto() {
-        if(currIndex-1 < 0){
-            currIndex = queue.size()-1;
-        }else{
-            currIndex--;
-        }
-        if(queue.get(currIndex).isReleased()){
-            return getPreviousPhoto();
-        }else{
-            return queue.get(currIndex);
+        int currIndex = cache.indexOf(currPhoto);
+        if(currIndex == 0){
+            /*SOME ERROR MESSAGE*/
+            return (Photo)null;
+        }else {
+            return cache.get(currIndex-1);
         }
     }
 
@@ -95,9 +83,12 @@ public class Controller implements Serializable{
      * @return the current wallpaper as a photo
      */
     public Photo getCurrentWallpaper() {
-        return queue.get(currIndex);
+        return currPhoto;
     }
 
+    /**
+     * Set current photo karma field to true
+     */
     void karmaPhoto(){
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
@@ -110,10 +101,17 @@ public class Controller implements Serializable{
      */
     void releasePhoto(){
         Photo photo = getCurrentWallpaper();
+        int currIndex = cache.indexOf(photo);
+        if(currIndex == -1){
+            Photo nextPhoto = getNextPhoto();
+            currPhoto = null;
+            setWallpaper(nextPhoto);
+        }else{
+            cache.remove(currIndex);
+            setWallpaper(cache.get(currIndex));
+        }
         photo.setReleased(true);
     }
-
-
 
     /**
      * Set the desired photo to be the wallpaper
@@ -122,10 +120,19 @@ public class Controller implements Serializable{
      *        contentResolver ...
      * @return true if the wallpaper was set. false otherwise
      */
+    boolean setWallpaper(Photo photo){
+        int currIndex = cache.indexOf(photo);
+        if(currIndex == -1){
+            cache.add(currPhoto);
+            currPhoto = photo;
+        }else{
 
-    boolean setWallpaper(Photo photo, Context context){
+        }
+        return setWallpaper(photo.phoneLocation);
+    }
+    boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
-        if(photo.getPhotoLocation() == null){
+        if(photoPath == null){
             try{
                 myWallpaperManager.setResource(+R.drawable.default_image);
                 return false;
@@ -134,10 +141,14 @@ public class Controller implements Serializable{
                 return false;
             }
         }
-        Uri data = Uri.parse(photo.getPhotoLocation());
+        //Uri data = Uri.parse(photoPath);
         try {
-            FileInputStream photoStream = new FileInputStream(new File(queue.get(currIndex).getPhotoLocation()));
+            FileInputStream photoStream = new FileInputStream(new File(photoPath));
             myWallpaperManager.setStream(photoStream);
+
+            //InputStream inputStream = context.getContentResolver().openInputStream(data);
+            //Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            //myWallpaperManager.setBitmap(bitmap);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -145,32 +156,5 @@ public class Controller implements Serializable{
         }
     }
 
-    /*REPLACE WITH DATABASE WHEN READY*/
-    private ArrayList<String> gatherPhotos(Context context) {
-        Uri uri;
-        Cursor cursor;
-        int columnIndexData;
-        int columnIndexFolder;
 
-        ArrayList<String> imageList = new ArrayList<String>();
-        String absolutePath = null;
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = {
-                MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
-        };
-
-        cursor = context.getContentResolver().query(uri, projection, null, null, null);
-
-        columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        columnIndexFolder = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-        while (cursor.moveToNext()) {
-            absolutePath = cursor.getString(columnIndexData);
-            imageList.add(absolutePath);
-        }
-
-        return imageList;
-    }
 }

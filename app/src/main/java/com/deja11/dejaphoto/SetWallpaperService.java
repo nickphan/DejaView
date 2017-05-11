@@ -53,7 +53,7 @@ public class SetWallpaperService extends Service {
             synchronized (this) {
                 try {
                     Photo photo = controller.getNextPhoto();
-                    boolean setWallpaper = controller.setWallpaper(photo, SetWallpaperService.this);
+                    boolean setWallpaper = controller.setWallpaper(photo);
                     Toast.makeText(SetWallpaperService.this, "Changed", Toast.LENGTH_SHORT);
                     wait(10000);
                 }catch(Exception e){
