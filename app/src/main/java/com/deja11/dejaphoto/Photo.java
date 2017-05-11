@@ -31,6 +31,15 @@ public class Photo {
         this.released = false;
     }
 
+    public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
+        this.phoneLocation = phoneLocation;
+        this.geoLocation = geoLocation;
+        this.date = date;
+        this.dejaPoints = dejaPoints;
+        this.released = released;
+        this.karma = karma;
+    }
+
     /**
      * Check if the photo is karma-ed
      * @return true if the photo is karma-ed
