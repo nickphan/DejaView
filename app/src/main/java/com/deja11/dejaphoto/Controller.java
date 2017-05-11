@@ -57,7 +57,7 @@ public class Controller implements Serializable{
      * */
     public Photo getNextPhoto(){
         int currIndex = cache.indexOf(currPhoto);
-        if(currIndex == cache.size()-1){
+        if(currIndex == -1){
             return databaseHelper.chooseNextPhoto();
         }else{
             return cache.get(currIndex+1);
@@ -73,7 +73,9 @@ public class Controller implements Serializable{
         if(currIndex == 0){
             /*SOME ERROR MESSAGE*/
             return (Photo)null;
-        }else {
+        }if(currIndex == -1){
+            return cache.get(cache.size()-1);
+        }else{
             return cache.get(currIndex-1);
         }
     }
@@ -108,6 +110,7 @@ public class Controller implements Serializable{
             setWallpaper(nextPhoto);
         }else{
             cache.remove(currIndex);
+            currPhoto = null;
             setWallpaper(cache.get(currIndex));
         }
         photo.setReleased(true);
@@ -121,12 +124,16 @@ public class Controller implements Serializable{
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo){
-        int currIndex = cache.indexOf(photo);
-        if(currIndex == -1){
+        int nextIndex = cache.indexOf(photo);
+        int currIndex = cache.indexOf(currPhoto);
+
+        if(currPhoto == null){
+            currPhoto = photo;
+        }if(nextIndex == -1 || currIndex == -1){
             cache.add(currPhoto);
             currPhoto = photo;
         }else{
-
+            currPhoto = cache.get(nextIndex);
         }
         return setWallpaper(photo.phoneLocation);
     }
