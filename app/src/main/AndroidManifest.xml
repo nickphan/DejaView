@@ -44,7 +44,7 @@
         </receiver>
 
         <service
-            android:name=".WallpaperService"
+            android:name=".SetWallpaperService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

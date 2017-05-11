@@ -31,7 +31,9 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.test_activity_main);
+
+
 
         // Create database object
         myDb = new DatabaseHelper(this);
@@ -39,7 +41,7 @@ public class MainActivity extends Activity {
         myDb.test(this);
 
 
-gi
+
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
@@ -82,8 +84,16 @@ gi
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-        mNotificationManager.notify(5, notification);
+        //mNotificationManager.notify(5, notification);
     }
+
+        /*karmaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.err.print("we are here");
+                Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
+            }
+        });*/
 
     public static class LeftReceiver extends BroadcastReceiver {
 
