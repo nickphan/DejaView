@@ -13,7 +13,7 @@ public class GeoLocation {
     private double latitude;
     private String locationName;
 
-    public GeoLocation(double longitude, double latitude){
+    public GeoLocation(double latitude,double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
 
@@ -26,7 +26,7 @@ public class GeoLocation {
      * @param currentLocation the current location where the user is currently located
      * @return true if the photo was taken nearby this current location
      */
-    public boolean isNearCurrentLocation(double longitude, double latitude){
+    public boolean isNearCurrentLocation(double latitude, double longitude){
         return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
                          (this.latitude - latitude) * (this.latitude - latitude))
                          < CONSTANT_CONSTRAINT;

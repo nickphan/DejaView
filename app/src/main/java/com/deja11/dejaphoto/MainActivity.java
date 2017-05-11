@@ -92,9 +92,9 @@ public class MainActivity extends Activity {
         startButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                String photo = myDb.chooseNextPhoto();
+                Photo photo = myDb.getNextPhoto();
                 controller.setWallpaper(photo);
-                Toast.makeText(MainActivity.this, photo, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, photo.getPhotoLocation(), Toast.LENGTH_SHORT).show();
             }
         });
 

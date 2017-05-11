@@ -24,6 +24,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
+import static android.R.attr.format;
+import static android.R.attr.path;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "deja.db";
@@ -106,36 +109,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuffer buffer = new StringBuffer();
 
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
-        Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
+        //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
+        //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
+        //while (res.moveToNext()) {
+    //res.moveToNext();
+                String format = "MM-dd-yyyy HH:mm:ss";
+                SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
-        while (res.moveToNext()) {
 
-                //String format = "MM-dd-yyyy HH:mm:ss";
-                //SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
-                //String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
+        Photo p = getNextPhoto();
 
-                buffer.append("\n\nId :" + res.getString(0));
-                buffer.append("\nphone location:" + res.getString(1));
-                buffer.append("\ngeoLat Point:" + res.getString(2));
-            /*
-                buffer.append("\ngeoLong :" + res.getString(3));
-                buffer.append("\n\ndate :" + dateTime);
-                buffer.append("\ndejapoints:" + res.getString(5));
-                buffer.append("\nrelease :" + res.getString(6));
-                buffer.append("\nkarma :" + res.getString(7));*/
-        }
-        res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
+
+
+
+                //String dateTime = formatter.format(date);
+
+        buffer.append("\nphone location:" + p.getPhotoLocation());
+        buffer.append("\ngeoLat :" + p.getGeoLocation().getLatitude());
+        buffer.append("\ngeoLong :" + p.getGeoLocation().getLongitude());
+        buffer.append("\n\ndate :" + formatter.format(p.getDate()));
+        buffer.append("\ndejapoints:" + p.getDejaPoints());
+        buffer.append("\nrelease :" + p.isReleased());
+        buffer.append("\nkarma :" + p.isKarma());
+        //}
+        //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
 
 
 
         //updateField("2","25");
         //updateField("3","50");
 
-        buffer.append("\n\n");
+        //buffer.append("\n\n");
 
 
-        buffer.append(chooseNextPhoto());
+        //buffer.append(chooseNextPath());
         //buffer.append(res.getCount());
 
         // show all data
@@ -209,7 +217,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     20% chances of displaying a random photo
 
  */
-    public String chooseNextPhoto(){
+    public String chooseNextPath(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res;
 
@@ -265,6 +273,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         }
         return pathToPhoto;
+    }
+
+    public Photo getNextPhoto(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
+
+        res.moveToNext();
+
+        String photoLocation = res.getString(1);
+
+        GeoLocation geoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
+
+        Date date = new Date(Long.parseLong(res.getString(4)));
+
+        int dejapoint = res.getInt(5);
+
+        boolean isReleased = res.getInt(6) > 0 ? true : false;
+        boolean isKarma = res.getInt(7) > 0 ? true : false;
+
+        return new Photo(photoLocation,geoLocation,date,dejapoint,isReleased,isKarma);
+
     }
 }
 
