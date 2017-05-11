@@ -57,10 +57,16 @@ public class Controller implements Serializable{
      * */
     public Photo getNextPhoto(){
         int currIndex = cache.indexOf(currPhoto);
+        Photo photo;
         if(currIndex == -1){
-            return databaseHelper.chooseNextPhoto();
+            photo = databaseHelper.chooseNextPhoto();
         }else{
-            return cache.get(currIndex+1);
+            photo = cache.get(currIndex+1);
+        }
+        if(photo.isReleased()){
+            return getNextPhoto();
+        }else{
+            return photo;
         }
     }
 
