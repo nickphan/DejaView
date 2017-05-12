@@ -35,7 +35,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.test_activity_main);
 
 
-
         // Create database object
         myDb = new DatabaseHelper(this);
         myDb.initialize(this);
@@ -44,9 +43,9 @@ public class MainActivity extends Activity {
         // Create controller object
         controller = new Controller(MainActivity.this);
 
-
+/*
         // create the view for the notification
-        /*RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
+        RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
 
         // add onClickListeners
@@ -78,22 +77,26 @@ public class MainActivity extends Activity {
                 .setContent(notificationView)
                 .build();
 
-        NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        */
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
         // TODO: Do we need this?
         /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
         notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-        //mNotificationManager.notify(5, notification);
-
+     //   mNotificationManager.notify(5, notification);
         Button startButton = (Button)findViewById(R.id.startButton);
         startButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+
+                //String photo = myDb.getNextPhoto().getPhotoLocation();
+                //controller.setWallpaper(photo);
+
                 Photo photo = myDb.getNextPhoto();
-                controller.setWallpaper(photo);
+                controller.setWallpaper(photo.getPhotoLocation(),photo.getGeoLocation().getLocationName());
+
                 Toast.makeText(MainActivity.this, photo.getPhotoLocation(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -105,15 +108,16 @@ public class MainActivity extends Activity {
 
             }
         });
+        /*
+    /*karmaButton.setOnClickListener(new View.OnClickListener()
+    {
+        @Override
+        public void onClick (View v){
+        System.err.print("we are here");
+        Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
     }
-
-        /*karmaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.err.print("we are here");
-                Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
-            }
-        });*/
+    });*/
+    }
 
     public static class LeftReceiver extends BroadcastReceiver {
 

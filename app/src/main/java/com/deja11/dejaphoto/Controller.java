@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Parcel;
@@ -132,8 +133,37 @@ public class Controller implements Serializable{
         }else{
 
         }
-        return setWallpaper(photo.phoneLocation,photo.geoLocation.getLocationName());
+        //return setWallpaper(photo.phoneLocation,photo.geoLocation.getLocationName());
+        return setWallpaper(photo.phoneLocation,"this is the location");
     }
+
+    boolean setWallpaper(String photoPath){
+        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        if(photoPath == null){
+            try{
+                myWallpaperManager.setResource(+R.drawable.default_image);
+                return false;
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        //Uri data = Uri.parse(photoPath);
+        try {
+            FileInputStream photoStream = new FileInputStream(new File(photoPath));
+            myWallpaperManager.setStream(photoStream);
+            /*
+            InputStream inputStream = context.getContentResolver().openInputStream(data);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            myWallpaperManager.setBitmap(bitmap);
+            */
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
@@ -147,27 +177,42 @@ public class Controller implements Serializable{
         }
         Uri data = Uri.parse(photoPath);
         try {
-            FileInputStream photoStream = new FileInputStream(new File(photoPath));
-            myWallpaperManager.setStream(photoStream);
 
             InputStream inputStream = context.getContentResolver().openInputStream(data);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            BitmapDrawable drawble = writeTextOnWallpaper(bitmap,geoLocation);
+            //create a new bitmap with the same configuration of the original
+            Bitmap mutableBitmap= Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(),bitmap.getConfig());
 
-            //myWallpaperManager.setBitmap(bitmap);
+            //Bitmap mutableBitmap= Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888);
+            //modify the new bitmap with the original bitmap
+            //BitmapDrawable mutable =writeTextOnWallpaper(mutableBitmap, bitmap, geoLocation);
+            //BitmapDrawable mutable = writeTextOnWallpaper(mutableBitmap, geoLocation);
+            myWallpaperManager.setBitmap(bitmap);
+           // myWallpaperManager.setBitmap(mutableBitmap);
             return true;
-        }catch(Exception e){
+        }
+        catch(Exception e){
             e.printStackTrace();
             return false;
         }
     }
 
-    private BitmapDrawable writeTextOnWallpaper(Bitmap bitmap, String text){
+    private BitmapDrawable writeTextOnWallpaper(Bitmap mutableBitmap, String text){
+        Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(15);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawText(text, 0, 0, paint);
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(10);
+        canvas.drawText("hello", 0, mutableBitmap.getHeight()/2, paint);
+        return new BitmapDrawable(context.getResources(),mutableBitmap);
+    }
+
+    private BitmapDrawable writeTextOnWallpaper(Bitmap mutableBitmap, Bitmap bitmap, String text){
+        Canvas canvas = new Canvas();
+        canvas.drawBitmap(bitmap,0,0,null);
+        Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(10);
+        canvas.drawText("hello", 50, bitmap.getHeight()/2, paint);
         return new BitmapDrawable(context.getResources(),bitmap);
     }
 }
