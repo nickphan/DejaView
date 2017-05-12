@@ -117,9 +117,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
 
-        buffer.append(chooseNextPath());
+        //buffer.append(chooseNextPath());
 
-        //buffer.append(printAll(context));
+        buffer.append(printAll(context));
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
         //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
         //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
@@ -228,6 +228,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor res;
 
         final int TOP10 = 3;
+        final int TOP3 = 3;
 
         /*
         * Update score first before deciding what to choose
@@ -242,11 +243,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         randomNumber = rand.nextInt(10)+1;
 
-        // Random number gives 1-8 pick top 10, 9-10 choose random photo
-        if(randomNumber >=9){
+        // Random number gives number between 1 and 10
+        // 1-5 pick top 5 highest deja point
+        // 6-8 pick top 10 most recent
+        // 9-10 choose random photo
+        if(randomNumber >= 9){
             // Don't choose photos that have been released
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, null, null);
             //pathToPhoto += "\n Random photo\n" + randomNumber;
+        }
+        else if(randomNumber >= 6){
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP3));
         }
         else {
             /* Note to self, make sure top 10 is not going over the database size*/
@@ -328,9 +335,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuffer buffer = new StringBuffer();
 
 
-        res = db.rawQuery("select * from " + TABLE_NAME , null);
+        //res = db.rawQuery("select * from " + TABLE_NAME , null);
         //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
-        //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, COL_DEJA_6 + " DESC", null);
+        res = db.query(true, TABLE_NAME, null, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(3));
         //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, null, null);
 
 
