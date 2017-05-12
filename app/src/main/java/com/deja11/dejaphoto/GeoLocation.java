@@ -1,5 +1,6 @@
 package com.deja11.dejaphoto;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -42,10 +43,11 @@ public class GeoLocation {
     /**
      * Get the name of the location where the photo is taken
      *
+     * @param context The context in which this method is being called
      * @return A string containing the location name where the photo is taken
      */
-    public String getLocationName(){
-        Geocoder geocoder = new Geocoder(); //TODO: Figure out how to pass a proper Context to the Geocoder constructor
+    public String getLocationName(Context context){
+        Geocoder geocoder = new Geocoder(context);
 
         try {
             // extract the location name using the Address created from the latitude and longitude coordinates
