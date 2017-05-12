@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -17,6 +18,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -33,7 +36,6 @@ import java.util.Stack;
 
 public class Controller implements Serializable{
 
-
     /**
      * TODO
      *  - replace arraylists with databasehelper
@@ -44,7 +46,8 @@ public class Controller implements Serializable{
     DatabaseHelper databaseHelper;
     Context context;
     Photo currPhoto;
-
+    private static int X;
+    private static int Y;
     //For prev
     LinkedList<Photo> cache;
 
@@ -56,6 +59,12 @@ public class Controller implements Serializable{
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
         cache = new LinkedList<Photo>();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        X= size.x;
+        Y= size.y;
     }
 
     /**
@@ -210,20 +219,12 @@ public class Controller implements Serializable{
                 return false;
             }
         }
-        Uri data = Uri.parse(photoPath);
         try {
 
-            InputStream inputStream = context.getContentResolver().openInputStream(data);
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
-            //create a new bitmap with the same configuration of the original
-            //Bitmap mutableBitmap= Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888);
-            Bitmap mutableBitmap= Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(),bitmap.getConfig());
-
-            //writeTextOnWallpaper(mutableBitmap, geoLocation);
-            writeTextOnWallpaper(mutableBitmap, bitmap, geoLocation);
-
-            //myWallpaperManager.setBitmap(bitmap);
+            Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
+            Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
+            writeBitmapOnMutable(mutableBitmap,bitmap);
+            writeTextOnWallpaper(mutableBitmap, geoLocation);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }
@@ -232,23 +233,19 @@ public class Controller implements Serializable{
             return false;
         }
     }
-/*
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text){
-        Canvas canvas = new Canvas(mutableBitmap);
 
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint.setTextSize(10);
-        canvas.drawText("hello", 0, mutableBitmap.getHeight()/2, paint);
-
-    }
-*/
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, Bitmap bitmap, String text){
+    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap){
         Canvas canvas = new Canvas(mutableBitmap);
         canvas.drawBitmap(bitmap,0,0,null);
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint.setTextSize(10);
-        canvas.drawText("hello", 50, bitmap.getHeight()/2, paint);
     }
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text){
+        Canvas canvas = new Canvas(mutableBitmap);
+        Paint paint = new Paint();
+        //paint.setTextAlign(Paint.Align.LEFT);
+        paint.setColor(Color.RED);
+        paint.setTextSize(60);
+        canvas.drawText("CSE110", 40, Y-paint.getTextSize(), paint);
+
+    }
+
 }

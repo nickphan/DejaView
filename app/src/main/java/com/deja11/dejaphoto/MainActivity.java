@@ -91,8 +91,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view){
                 Photo photo = controller.getNextPhoto();
-                controller.setWallpaper(photo);
-                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
+                //controller.setWallpaper(photo.getPhotoLocation());
+                if(controller.setWallpaper(photo))
+                    Toast.makeText(MainActivity.this, photo.getPhotoLocation(), Toast.LENGTH_SHORT).show();
             }
         });
 
