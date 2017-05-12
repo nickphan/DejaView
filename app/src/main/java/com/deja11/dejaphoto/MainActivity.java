@@ -90,14 +90,9 @@ public class MainActivity extends Activity {
         startButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-
-                //String photo = myDb.getNextPhoto().getPhotoLocation();
-                //controller.setWallpaper(photo);
-
-                Photo photo = myDb.getNextPhoto();
-                controller.setWallpaper(photo.getPhotoLocation(),photo.getGeoLocation().getLocationName());
-
-                Toast.makeText(MainActivity.this, photo.getPhotoLocation(), Toast.LENGTH_SHORT).show();
+                Photo photo = controller.getNextPhoto();
+                controller.setWallpaper(photo);
+                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -105,7 +100,9 @@ public class MainActivity extends Activity {
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-
+                Photo photo = controller.getPreviousPhoto();
+                controller.setWallpaper(photo);
+                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
         /*

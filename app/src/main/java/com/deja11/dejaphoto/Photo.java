@@ -137,4 +137,12 @@ public class Photo {
 
         return imageList;
     }
+
+    public boolean equals(Photo photo){
+        if(this.phoneLocation == photo.phoneLocation){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
