@@ -92,9 +92,9 @@ public class MainActivity extends Activity {
         startButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                String photo = myDb.chooseNextPhoto();
+                Photo photo = controller.getNextPhoto();
                 controller.setWallpaper(photo);
-                Toast.makeText(MainActivity.this, photo, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -102,7 +102,9 @@ public class MainActivity extends Activity {
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-
+                Photo photo = controller.getPreviousPhoto();
+                controller.setWallpaper(photo);
+                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
     }
