@@ -113,12 +113,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //buffer.append(res.getCount() + "");
 
         //updateField(2,COL_KARMA_8,"1");
-        updateField(3,COL_DEJA_6,50);
-        updateField(2,COL_DEJA_6,25);
+        //updateField(3,COL_DEJA_6,50);
+        //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
 
-        //buffer.append(chooseNextPath());
+        buffer.append(chooseNextPath());
 
+        //buffer.append(printAll(context));
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
         //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
         //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
@@ -234,48 +235,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //update all points
 
-
-        int  randomNumber;
+        int randomNumber;
+        int randomPosition = 0;
         String pathToPhoto = null;
         Random rand = new Random();
 
         randomNumber = rand.nextInt(10)+1;
 
-        if(randomNumber >7){
-            res = db.rawQuery("SELECT * FROM photo_table", null);
-
-            // Do loop to make sure that the data actually exists
-            do{
-                randomNumber= rand.nextInt(res.getCount()) + 1;
-            }while (db.rawQuery("SELECT id FROM photo_table WHERE id = '" + randomNumber + "'", null).getCount()==0);
-
-            res = db.rawQuery("SELECT phonelocation FROM photo_table WHERE id = " + randomNumber, null);
-            while (res.moveToNext()) {
-                pathToPhoto = res.getString(0);
-            }
+        // Random number gives 1-8 pick top 10, 9-10 choose random photo
+        if(randomNumber >=9){
+            // Don't choose photos that have been released
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, null, null);
             //pathToPhoto += "\n Random photo\n" + randomNumber;
         }
         else {
             /* Note to self, make sure top 10 is not going over the database size*/
-
             // Select path from photo_table order by deja point descending Limit Top10
-
-
-            // Do loop to make sure that the data actually exists
-            do{
-                randomNumber= rand.nextInt(TOP10) + 1;
-                res = db.query(true, TABLE_NAME, new String[] {COL_PATH_2}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(TOP10));
-            }while (res.getCount()==0);
-
-            for (int i = 0 ; i< randomNumber;i++) {
-                if (!res.moveToNext()) {
-                    break;
-                }
-                pathToPhoto = res.getString(0);
-            }
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, COL_DEJA_6 + " DESC", String.valueOf(TOP10));
             //pathToPhoto += "\n Top 10\n" + randomNumber ;
 
         }
+
+        randomPosition = rand.nextInt(res.getCount())+1;
+        for (int i = 0 ; i< randomPosition;i++) {
+            if (!res.moveToNext()) {
+                break;
+            }
+            pathToPhoto = res.getString(0);
+        }
+
         return pathToPhoto;
     }
 
@@ -336,8 +324,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String printAll(Context context) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        Cursor res;
         StringBuffer buffer = new StringBuffer();
+
+
+        res = db.rawQuery("select * from " + TABLE_NAME , null);
+        //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
+        //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, COL_DEJA_6 + " DESC", null);
+        //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, null, null);
+
+
         buffer.append(res.getCount() + "");
 
         while (res.moveToNext()) {
@@ -346,18 +342,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String format = "MM-dd-yyyy HH:mm:ss";
             SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
-            String dateTime = formatter.format(new Date(Long.parseLong(res.getString(4))));
-
             buffer.append("\n\nId :" + res.getString(0));
             buffer.append("\nphone location:" + res.getString(1));
             buffer.append("\ngeoLat :" + res.getString(2));
             buffer.append("\ngeoLong :" + res.getString(3));
-            buffer.append("\ndate :" + dateTime);
+            buffer.append("\ndate :" + formatter.format(new Date(Long.parseLong(res.getString(4)))));
             buffer.append("\ndejapoints:" + res.getString(5));
             buffer.append("\nrelease :" + res.getString(6));
             buffer.append("\nkarma :" + res.getString(7));
-
-            // show all data
 
         }
         return buffer.toString();
