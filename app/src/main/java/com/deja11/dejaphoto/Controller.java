@@ -60,6 +60,7 @@ public class Controller implements Serializable{
     /**
      * Get the next photo to display
      * @return the next photo
+     *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
         if(currPhoto == null){
@@ -79,6 +80,7 @@ public class Controller implements Serializable{
     /**
      * Get the previous photo displayed
      * @return the previous photo
+     *      from the cache or null if necessary
      * */
     public Photo getPreviousPhoto() {
         if(currPhoto == null){
@@ -146,6 +148,9 @@ public class Controller implements Serializable{
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo){
+        if(photo == null){
+            return false;
+        }
         if(currPhoto == null){
             int nextPhoto = cache.indexOf(photo);
             if(nextPhoto == -1) {
