@@ -30,8 +30,7 @@ import java.util.Stack;
  * Created by shuai9532 on 5/6/17.
  */
 
-public class Controller implements Serializable{
-
+public class Controller implements Parcelable{
 
     /**
      * TODO
@@ -43,9 +42,10 @@ public class Controller implements Serializable{
     DatabaseHelper databaseHelper;
     Context context;
     Photo currPhoto;
-
-    //For prev
     LinkedList<Photo> cache;
+
+    //For Parcelable
+    int mData;
 
     /**
      * Constructor with context
@@ -206,5 +206,31 @@ public class Controller implements Serializable{
         Canvas canvas = new Canvas(bitmap);
         canvas.drawText(text, 0, 0, paint);
         return new BitmapDrawable(context.getResources(),bitmap);
+    }
+
+
+
+    /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(i);
+    }
+    public static final Parcelable.Creator<Controller> CREATOR
+            = new Parcelable.Creator<Controller>() {
+        public Controller createFromParcel(Parcel in) {
+            return new Controller(in);
+        }
+
+        public Controller[] newArray(int size) {
+            return new Controller[size];
+        }
+    };
+    private Controller(Parcel in) {
+        mData = in.readInt();
     }
 }
