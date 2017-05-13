@@ -117,9 +117,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
 
-        //buffer.append(chooseNextPath());
+        buffer.append(chooseNextPath());
 
-        buffer.append(printAll(context));
+        //buffer.append(printAll(context));
         //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
         //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
         //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
@@ -263,13 +263,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         }
 
-        randomPosition = rand.nextInt(res.getCount())+1;
-        for (int i = 0 ; i< randomPosition;i++) {
-            if (!res.moveToNext()) {
-                break;
-            }
-            pathToPhoto = res.getString(0);
-        }
+
+
+        randomPosition = rand.nextInt(res.getCount());
+        res.moveToPosition(randomPosition);
+        pathToPhoto = res.getString(0);
 
         return pathToPhoto;
     }
@@ -325,8 +323,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             updateField(id,COL_DEJA_6,newPoint);
             newPoint = 0;
-
         }
+
+        /*Loop through 10 latest photo*/
+        res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(10));
+
     }
 
     public String printAll(Context context) {
@@ -335,16 +336,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuffer buffer = new StringBuffer();
 
 
-        //res = db.rawQuery("select * from " + TABLE_NAME , null);
+        res = db.rawQuery("select * from " + TABLE_NAME , null);
         //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
-        res = db.query(true, TABLE_NAME, null, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(3));
+        //res = db.query(true, TABLE_NAME, null, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(3));
         //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, null, null);
 
 
-        buffer.append(res.getCount() + "");
+        buffer.append(res.getCount() + "\n");
 
-        while (res.moveToNext()) {
+        //while (res.moveToNext()) {
 
+        buffer.append(res.moveToPosition(4)+"\n");
 
             String format = "MM-dd-yyyy HH:mm:ss";
             SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
@@ -358,7 +360,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             buffer.append("\nrelease :" + res.getString(6));
             buffer.append("\nkarma :" + res.getString(7));
 
-        }
+        //}
         return buffer.toString();
     }
 }
