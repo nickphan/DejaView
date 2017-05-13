@@ -23,11 +23,19 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class SetWallpaperService extends IntentService {
-    //Controller controller = new Controller(MainActivity.getContext());
+    private static Controller controller;
     private static int i = 0;
 
     public SetWallpaperService() {
         super("WallpaperService");
+    }
+
+    public Controller getController() {
+        if (controller == null) {
+            controller = new Controller(getApplicationContext());
+        }
+
+        return controller;
     }
 
     @Override
@@ -35,8 +43,8 @@ public class SetWallpaperService extends IntentService {
         Log.i("Service Started", "SetWallpaper Service called");
         Log.i("i", Integer.toString(i));
         i++;
-        //Photo nextPhoto = controller.getNextPhoto();
-        //controller.setWallpaper(nextPhoto);
+        Photo nextPhoto = getController().getNextPhoto();
+        getController().setWallpaper(nextPhoto);
     }
 
     /*
