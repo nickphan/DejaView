@@ -7,26 +7,40 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="150dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="100dp"
 
-        android:id="@+id/startButton"
+        android:id="@+id/prevButton"
+        android:text="Prev"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/prevButton"
+        android:layout_marginTop="70dp"
 
-        android:text="Next"/>
+        android:id="@+id/karmaButton"
+        android:text="Karma"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/karmaButton"
+        android:layout_toRightOf="@id/prevButton"
+        android:id="@+id/releaseButton"
+        android:text="Release"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="150dp"
-        android:layout_below="@id/startButton"
+        android:layout_toRightOf="@id/karmaButton"
+        android:layout_marginTop="100dp"
 
-        android:id="@+id/stopButton"
-        android:text="Prev"/>
+        android:id="@+id/nextButton"
+        android:text="Next"/>
 
     <ImageView
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_below="@id/stopButton"
+        android:layout_below="@id/releaseButton"
         android:layout_marginTop="100dp"
         android:layout_marginLeft="50dp"
 
