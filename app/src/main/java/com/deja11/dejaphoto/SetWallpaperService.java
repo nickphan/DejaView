@@ -23,13 +23,11 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class SetWallpaperService extends IntentService {
-    Controller controller;
-    int i;
+    //Controller controller = new Controller(MainActivity.getContext());
+    private static int i = 0;
 
     public SetWallpaperService() {
         super("WallpaperService");
-        i = 0;
-        //controller = new Controller(getApplicationContext());
     }
 
     @Override

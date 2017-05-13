@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -43,7 +45,7 @@ public class MainActivity extends Activity {
         //myDb.test(this);
 
         // Create controller object
-        //controller = new Controller(MainActivity.this);
+        controller = new Controller(MainActivity.this);
 
 
         // create the view for the notification
@@ -61,6 +63,9 @@ public class MainActivity extends Activity {
         notificationView.setOnClickPendingIntent(R.id.previous, leftButtonPIntent);
 
         Intent rightButtonIntent = new Intent("right_button_receiver");
+        //Bundle b = new Bundle();
+        //b.putParcelable("controller", controller);
+        rightButtonIntent.putExtra("controller", controller);
         PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, 2, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
@@ -97,21 +102,56 @@ public class MainActivity extends Activity {
 
         /*Button startButton = (Button)findViewById(R.id.startButton);
         startButton.setOnClickListener(new View.OnClickListener(){
+        Button nextButton = (Button)findViewById(R.id.nextButton);
+        nextButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 Photo photo = controller.getNextPhoto();
                 controller.setWallpaper(photo);
+                Uri data = Uri.parse(photo.getPhotoLocation());
+                ImageView imageView = (ImageView)findViewById(R.id.imageView);
+                imageView.setImageURI(data);
                 Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
 
-        Button stopButton = (Button)findViewById(R.id.stopButton);
-        stopButton.setOnClickListener(new View.OnClickListener(){
+        Button prevButton = (Button)findViewById(R.id.prevButton);
+        prevButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 Photo photo = controller.getPreviousPhoto();
                 controller.setWallpaper(photo);
-                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
+                if(photo != null) {
+                    Uri data = Uri.parse(photo.getPhotoLocation());
+                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                    imageView.setImageURI(data);
+                    Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "Error no more photos in cache", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        Button karmaButton = (Button)findViewById(R.id.karmaButton);
+        karmaButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                controller.karmaPhoto();
+                Photo photo = controller.getCurrentWallpaper();
+                Uri data = Uri.parse(photo.getPhotoLocation());
+                ImageView imageView = (ImageView)findViewById(R.id.imageView);
+                imageView.setImageURI(data);
+            }
+        });
+        Button releaseButton = (Button)findViewById(R.id.releaseButton);
+        releaseButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                controller.releasePhoto();
+                Photo photo = controller.getCurrentWallpaper();
+                Uri data = Uri.parse(photo.getPhotoLocation());
+                ImageView imageView = (ImageView)findViewById(R.id.imageView);
+                imageView.setImageURI(data);
             }
         });*/
     }
@@ -128,6 +168,10 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            //Bundle b = intent.getBundleExtra(;
+            //Controller controller = (Controller) intent.getParcelableExtra("controller");
+            //Photo photo = controller.getNextPhoto();
+            //controller.setWallpaper(photo);
             Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
             context.startService(nextButtonIntent);
