@@ -50,10 +50,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".MainActivity$AlarmReceiver"
+            android:process=":remote" />
+
         <service
             android:name=".SetWallpaperService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:exported="false"></service>
     </application>
 
 </manifest>
