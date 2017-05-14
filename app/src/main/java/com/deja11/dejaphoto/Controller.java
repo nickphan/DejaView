@@ -252,7 +252,7 @@ public class Controller implements Parcelable{
      * @param context The Context from which this method is being called
      * @return The user's current location as a Location object, null if location permission not granted
      */
-    public GeoLocation getUserCurrentLocation(Context context) {
+    public GeoLocation getUserCurrentLocation() {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         ControllerLocationListener locationListener = new ControllerLocationListener();
 
