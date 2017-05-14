@@ -136,8 +136,8 @@ public class Controller implements Parcelable{
      * Remove the current photo shown on the homepage from the cycle
      */
     void releasePhoto(){
-        currPhoto.setReleased(true);
         if(currPhoto != null){
+            currPhoto.setReleased(true);
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
@@ -168,18 +168,18 @@ public class Controller implements Parcelable{
             return false;
         }
         if(currPhoto == null){
-            int nextPhoto = cache.indexOf(photo);
-            if(nextPhoto == -1) {
-                currPhoto = photo;
-                cache.add(photo);
-            }else{
-                currPhoto = photo;
-            }
-            return setWallpaper(photo.phoneLocation, "Hello World");
+            currPhoto = photo;
+            setWallpaper(photo.phoneLocation);
         }else{
-            return setWallpaper(photo.phoneLocation, "Hello");
-        }
+            int currIndex = cache.indexOf(currPhoto);
+            if(currIndex == -1){
+                cache.add(currPhoto);
+                currPhoto = photo;
+                setWallpaper(photo);
+            }else{
 
+            }
+        }
     }
 
     //set the wallpaper without a location displayed
