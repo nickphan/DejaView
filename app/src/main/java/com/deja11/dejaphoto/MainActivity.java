@@ -37,8 +37,8 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_activity_main);
-        /*
+        setContentView(R.layout.activity_main);
+
 
         // Create database object
         //myDb = new DatabaseHelper(this);
@@ -86,24 +86,25 @@ public class MainActivity extends Activity {
                 .build();
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        */
+
         // TODO: Do we need this?
         /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
         notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-        /*mNotificationManager.notify(5, notification);*/
+        mNotificationManager.notify(5, notification);
 
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
-        /*
+
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, alarmPIntent);
+        int defaultTimer = 60000;
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
 
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -111,8 +112,15 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
-        });*/
+        });
 
+
+
+
+
+
+        /*Nick's shitty way of testing*/
+        /*
         controller = new Controller(this);
         Button button = (Button)findViewById(R.id.nextButton);
         button.setOnClickListener(new View.OnClickListener(){
@@ -133,14 +141,14 @@ public class MainActivity extends Activity {
                 controller.setWallpaper(photo);
             }
         });
-
+        */
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
             Intent prevButtonIntent = new Intent(context, SetWallpaperService.class);
             prevButtonIntent.putExtra("Order", 2);
             context.startService(prevButtonIntent);
@@ -151,8 +159,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
             nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
@@ -185,9 +192,9 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            serviceIntent.putExtra("Order", 1);
-            context.startService(serviceIntent);
+            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            //serviceIntent.putExtra("Order", 1);
+            //context.startService(serviceIntent);
         }
     }
 }
