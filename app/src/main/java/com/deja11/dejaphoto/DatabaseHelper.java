@@ -321,7 +321,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // if location is nearby, add 2 points
             photoGeoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
             if (photoGeoLocation.isNearCurrentLocation(deviceLocation)){
-            //    newPoint+=20;
+                newPoint+=20;
             }
 
             // if date is same add 2 points
