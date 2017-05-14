@@ -1,8 +1,11 @@
-/*
-This DatabaseHelper class was based on the video series "Android SQLite Database Tutorial"
-made by the youtube channel "ProgrammingKnowledge"
-
- */
+/**
+ * This class is used as a gallery databases that store, access all the photos.
+ * This class was based on
+ *
+ * @author : Sothyrak Tee Srey (Some methods are based on the video series "Android SQLite
+ * Database Tutorial" made by the youtube channel "ProgrammingKnowledge"
+ *
+ * */
 
 package com.deja11.dejaphoto;
 
@@ -48,7 +51,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
-
 
 
     @Override
@@ -253,15 +255,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         randomNumber = rand.nextInt(10)+1;
 
         // Random number gives number between 1 and 10
-        // 1-5 pick top 5 highest deja point
-        // 6-8 pick top 10 most recent
-        // 9-10 choose random photo
-        if(randomNumber >= 9){
+        // 1-6 pick top 5 highest deja point
+        // 7-9 pick top 10 most recent
+        // 10 choose random photo
+        if(randomNumber >= 10){
             // Don't choose photos that have been released
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, null, null);
             //pathToPhoto += "\n Random photo\n" + randomNumber;
         }
-        else if(randomNumber >= 6){
+        else if(randomNumber >= 7){
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP3));
         }
         else {
