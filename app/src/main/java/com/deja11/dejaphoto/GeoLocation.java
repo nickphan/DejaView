@@ -14,19 +14,17 @@ import java.util.List;
 
 public class GeoLocation {
 
-    // for isNearlocation()
-    int CONSTANT_CONSTRAINT = 1000;
-
     private double longitude;
     private double latitude;
     private String locationName;
 
+    // for isNearlocation()
+    private int CONSTANT_CONSTRAINT = 1000;
+
     public GeoLocation(double latitude,double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
-
-        // call the location API to get the location name
-        // this.locationName = locationName;
+        locationName = "";
     }
 
     public GeoLocation(Location location) {
@@ -47,6 +45,11 @@ public class GeoLocation {
                          < CONSTANT_CONSTRAINT;
     }
 
+    /**
+     * Check if the geolocation of the photo is within 1000 feet of where the user is currently at
+     * @param deviceLocation the geoLocation of the user's current location
+     * @return true if the photo was taken nearby this current location
+     */
     public boolean isNearCurrentLocation(GeoLocation deviceLocation){
         double latitude = deviceLocation.getLatitude();
         double longitude = deviceLocation.getLongitude();
@@ -62,7 +65,6 @@ public class GeoLocation {
      */
     public String getLocationName(Context context){
         Geocoder geocoder = new Geocoder(context);
-
         try {
             // extract the location name using the Address created from the latitude and longitude coordinates
             List<Address> addressName = geocoder.getFromLocation(getLatitude(), getLongitude(), 1);
@@ -72,7 +74,6 @@ public class GeoLocation {
             // set location name to null if there was an error
             locationName = null;
         }
-
         return locationName;
     }
 
@@ -117,7 +118,6 @@ public class GeoLocation {
 
             name.append(address.getAdminArea());
         }
-
         if (address.getCountryName() != null) {
             // if something is already in the location name (i.e. a more specific part of the name), use a comma separator
             if (name.length() != 0) {

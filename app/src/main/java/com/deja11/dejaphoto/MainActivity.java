@@ -108,7 +108,18 @@ public class MainActivity extends Activity {
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
-        // Setting up the alarm to change the photo every x minutes
+        // Setting up the alarm
+        int timer;
+        //SettingPreference settingPreference = new SettingPreference();
+        //timer = 60000*settingPreference.getTime();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        try{
+            timer = 300000 + sharedPreferences.getInt("Progress", 0);
+        } catch (Exception e){
+            e.printStackTrace();
+            timer = 300000;
+        }
 
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -131,33 +142,6 @@ public class MainActivity extends Activity {
         });
 
 
-
-
-
-
-        /*Nick's shitty way of testing*/
-        /*
-        controller = new Controller(this);
-        Button button = (Button)findViewById(R.id.nextButton);
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getNextPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-
-        Button prevButton = (Button)findViewById(R.id.prevButton);
-        prevButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getPreviousPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-        */
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
@@ -224,7 +208,6 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // reset the alarm
                 Intent alarmIntent = new Intent(context, AlarmReceiver.class);
@@ -233,10 +216,6 @@ public class MainActivity extends Activity {
                 int defaultTimer = 10000;
                 mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + defaultTimer, alarmPIntent);
             }
-
-            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            serviceIntent.putExtra("Order", 1);
-            context.startService(serviceIntent);
         }
     }
 }

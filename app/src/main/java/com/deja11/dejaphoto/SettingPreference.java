@@ -90,7 +90,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    public int setTime(){
+    public int getTime(){
         return currentProgress;
     }
 
