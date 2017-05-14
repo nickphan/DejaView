@@ -107,10 +107,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public void updateKarma(String photoLocation) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        //Cursor res = db.rawQuery("SELECT id FROM photo_table WHERE phonelocation = '" + photoLocation + "'", null);
+        Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + " = '" + photoLocation + "'", null, null, null, null, null);
+        //updateField(res.getInt(0),COL_KARMA_8,1);
+
+        updateField(4,COL_KARMA_8,1);
+
+
+    }
+
+
     public void test(Context context){
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
+        //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
         StringBuffer buffer = new StringBuffer();
         //buffer.append(res.getCount() + "");
 
@@ -119,16 +132,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
 
-        buffer.append(chooseNextPath());
+        //updateKarma("/storage/emulated/0/DCIM/Camera/corgi2.jpg");
+        //buffer.append(printAll(context));
 
         //buffer.append(printAll(context));
-        //Cursor res = db.query(true, TABLE_NAME, null, COL_ID_1 +" = "+2, null, null, null, null, null);
+        String path = "/storage/emulated/0/DCIM/Camera/corgi2.jpg";
+        Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + " = '" + path + "'", null, null, null, null, null);
         //Cursor res = db.query(true, TABLE_NAME, new String[] {COL_ID_1, COL_PATH_2,COL_DEJA_6}, null, null, null, null, COL_DEJA_6+" DESC", String.valueOf(3));
         //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
-        //while (res.moveToNext()) {
+        while (res.moveToNext()) {
     //res.moveToNext();
 
 
+        buffer.append(res.getString(0)+"\n");
 
 /*
         Photo p = getNextPhoto();
@@ -142,7 +158,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         buffer.append("\nrelease :" + p.isReleased());
         buffer.append("\nkarma :" + p.isKarma());
 */
-        //}
+        }
         //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
 
 
@@ -346,9 +362,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         buffer.append(res.getCount() + "\n");
 
-        //while (res.moveToNext()) {
+        while (res.moveToNext()) {
 
-        buffer.append(res.moveToPosition(4)+"\n");
+            //buffer.append(res.moveToPosition(4)+"\n");
 
             String format = "MM-dd-yyyy HH:mm:ss";
             SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
@@ -362,9 +378,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             buffer.append("\nrelease :" + res.getString(6));
             buffer.append("\nkarma :" + res.getString(7));
 
-        //}
+        }
         return buffer.toString();
     }
+
 }
 
 
