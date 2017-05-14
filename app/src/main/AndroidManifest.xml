@@ -1,63 +1,62 @@
-<<<<<<< Original<<<<<<< Original<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"
-package="com.deja11.dejaphoto">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.deja11.dejaphoto">
 
-<uses-permission android:name="android.permission.SET_WALLPAPER" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-<application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name"
-    android:supportsRtl="true" android:theme="@style/AppTheme">
-    <activity android:name=".MainActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-    <receiver android:name=".MainActivity$LeftReceiver" android:exported="false">
-        <intent-filter>
-            <action android:name="left_button_receiver" />
-        </intent-filter>
-    </receiver>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    <receiver android:name=".MainActivity$RightReceiver" android:exported="false">
-        <intent-filter>
-            <action android:name="right_button_receiver" />
-        </intent-filter>
-    </receiver>
+        <receiver android:name=".MainActivity$LeftReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="left_button_receiver" />
+            </intent-filter>
+        </receiver>
 
-    <receiver android:name=".MainActivity$KarmaReceiver" android:exported="false">
-        <intent-filter>
-            <action android:name="karma_button_receiver" />
-        </intent-filter>
-    </receiver>
+        <receiver android:name=".MainActivity$RightReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="right_button_receiver" />
+            </intent-filter>
+        </receiver>
 
-    <receiver android:name=".MainActivity$ReleaseReceiver" android:exported="false">
-        <intent-filter>
-            <action android:name="release_button_receiver" />
-        </intent-filter>
-    </receiver>
+        <receiver android:name=".MainActivity$KarmaReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="karma_button_receiver" />
+            </intent-filter>
+        </receiver>
 
-    <service android:name=".SetWallpaperService" android:enabled="true" android:exported="true" />
+        <receiver android:name=".MainActivity$ReleaseReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="release_button_receiver" />
+            </intent-filter>
+        </receiver>
 
-</application>
+        <receiver android:name=".MainActivity$AlarmReceiver"
+            android:process=":remote" />
 
-=======
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application>
-        <activity android:name="com.deja11.dejaphoto.SettingActivity" android:label="@string/title_activity_setting"
+        <service
+            android:name=".SetWallpaperService"
+            android:exported="false"></service>
+        <activity android:name="com.deja11.dejaphoto.SettingPreference" android:label="@string/title_activity_setting"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 </manifest>
->>>>>>> Added
-
-=======
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application>
-        <activity android:name="com.deja11.dejaphoto.SettingPreference" android:label="@string/title_activity_setting_preference"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-    </application>
-</manifest>
->>>>>>> Added

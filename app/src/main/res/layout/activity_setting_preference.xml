@@ -48,8 +48,7 @@ android:layout_height="fill_parent"
             android:layout_height="40dp"
             android:layout_below="@+id/seekbar_preference"
             android:background="#D3D3D3"
-            android:max="30"
-            android:min="5" />
+             />
     </LinearLayout>
 
 

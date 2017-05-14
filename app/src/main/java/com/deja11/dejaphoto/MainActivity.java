@@ -1,6 +1,7 @@
 package com.deja11.dejaphoto;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,11 +21,13 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 
 public class MainActivity extends Activity {
 
@@ -33,7 +37,7 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_activity_main);
+        setContentView(R.layout.activity_main);
 
 
         // Create database object
@@ -44,7 +48,7 @@ public class MainActivity extends Activity {
         // Create controller object
         controller = new Controller(MainActivity.this);
 
-/*
+
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
@@ -60,6 +64,9 @@ public class MainActivity extends Activity {
         notificationView.setOnClickPendingIntent(R.id.previous, leftButtonPIntent);
 
         Intent rightButtonIntent = new Intent("right_button_receiver");
+        //Bundle b = new Bundle();
+        //b.putParcelable("controller", controller);
+        rightButtonIntent.putExtra("controller", controller);
         PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, 2, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
@@ -86,31 +93,17 @@ public class MainActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-     //   mNotificationManager.notify(5, notification);
-        Button startButton = (Button)findViewById(R.id.startButton);
-        startButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getNextPhoto();
-                //controller.setWallpaper(photo.getPhotoLocation());
-                if(controller.setWallpaper(photo))
-                    Toast.makeText(MainActivity.this, photo.getPhotoLocation(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        mNotificationManager.notify(5, notification);
+        //Button startButton = (Button)findViewById(R.id.startButton);
+        //mNotificationManager.notify(5, notification);
 
-        Button stopButton = (Button)findViewById(R.id.stopButton);
-        stopButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getPreviousPhoto();
-                controller.setWallpaper(photo);
-                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Setting up the alarm
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, alarmPIntent);
 
-       /* PreferenceManager.setDefaultValues(this, R.xml.prefalse);*/
-
-        ImageButton setting = (ImageButton) findViewById(R.id.settingtest);
+        ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,16 +111,6 @@ public class MainActivity extends Activity {
             }
         });
 
-
-        /*
-    /*karmaButton.setOnClickListener(new View.OnClickListener()
-    {
-        @Override
-        public void onClick (View v){
-        System.err.print("we are here");
-        Toast.makeText(MainActivity.this, "updated karma points", Toast.LENGTH_SHORT).show();
-    }
-    });*/
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
@@ -142,7 +125,13 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            //Bundle b = intent.getBundleExtra(;
+            //Controller controller = (Controller) intent.getParcelableExtra("controller");
+            //Photo photo = controller.getNextPhoto();
+            //controller.setWallpaper(photo);
             Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
+            context.startService(nextButtonIntent);
         }
     }
 
@@ -162,4 +151,12 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            context.startService(serviceIntent);
+        }
+    }
 }

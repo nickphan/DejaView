@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -34,7 +33,7 @@ import java.util.Stack;
  * Created by shuai9532 on 5/6/17.
  */
 
-public class Controller implements Serializable{
+public class Controller implements Parcelable{
 
     /**
      * TODO
@@ -50,6 +49,9 @@ public class Controller implements Serializable{
     private static int Y;
     //For prev
     LinkedList<Photo> cache;
+
+    //For Parcelable
+    int mData;
 
     /**
      * Constructor with context
@@ -70,6 +72,7 @@ public class Controller implements Serializable{
     /**
      * Get the next photo to display
      * @return the next photo
+     *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
         if(currPhoto == null){
@@ -89,6 +92,7 @@ public class Controller implements Serializable{
     /**
      * Get the previous photo displayed
      * @return the previous photo
+     *      from the cache or null if necessary
      * */
     public Photo getPreviousPhoto() {
         if(currPhoto == null){
@@ -156,6 +160,9 @@ public class Controller implements Serializable{
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo){
+        if(photo == null){
+            return false;
+        }
         if(currPhoto == null){
             int nextPhoto = cache.indexOf(photo);
             if(nextPhoto == -1) {
@@ -164,17 +171,17 @@ public class Controller implements Serializable{
             }else{
                 currPhoto = photo;
             }
-            return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
+            return setWallpaper(photo.phoneLocation, "Hello");
         }
         else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
+                return setWallpaper(photo.phoneLocation, "Hello");
             }else{
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
+                return setWallpaper(photo.phoneLocation, "Hello");
             }
         }
     }
@@ -248,4 +255,27 @@ public class Controller implements Serializable{
 
     }
 
+    /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(i);
+    }
+    public static final Parcelable.Creator<Controller> CREATOR
+            = new Parcelable.Creator<Controller>() {
+        public Controller createFromParcel(Parcel in) {
+            return new Controller(in);
+        }
+
+        public Controller[] newArray(int size) {
+            return new Controller[size];
+        }
+    };
+    private Controller(Parcel in) {
+        mData = in.readInt();
+    }
 }
