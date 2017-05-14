@@ -168,16 +168,23 @@ public class Controller implements Parcelable{
             return false;
         }
         if(currPhoto == null){
-            currPhoto = photo;
-            setWallpaper(photo.phoneLocation);
+            int nextPhoto = cache.indexOf(photo);
+            if(nextPhoto == -1) {
+                currPhoto = photo;
+                cache.add(photo);
+            }else{
+                currPhoto = photo;
+            }
+            return setWallpaper(photo.phoneLocation, "Hello World");
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
                 currPhoto = photo;
-                setWallpaper(photo);
+                return setWallpaper(photo.phoneLocation, "Hello World");
             }else{
-
+                currPhoto = photo;
+                return setWallpaper(photo.phoneLocation, "Hello World");
             }
         }
     }
