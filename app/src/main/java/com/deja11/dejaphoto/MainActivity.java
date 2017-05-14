@@ -41,8 +41,8 @@ public class MainActivity extends Activity {
 
 
         // Create database object
-        myDb = new DatabaseHelper(this);
-        myDb.initialize(this);
+        //myDb = new DatabaseHelper(this);
+        //myDb.initialize(this);
         //myDb.test(this);
 
         // Create controller object

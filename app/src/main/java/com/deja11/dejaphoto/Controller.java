@@ -82,6 +82,8 @@ public class Controller implements Parcelable{
      *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
+
+        databaseHelper.updatePoint(getUserCurrentLocation());
         Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
             if(photo.isReleased()){
@@ -145,6 +147,7 @@ public class Controller implements Parcelable{
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            databaseHelper.updateKarma(photo.getPhotoLocation());
             return true;
         }else{
             //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
@@ -158,6 +161,7 @@ public class Controller implements Parcelable{
     void releasePhoto(){
         if(currPhoto != null){
             currPhoto.setReleased(true);
+            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
@@ -258,9 +262,10 @@ public class Controller implements Parcelable{
         catch (SecurityException e) {
             return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
         }
-
+      
         return new GeoLocation(locationListener.getLastLocation());
     }
+
 
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
