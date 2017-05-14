@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.io.InputStream;
 import java.util.Stack;
@@ -247,7 +248,7 @@ public class Controller implements Parcelable{
      * @param context The Context from which this method is being called
      * @return The user's current location as a Location object, null if location permission not granted
      */
-    public Location getUserCurrentLocation(Context context) {
+    public GeoLocation getUserCurrentLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         ControllerLocationListener locationListener = new ControllerLocationListener();
 
@@ -255,10 +256,10 @@ public class Controller implements Parcelable{
             locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
         }
         catch (SecurityException e) {
-            return new Location(LocationManager.GPS_PROVIDER);
+            return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
         }
 
-        return locationListener.getLastLocation();
+        return new GeoLocation(locationListener.getLastLocation());
     }
 
     //setting the wallpaper with the lcoation displayed

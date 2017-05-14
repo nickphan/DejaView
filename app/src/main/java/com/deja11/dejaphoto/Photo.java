@@ -69,6 +69,9 @@ public class Photo {
         this.released = released;
     }
 
+    // Used for unit testing
+    // public void setDate(Date newDate) { date = newDate; }
+
     /**
      * Get the date when the photo was taken
      * @return the photo taken time
