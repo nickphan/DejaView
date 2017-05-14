@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -100,9 +101,16 @@ public class MainActivity extends Activity {
 
         // Setting up the alarm
         int timer = 60000;
-        SettingPreference settingPreference = new SettingPreference();
-        timer = 60000*settingPreference.getTime();
+        //SettingPreference settingPreference = new SettingPreference();
+        //timer = 60000*settingPreference.getTime();
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        try{
+            timer = sharedPreferences.getInt("Progress", 0);
+        } catch (Exception e){
+            e.printStackTrace();
+            timer = 300000;
+        }
 
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);

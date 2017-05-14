@@ -37,22 +37,12 @@ import java.util.Stack;
 
 public class Controller implements Parcelable{
 
-    /**
-     * TODO
-     *  - replace arraylists with databasehelper
-     *  - TEST THE SETWALLPAPER METHOD
-     * */
-
-
     DatabaseHelper databaseHelper;
     Context context;
     Photo currPhoto;
     private static int X;
     private static int Y;
-    //For prev
     LinkedList<Photo> cache;
-
-    //For Parcelable
     int mData;
 
     /**
@@ -195,7 +185,8 @@ public class Controller implements Parcelable{
             }else{
                 currPhoto = photo;
             }
-            return setWallpaper(photo.phoneLocation, "Hello World");
+            //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+            return setWallpaper(photo.phoneLocation);
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
@@ -204,10 +195,12 @@ public class Controller implements Parcelable{
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello World");
+                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+                return setWallpaper(photo.phoneLocation);
             }else{
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello World");
+                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+                return setWallpaper(photo.phoneLocation);
             }
         }
     }
@@ -224,15 +217,9 @@ public class Controller implements Parcelable{
                 return false;
             }
         }
-        //Uri data = Uri.parse(photoPath);
         try {
             FileInputStream photoStream = new FileInputStream(new File(photoPath));
             myWallpaperManager.setStream(photoStream);
-
-            //InputStream inputStream = context.getContentResolver().openInputStream(data);
-            //Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            //BitmapDrawable drawble = writeTextOnWallpaper(bitmap,geoLocation);
-            //myWallpaperManager.setBitmap(bitmap);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -240,27 +227,10 @@ public class Controller implements Parcelable{
         }
     }
 
-    /**
-     * Gets the user's current location
-     * @param context The Context from which this method is being called
-     * @return The user's current location as a Location object, null if location permission not granted
-     */
-    public Location getUserCurrentLocation(Context context) {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-        // Get last known location from GPS, return null if permission not granted
-        try {
-            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        catch (SecurityException e) {
-            return null;
-        }
-    }
 
     /**
      * Give the current photo priority of appearance
      */
-    void karmaPhoto(){ }
 
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
@@ -275,12 +245,10 @@ public class Controller implements Parcelable{
             }
         }
         try {
-
-
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
-            //writeTextOnWallpaper(mutableBitmap, geoLocation);
+            writeTextOnWallpaper(mutableBitmap, geoLocation);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }
@@ -300,10 +268,26 @@ public class Controller implements Parcelable{
         //paint.setTextAlign(Paint.Align.LEFT);
         paint.setColor(Color.RED);
         paint.setTextSize(60);
-        canvas.drawText("CSE110", 40, Y-paint.getTextSize(), paint);
+        canvas.drawText(text, 40, Y-paint.getTextSize(), paint);
 
     }
 
+
+    /**
+     * Gets the user's current location
+     * @param context The Context from which this method is being called
+     * @return The user's current location as a Location object, null if location permission not granted
+     */
+    public Location getUserCurrentLocation(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        // Get last known location from GPS, return null if permission not granted
+        try {
+            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        catch (SecurityException e) {
+            return null;
+        }
+    }
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
     @Override
