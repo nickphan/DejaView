@@ -5,6 +5,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.CountDownTimer;
 
@@ -58,6 +60,23 @@ public class Controller {
         }catch(Exception e){
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Gets the user's current location
+     * @param context The Context from which this method is being called
+     * @return The user's current location as a Location object, null if location permission not granted
+     */
+    public Location getUserCurrentLocation(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        // Get last known location from GPS, return null if permission not granted
+        try {
+            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        catch (SecurityException e) {
+            return null;
         }
     }
 
