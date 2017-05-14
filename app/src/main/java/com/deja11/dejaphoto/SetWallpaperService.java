@@ -31,13 +31,7 @@ public class SetWallpaperService extends IntentService {
         //controller = getController();
     }
 
-    public Controller getController() {
-        if (controller == null) {
-            controller = new Controller(getApplicationContext());
-        }
 
-        return controller;
-    }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
