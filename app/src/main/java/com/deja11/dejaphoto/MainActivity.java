@@ -37,8 +37,8 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.test_activity_main);
+        /*
 
         // Create database object
         //myDb = new DatabaseHelper(this);
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         //myDb.test(this);
 
         // Create controller object
-        controller = new Controller(MainActivity.this);
+        //controller = new Controller(MainActivity.this);
 
 
         // create the view for the notification
@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
         Intent rightButtonIntent = new Intent("right_button_receiver");
         //Bundle b = new Bundle();
         //b.putParcelable("controller", controller);
-        rightButtonIntent.putExtra("controller", controller);
+        //rightButtonIntent.putExtra("controller", controller);
         PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, 2, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
@@ -86,18 +86,20 @@ public class MainActivity extends Activity {
                 .build();
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
+        */
         // TODO: Do we need this?
         /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
         notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-        mNotificationManager.notify(5, notification);
+        /*mNotificationManager.notify(5, notification);*/
+
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
+        /*
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -109,6 +111,27 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
+        });*/
+
+        controller = new Controller(this);
+        Button button = (Button)findViewById(R.id.nextButton);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Photo photo = controller.getNextPhoto();
+                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
+                controller.setWallpaper(photo);
+            }
+        });
+
+        Button prevButton = (Button)findViewById(R.id.prevButton);
+        prevButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Photo photo = controller.getPreviousPhoto();
+                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
+                controller.setWallpaper(photo);
+            }
         });
 
     }
@@ -118,6 +141,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent prevButtonIntent = new Intent(context, SetWallpaperService.class);
+            prevButtonIntent.putExtra("Order", 2);
+            context.startService(prevButtonIntent);
         }
     }
 
@@ -125,12 +151,10 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Bundle b = intent.getBundleExtra(;
-            //Controller controller = (Controller) intent.getParcelableExtra("controller");
-            //Photo photo = controller.getNextPhoto();
-            //controller.setWallpaper(photo);
+
             Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
+            nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
         }
     }
@@ -139,7 +163,10 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Karma Button Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Photo is Karma'd", Toast.LENGTH_SHORT).show();
+            Intent karmaButtonIntent = new Intent(context, SetWallpaperService.class);
+            karmaButtonIntent.putExtra("Order", 3);
+            context.startService(karmaButtonIntent);
         }
     }
 
@@ -147,7 +174,10 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Release Button Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Photo Released", Toast.LENGTH_SHORT).show();
+            Intent releaseButtonIntent = new Intent(context, SetWallpaperService.class);
+            releaseButtonIntent.putExtra("Order", 4);
+            context.startService(releaseButtonIntent);
         }
     }
 
@@ -156,6 +186,7 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            serviceIntent.putExtra("Order", 1);
             context.startService(serviceIntent);
         }
     }

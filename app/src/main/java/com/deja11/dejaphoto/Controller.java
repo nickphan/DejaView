@@ -121,10 +121,14 @@ public class Controller implements Parcelable{
     /**
      * Set current photo karma field to true
      */
-    void karmaPhoto(){
+    public boolean karmaPhoto(){
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            return true;
+        }else{
+            //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -132,8 +136,8 @@ public class Controller implements Parcelable{
      * Remove the current photo shown on the homepage from the cycle
      */
     void releasePhoto(){
-        currPhoto.setReleased(true);
         if(currPhoto != null){
+            currPhoto.setReleased(true);
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
@@ -164,24 +168,16 @@ public class Controller implements Parcelable{
             return false;
         }
         if(currPhoto == null){
-            int nextPhoto = cache.indexOf(photo);
-            if(nextPhoto == -1) {
-                currPhoto = photo;
-                cache.add(photo);
-            }else{
-                currPhoto = photo;
-            }
-            return setWallpaper(photo.phoneLocation, "Hello");
-        }
-        else{
+            currPhoto = photo;
+            setWallpaper(photo.phoneLocation);
+        }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
+                setWallpaper(photo);
             }else{
-                currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
+
             }
         }
     }
@@ -231,7 +227,7 @@ public class Controller implements Parcelable{
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation);
+            //writeTextOnWallpaper(mutableBitmap, geoLocation);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }
