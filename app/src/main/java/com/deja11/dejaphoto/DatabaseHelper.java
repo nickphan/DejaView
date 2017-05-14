@@ -107,8 +107,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public void updateKarma(String photoLocation){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+//Cursorres=db.rawQuery("SELECTidFROMphoto_tableWHEREphonelocation='"+photoLocation+"'",null);
+        Cursor res=db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+photoLocation+"'",null,null,null,null,null);
+        res.moveToNext();
+        updateField(res.getInt(0),COL_KARMA_8,1);
+
+//updateField(4,COL_KARMA_8,1);
 
 
+    }
+
+    public void updateRelease(String photoLocation){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+//Cursorres=db.rawQuery("SELECTidFROMphoto_tableWHEREphonelocation='"+photoLocation+"'",null);
+        Cursor res=db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+photoLocation+"'",null,null,null,null,null);
+        res.moveToNext();
+        updateField(res.getInt(0),COL_REL_7,1);
+
+//updateField(4,COL_KARMA_8,1);
+
+
+    }
 
 
     public void test(Context context){
@@ -117,14 +140,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
         StringBuffer buffer = new StringBuffer();
         //buffer.append(res.getCount() + "");
+        chooseNextPath();
 
         //updateField(2,COL_KARMA_8,"1");
         //updateField(3,COL_DEJA_6,50);
         //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
 
+        updateKarma("/storage/emulated/0/DCIM/Camera/corgi2.jpg");
+        updateRelease("/storage/emulated/0/DCIM/Camera/corgi2.jpg");
 
-        //showMessage("Data",buffer.toString(),context);
+        buffer.append(printAll(context));
+
+        showMessage("Data",buffer.toString(),context);
 
 
 
@@ -213,6 +241,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         * */
 
         //update all points
+        updatePoint();
 
         int randomNumber;
         int randomPosition = 0;
