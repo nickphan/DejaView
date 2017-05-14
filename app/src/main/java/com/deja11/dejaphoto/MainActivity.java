@@ -127,33 +127,6 @@ public class MainActivity extends Activity {
         });
 
 
-        //Photo photo = controller.getNextPhoto();
-        //controller.setWallpaper(photo);
-
-
-        /*Nick's shitty way of testing*/
-        /*
-        controller = new Controller(this);
-        Button button = (Button)findViewById(R.id.nextButton);
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getNextPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-
-        Button prevButton = (Button)findViewById(R.id.prevButton);
-        prevButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getPreviousPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-        */
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
@@ -204,9 +177,9 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            //serviceIntent.putExtra("Order", 1);
-            //context.startService(serviceIntent);
+            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            serviceIntent.putExtra("Order", 1);
+            context.startService(serviceIntent);
         }
     }
 }
