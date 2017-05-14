@@ -121,10 +121,14 @@ public class Controller implements Parcelable{
     /**
      * Set current photo karma field to true
      */
-    void karmaPhoto(){
+    public boolean karmaPhoto(){
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            return true;
+        }else{
+            //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -223,7 +227,7 @@ public class Controller implements Parcelable{
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation);
+            //writeTextOnWallpaper(mutableBitmap, geoLocation);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }

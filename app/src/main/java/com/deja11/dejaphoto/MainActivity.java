@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Karma Button Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Photo is Karma'd", Toast.LENGTH_SHORT).show();
             Intent karmaButtonIntent = new Intent(context, SetWallpaperService.class);
             karmaButtonIntent.putExtra("Order", 3);
             context.startService(karmaButtonIntent);
@@ -162,8 +162,6 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            //context.startService(serviceIntent);
             Intent serviceIntent = new Intent(context, SetWallpaperService.class);
             serviceIntent.putExtra("Order", 1);
             context.startService(serviceIntent);
