@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -326,6 +327,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // if date is same add 2 points
             date = new Date(Long.parseLong(res.getString(4)));
+            Calendar photoTime = Calendar.getInstance();
+            photoTime.setTime(date);
+            Calendar currentTime = Calendar.getInstance();
+
+            // 1 point for matching day of week
+            if (currentTime.get(Calendar.DAY_OF_WEEK) == photoTime.get(Calendar.DAY_OF_WEEK)) {
+                newPoint += 10;
+            }
+
+            int photoTimeOfDay = (photoTime.get(Calendar.HOUR_OF_DAY) * 60) + photoTime.get(Calendar.MINUTE);
+            int currentTimeOfDay = (currentTime.get(Calendar.HOUR_OF_DAY) * 60) + currentTime.get(Calendar.MINUTE);
+            int lowerTimeBound = (currentTimeOfDay - 120) % 1440, highTimeBound = (currentTimeOfDay + 120) % 1440;
+
+            // 1 point for matching time of day
+            if (photoTimeOfDay >= lowerTimeBound || photoTimeOfDay <= highTimeBound) {
+                newPoint += 10;
+            }
 
             // if it is karma add 1 point
             isKarma = res.getInt(7) > 0 ? true : false;
