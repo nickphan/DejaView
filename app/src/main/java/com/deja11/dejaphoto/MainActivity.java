@@ -99,12 +99,16 @@ public class MainActivity extends Activity {
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
+        int timer = 60000;
+        SettingPreference settingPreference = new SettingPreference();
+        timer = 60000*settingPreference.getTime();
+
 
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int defaultTimer = 60000;
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
+
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), timer, alarmPIntent);
 
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -115,8 +119,8 @@ public class MainActivity extends Activity {
         });
 
 
-
-
+        //Photo photo = controller.getNextPhoto();
+        //controller.setWallpaper(photo);
 
 
         /*Nick's shitty way of testing*/

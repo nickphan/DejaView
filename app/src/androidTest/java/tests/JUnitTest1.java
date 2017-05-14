@@ -2,6 +2,7 @@ package tests;
 
 import android.support.test.rule.ActivityTestRule;
 
+import com.deja11.dejaphoto.GeoLocation;
 import com.deja11.dejaphoto.MainActivity;
 import com.deja11.dejaphoto.Photo;
 
@@ -9,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by thefr on 5/12/2017.
