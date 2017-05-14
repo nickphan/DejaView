@@ -5,7 +5,18 @@
  * @author : Sothyrak Tee Srey (Some methods are based on the video series "Android SQLite
  * Database Tutorial" made by the youtube channel "ProgrammingKnowledge"
  *
- * */
+ * *Note* query is in the following format:
+ * Cursor query (boolean distinct,
+ *              String table,
+ *              String[] columns,
+ *              String selection,
+ *              String[] selectionArgs,
+ *              String groupBy,
+ *              String having,
+ *              String orderBy,
+ *              String limit)
+ *
+ **/
 
 package com.deja11.dejaphoto;
 
@@ -115,20 +126,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updateKarma(String photoLocation){
 
         SQLiteDatabase db=this.getWritableDatabase();
-//Cursorres=db.rawQuery("SELECTidFROMphoto_tableWHEREphonelocation='"+photoLocation+"'",null);
         Cursor res=db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+photoLocation+"'",null,null,null,null,null);
         res.moveToNext();
         updateField(res.getInt(0),COL_KARMA_8,1);
-
-//updateField(4,COL_KARMA_8,1);
-
-
     }
 
     public void updateRelease(String photoLocation){
 
         SQLiteDatabase db=this.getWritableDatabase();
-//Cursorres=db.rawQuery("SELECTidFROMphoto_tableWHEREphonelocation='"+photoLocation+"'",null);
         Cursor res=db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+photoLocation+"'",null,null,null,null,null);
         res.moveToNext();
         updateField(res.getInt(0),COL_REL_7,1);
