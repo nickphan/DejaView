@@ -234,6 +234,26 @@ public class Controller implements Parcelable{
         }
     }
 
+
+    /**
+     * Gets the user's current location
+     * @return The user's current location as a Location object, null if location permission not granted
+     */
+    public GeoLocation getUserCurrentLocation() {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        ControllerLocationListener locationListener = new ControllerLocationListener();
+
+        try {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
+        }
+        catch (SecurityException e) {
+            return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
+        }
+      
+        return new GeoLocation(locationListener.getLastLocation());
+    }
+
+
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
@@ -279,16 +299,7 @@ public class Controller implements Parcelable{
      * Gets the user's current location
      * @return The user's current location as a Location object, null if location permission not granted
      */
-    public Location getUserCurrentLocation() {
-        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
-        // Get last known location from GPS, return null if permission not granted
-        try {
-            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        catch (SecurityException e) {
-            return null;
-        }
-    }
+
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
     @Override
