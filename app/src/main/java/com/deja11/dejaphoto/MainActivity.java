@@ -207,6 +207,9 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
             //context.startService(serviceIntent);
+            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            serviceIntent.putExtra("Order", 1);
+            context.startService(serviceIntent);
         }
     }
 }
