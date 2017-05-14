@@ -32,17 +32,13 @@ public class SetWallpaperService extends IntentService {
     private static int CODE_RELEASE = 4;
     private static int CODE_DEFAULT_VALUE = 0;
 
-    private static final int INTERVAL_OFFSET = 5; // offset for the interval
-    private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
-    private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    public static long interval = 10000; // interval between Wallpaper changes (5 minutes default)
     private static final long MIN_TO_MS = 60000; // a conversion factor from minutes to milliseconds
 
     private static Controller controller;
-    private static long interval = 10000;
 
     public SetWallpaperService() {
         super("WallpaperService");
-        //controller = getController();
     }
 
     @Override
@@ -85,10 +81,7 @@ public class SetWallpaperService extends IntentService {
 
     public static void updateInterval(int minutes) {
         interval = minutes * MIN_TO_MS;
-    }
-
-    public static long getInterval() {
-        return interval;
+        Log.d("Interval updated to", Long.toString(interval));
     }
 
     /*

@@ -1,11 +1,6 @@
 package com.deja11.dejaphoto;
 
 import java.util.Calendar;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -14,12 +9,12 @@ import java.util.Date;
 
 public class Photo {
 
-    String phoneLocation;
-    GeoLocation geoLocation;
-    Date date;
-    int dejaPoints;
-    boolean released;
-    boolean karma;
+    private String phoneLocation;
+    private GeoLocation geoLocation;
+    private Date date;
+    private int dejaPoints;
+    private boolean released;
+    private boolean karma;
 
     public Photo(String phoneLocation){
         this.phoneLocation = phoneLocation;
@@ -87,7 +82,6 @@ public class Photo {
     public int getDayOfWeek() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-
         return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
@@ -162,39 +156,12 @@ public class Photo {
     }
 
 
+    /**
+     * Used instead of operator overloading
+     * @return true if the photos share the same path, false otherwise
+     * */
     public boolean equals(Photo photo){
-        if(this.phoneLocation == photo.phoneLocation){
-            return true;
-        }else{
-            return false;
-        }
+        return this.phoneLocation == photo.phoneLocation;
     }
 
-    /*private ArrayList<String> gatherPhotos(Context context) {
-        Uri uri;
-        Cursor cursor;
-        int columnIndexData;
-        int columnIndexFolder;
-
-        ArrayList<String> imageList = new ArrayList<String>();
-        String absolutePath = null;
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = {
-                MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
-        };
-
-        cursor = context.getContentResolver().query(uri, projection, null, null, null);
-
-        columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        columnIndexFolder = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-        while (cursor.moveToNext()) {
-            absolutePath = cursor.getString(columnIndexData);
-            imageList.add(absolutePath);
-        }
-
-        return imageList;
-    }*/
 }
