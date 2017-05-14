@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
@@ -19,13 +20,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 
 public class MainActivity extends Activity {
 
@@ -36,7 +38,6 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         // Create database object
@@ -93,6 +94,8 @@ public class MainActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
         mNotificationManager.notify(5, notification);
+        //Button startButton = (Button)findViewById(R.id.startButton);
+        //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
@@ -100,60 +103,14 @@ public class MainActivity extends Activity {
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, alarmPIntent);
 
-        /*Button startButton = (Button)findViewById(R.id.startButton);
-        startButton.setOnClickListener(new View.OnClickListener(){
-        Button nextButton = (Button)findViewById(R.id.nextButton);
-        nextButton.setOnClickListener(new View.OnClickListener(){
+        ImageButton setting = (ImageButton) findViewById(R.id.setting);
+        setting.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                Photo photo = controller.getNextPhoto();
-                controller.setWallpaper(photo);
-                Uri data = Uri.parse(photo.getPhotoLocation());
-                ImageView imageView = (ImageView)findViewById(R.id.imageView);
-                imageView.setImageURI(data);
-                Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
         });
 
-        Button prevButton = (Button)findViewById(R.id.prevButton);
-        prevButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getPreviousPhoto();
-                controller.setWallpaper(photo);
-                if(photo != null) {
-                    Uri data = Uri.parse(photo.getPhotoLocation());
-                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                    imageView.setImageURI(data);
-                    Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(MainActivity.this, "Error no more photos in cache", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-        Button karmaButton = (Button)findViewById(R.id.karmaButton);
-        karmaButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                controller.karmaPhoto();
-                Photo photo = controller.getCurrentWallpaper();
-                Uri data = Uri.parse(photo.getPhotoLocation());
-                ImageView imageView = (ImageView)findViewById(R.id.imageView);
-                imageView.setImageURI(data);
-            }
-        });
-        Button releaseButton = (Button)findViewById(R.id.releaseButton);
-        releaseButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                controller.releasePhoto();
-                Photo photo = controller.getCurrentWallpaper();
-                Uri data = Uri.parse(photo.getPhotoLocation());
-                ImageView imageView = (ImageView)findViewById(R.id.imageView);
-                imageView.setImageURI(data);
-            }
-        });*/
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
