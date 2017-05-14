@@ -41,6 +41,8 @@ public class GalleryDatabaseTest {
 
 
         testDb.insertData("GenericPath", 2.5, -6.8, "1000", 0, 0, 0);
+
+
     }
 
 }

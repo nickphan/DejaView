@@ -125,6 +125,7 @@ public class Controller implements Parcelable{
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            databaseHelper.updateKarma(photo.getPhotoLocation());
             return true;
         }else{
             //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
