@@ -231,7 +231,7 @@ public class Controller implements Parcelable{
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation);
+            //writeTextOnWallpaper(mutableBitmap, geoLocation);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }
