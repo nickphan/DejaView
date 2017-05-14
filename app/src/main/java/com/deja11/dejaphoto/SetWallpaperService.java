@@ -24,14 +24,11 @@ import java.util.Set;
 
 public class SetWallpaperService extends IntentService {
     private static Controller controller;
-    private static int i = 0;
 
     public SetWallpaperService() {
         super("WallpaperService");
         //controller = getController();
     }
-
-
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
