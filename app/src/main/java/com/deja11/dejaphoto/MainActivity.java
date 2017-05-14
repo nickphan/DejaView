@@ -100,13 +100,13 @@ public class MainActivity extends Activity {
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
-        int timer = 60000;
+        int timer;
         //SettingPreference settingPreference = new SettingPreference();
         //timer = 60000*settingPreference.getTime();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         try{
-            timer = sharedPreferences.getInt("Progress", 0);
+            timer = 300000 + sharedPreferences.getInt("Progress", 0);
         } catch (Exception e){
             e.printStackTrace();
             timer = 300000;

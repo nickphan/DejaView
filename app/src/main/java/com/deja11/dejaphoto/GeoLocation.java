@@ -3,6 +3,7 @@ package com.deja11.dejaphoto;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +29,12 @@ public class GeoLocation {
         // this.locationName = locationName;
     }
 
+    public GeoLocation(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        locationName = "";
+    }
+
     /**
      * Check if the geolocation of the photo is within 1000 feet of where the user is currently at
      * @param longitude the current longitude of the user
@@ -40,6 +47,13 @@ public class GeoLocation {
                          < CONSTANT_CONSTRAINT;
     }
 
+    public boolean isNearCurrentLocation(GeoLocation deviceLocation){
+        double latitude = deviceLocation.getLatitude();
+        double longitude = deviceLocation.getLongitude();
+        return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
+                (this.latitude - latitude) * (this.latitude - latitude))
+                < CONSTANT_CONSTRAINT;
+    }
     /**
      * Get the name of the location where the photo is taken
      *

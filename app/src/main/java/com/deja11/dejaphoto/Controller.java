@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,7 +16,10 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Looper;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
@@ -27,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.io.InputStream;
 import java.util.Stack;
@@ -67,6 +72,8 @@ public class Controller implements Parcelable{
      *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
+
+        databaseHelper.updatePoint(getUserCurrentLocation());
         Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
             if(photo.isReleased()){
@@ -227,11 +234,6 @@ public class Controller implements Parcelable{
         }
     }
 
-
-    /**
-     * Give the current photo priority of appearance
-     */
-
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
@@ -275,11 +277,10 @@ public class Controller implements Parcelable{
 
     /**
      * Gets the user's current location
-     * @param context The Context from which this method is being called
      * @return The user's current location as a Location object, null if location permission not granted
      */
-    public Location getUserCurrentLocation(Context context) {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    public Location getUserCurrentLocation() {
+        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
         // Get last known location from GPS, return null if permission not granted
         try {
             return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -310,5 +311,30 @@ public class Controller implements Parcelable{
     };
     private Controller(Parcel in) {
         mData = in.readInt();
+    }
+
+    class ControllerLocationListener implements LocationListener {
+        private Location lastLocation;
+        private String locationProvider;
+
+        public Location getLastLocation() {
+            return lastLocation;
+        }
+
+        public void onLocationChanged(Location location) {
+            lastLocation = location;
+        }
+
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        public void onProviderEnabled (String provider) {
+            locationProvider = provider;
+        }
+
+        public void onStatusChanged (String provider, int status, Bundle extras) {
+
+        }
     }
 }
