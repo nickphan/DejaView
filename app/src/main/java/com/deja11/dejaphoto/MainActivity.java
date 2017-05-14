@@ -30,7 +30,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
     DatabaseHelper myDb;
-    Controller controller;
+    //Controller controller;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
         //myDb.test(this);
 
         // Create controller object
-        controller = new Controller(MainActivity.this);
+        //controller = new Controller(MainActivity.this);
 
 
         // create the view for the notification
@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
         Intent rightButtonIntent = new Intent("right_button_receiver");
         //Bundle b = new Bundle();
         //b.putParcelable("controller", controller);
-        rightButtonIntent.putExtra("controller", controller);
+        //rightButtonIntent.putExtra("controller", controller);
         PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, 2, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
@@ -161,6 +161,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent prevButtonIntent = new Intent(context, SetWallpaperService.class);
+            prevButtonIntent.putExtra("Order", 2);
+            context.startService(prevButtonIntent);
         }
     }
 
@@ -168,12 +171,10 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Bundle b = intent.getBundleExtra(;
-            //Controller controller = (Controller) intent.getParcelableExtra("controller");
-            //Photo photo = controller.getNextPhoto();
-            //controller.setWallpaper(photo);
+
             Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
+            nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
         }
     }
@@ -183,6 +184,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Karma Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent karmaButtonIntent = new Intent(context, SetWallpaperService.class);
+            karmaButtonIntent.putExtra("Order", 3);
+            context.startService(karmaButtonIntent);
         }
     }
 
@@ -191,6 +195,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Release Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent releaseButtonIntent = new Intent(context, SetWallpaperService.class);
+            releaseButtonIntent.putExtra("Order", 4);
+            context.startService(releaseButtonIntent);
         }
     }
 
@@ -198,8 +205,8 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            context.startService(serviceIntent);
+            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            //context.startService(serviceIntent);
         }
     }
 }
