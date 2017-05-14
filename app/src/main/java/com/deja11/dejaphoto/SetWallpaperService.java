@@ -36,9 +36,9 @@ public class SetWallpaperService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.i("Service Started", "SetWallpaper Service called");
-        Log.i("i", Integer.toString(i));
-        i++;
+
         int order = intent.getIntExtra("Order", 0);
+        Log.i("i", Integer.toString(order));
         if(order == 1) {
             Photo nextPhoto = controller.getNextPhoto();
             controller.setWallpaper(nextPhoto);

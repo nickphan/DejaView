@@ -103,7 +103,8 @@ public class MainActivity extends Activity {
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, alarmPIntent);
+        int defaultTimer = 60000;
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
 
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +148,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Previous Button Clicked", Toast.LENGTH_SHORT).show();
             Intent prevButtonIntent = new Intent(context, SetWallpaperService.class);
             prevButtonIntent.putExtra("Order", 2);
             context.startService(prevButtonIntent);
@@ -158,8 +159,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
             nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
@@ -192,9 +192,9 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            serviceIntent.putExtra("Order", 1);
-            context.startService(serviceIntent);
+            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            //serviceIntent.putExtra("Order", 1);
+            //context.startService(serviceIntent);
         }
     }
 }

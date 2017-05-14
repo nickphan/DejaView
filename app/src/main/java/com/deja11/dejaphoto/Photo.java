@@ -23,9 +23,6 @@ public class Photo {
 
     public Photo(String phoneLocation){
         this.phoneLocation = phoneLocation;
-
-        // have a method to extract information from the photo
-
         this.dejaPoints = 0;
         this.karma = false;
         this.released = false;
@@ -110,7 +107,17 @@ public class Photo {
     public void updateDejaPoint(){
 
     }
-    private ArrayList<String> gatherPhotos(Context context) {
+
+
+    public boolean equals(Photo photo){
+        if(this.phoneLocation == photo.phoneLocation){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /*private ArrayList<String> gatherPhotos(Context context) {
         Uri uri;
         Cursor cursor;
         int columnIndexData;
@@ -136,13 +143,5 @@ public class Photo {
         }
 
         return imageList;
-    }
-
-    public boolean equals(Photo photo){
-        if(this.phoneLocation == photo.phoneLocation){
-            return true;
-        }else{
-            return false;
-        }
-    }
+    }*/
 }
