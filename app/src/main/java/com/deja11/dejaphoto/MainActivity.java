@@ -9,7 +9,12 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+<<<<<<< HEAD
 import android.content.pm.PackageManager;
+||||||| merged common ancestors
+=======
+import android.content.SharedPreferences;
+>>>>>>> 1b3a746411c01df0799aa53e1e153f09c3aceff6
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -36,22 +41,31 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class MainActivity extends Activity {
 
+    private static int INTERVAL_OFFSET = 5; // offset for the interval
+    private static String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    private static int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    private static int MIN_TO_MS = 60000; // a conversion factor from minutes to milliseconds
+
+    // request codes for each pending intent
+    private static int LEFT_PENDING_INTENT_RC = 0;
+    private static int RIGHT_PENDING_INTENT_RC = 1;
+    private static int KARMA_PENDING_INTENT_RC = 2;
+    private static int RELEASE_PENDING_INTENT_RC = 3;
+    private static int ALARM_PENDING_INTENT_RC = 4;
+
+
     DatabaseHelper myDb;
     Controller controller;
+    private static long interval; // the time in between a photo change
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-        }
-
-
-
-
-
+        // initialize the value of the interval using shared preferences, if applicable
+        SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        interval = (mSharedPref.getInt(INTERVAL_KEY, INTERVAL_DEFAULT) + INTERVAL_OFFSET) * MIN_TO_MS;
 
         // Create database object
         //myDb = new DatabaseHelper(this);
@@ -73,22 +87,19 @@ public class MainActivity extends Activity {
         // 4. call setOnClickPendingIntent of the view with the appropriate button and pending intent
 
         Intent leftButtonIntent = new Intent("left_button_receiver");
-        PendingIntent leftButtonPIntent = PendingIntent.getBroadcast(this, 1, leftButtonIntent, 0);
+        PendingIntent leftButtonPIntent = PendingIntent.getBroadcast(this, LEFT_PENDING_INTENT_RC, leftButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.previous, leftButtonPIntent);
 
         Intent rightButtonIntent = new Intent("right_button_receiver");
-        //Bundle b = new Bundle();
-        //b.putParcelable("controller", controller);
-        //rightButtonIntent.putExtra("controller", controller);
-        PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, 2, rightButtonIntent, 0);
+        PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this, RIGHT_PENDING_INTENT_RC, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
         Intent karmaButtonIntent = new Intent("karma_button_receiver");
-        PendingIntent karmaButtonPIntent = PendingIntent.getBroadcast(this, 3, karmaButtonIntent, 0);
+        PendingIntent karmaButtonPIntent = PendingIntent.getBroadcast(this, KARMA_PENDING_INTENT_RC, karmaButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.karma, karmaButtonPIntent);
 
         Intent releaseButtonIntent = new Intent("release_button_receiver");
-        PendingIntent releaseButtonPIntent = PendingIntent.getBroadcast(this, 4, releaseButtonIntent, 0);
+        PendingIntent releaseButtonPIntent = PendingIntent.getBroadcast(this, RELEASE_PENDING_INTENT_RC, releaseButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.release, releaseButtonPIntent);
 
         //set the icon and time and build the notification of deja photo
@@ -96,28 +107,40 @@ public class MainActivity extends Activity {
                 .setSmallIcon(R.drawable.ic_wallpaper)
                 .setWhen(System.currentTimeMillis())
                 .setContent(notificationView)
+                .setDefaults(Notification.FLAG_NO_CLEAR)
                 .build();
 
+        // call the notification manager to show the notification in the status bar
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        // TODO: Do we need this?
-        /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
-        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
-        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
-        notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
-
         mNotificationManager.notify(5, notification);
 
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
+        int timer;
+        //SettingPreference settingPreference = new SettingPreference();
+        //timer = 60000*settingPreference.getTime();
 
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        try{
+            timer = 300000 + sharedPreferences.getInt("Progress", 0);
+        } catch (Exception e){
+            e.printStackTrace();
+            timer = 300000;
+        }
+
+        Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int defaultTimer = 60000;
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmPIntent);
+        }
+
+        else {
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPIntent);
+        }
 
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -128,33 +151,6 @@ public class MainActivity extends Activity {
         });
 
 
-
-
-
-
-        /*Nick's shitty way of testing*/
-        /*
-        controller = new Controller(this);
-        Button button = (Button)findViewById(R.id.nextButton);
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getNextPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-
-        Button prevButton = (Button)findViewById(R.id.prevButton);
-        prevButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Photo photo = controller.getPreviousPhoto();
-                Toast.makeText(getApplicationContext(), photo.phoneLocation, Toast.LENGTH_SHORT).show();
-                controller.setWallpaper(photo);
-            }
-        });
-        */
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
@@ -173,6 +169,22 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
+
+            // reset the alarm
+            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+            PendingIntent alarmPIntent = PendingIntent.getBroadcast(context, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+
+            mAlarmManager.cancel(alarmPIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPIntent);
+            }
+
+            else {
+                mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPIntent);
+            }
+
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
             nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
@@ -205,9 +217,14 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            //serviceIntent.putExtra("Order", 1);
-            //context.startService(serviceIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                // reset the alarm
+                Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+                PendingIntent alarmPIntent = PendingIntent.getBroadcast(context, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+                int defaultTimer = 10000;
+                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + defaultTimer, alarmPIntent);
+            }
         }
     }
 }

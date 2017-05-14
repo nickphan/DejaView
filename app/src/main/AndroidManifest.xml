@@ -53,12 +53,17 @@
         </receiver>
 
         <receiver android:name=".MainActivity$AlarmReceiver"
-            android:process=":remote" />
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="alarm_receiver" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".SetWallpaperService"
-            android:exported="false"></service>
+            android:exported="false" />
+
         <activity android:name="com.deja11.dejaphoto.SettingPreference" android:label="@string/title_activity_setting"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 </manifest>
