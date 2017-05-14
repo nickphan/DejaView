@@ -1,6 +1,7 @@
 package com.deja11.dejaphoto;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -10,6 +11,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,19 +22,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class SetWallpaperService extends Service {
-    Controller controller;
+public class SetWallpaperService extends IntentService {
+    private static Controller controller;
+    private static int i = 0;
 
     public SetWallpaperService() {
-        controller = new Controller(SetWallpaperService.this);
+        super("WallpaperService");
+    }
+
+    public Controller getController() {
+        if (controller == null) {
+            controller = new Controller(getApplicationContext());
+        }
+
+        return controller;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+    protected void onHandleIntent(@Nullable Intent intent) {
+        Log.i("Service Started", "SetWallpaper Service called");
+        Log.i("i", Integer.toString(i));
+        i++;
+        Photo nextPhoto = getController().getNextPhoto();
+        getController().setWallpaper(nextPhoto);
     }
 
+    /*
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(SetWallpaperService.this, "Started", Toast.LENGTH_SHORT);
@@ -61,5 +77,5 @@ public class SetWallpaperService extends Service {
                 }
             }
         }
-    }
+    } */
 }
