@@ -1,5 +1,6 @@
 package com.deja11.dejaphoto;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -63,6 +64,56 @@ public class Photo {
      */
     public Date getDate() {
         return date;
+    }
+
+    /**
+     * Get the day of the week the photo was taken
+     * @return Integer corresponding to day of week, starting from 1 for Sunday, 2 for Monday ... 7 for Saturday.
+     */
+    public int getDayOfWeek() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        return calendar.get(Calendar.DAY_OF_WEEK);
+    }
+
+    /**
+     * Determine if the photo was taken on the same day of the week as the given day of the week
+     * @param dayOfWeek The day of the week to compare to the photo's day of the week
+     * @return Whether or not the photo's day of the week is the same
+     */
+    public boolean isSameDayOfWeek(int dayOfWeek) {
+        return getDayOfWeek() == dayOfWeek;
+    }
+
+    /**
+     * Get the time of day the photo was taken
+     * @return The time of day the photo was taken, in the format of minutes after 12:00 midnight
+     */
+    public int getTimeOfDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // Return time of day in the form of minutes after 12:00 midnight
+        return (calendar.get(Calendar.HOUR_OF_DAY) * 60) + calendar.get(Calendar.MINUTE);
+    }
+
+    /**
+     * Determine if the photo was taken around the same time of day as a given time of day
+     * @param timeOfDay The time of day to compare the photo's time of day, in minutes after 12:00 midnight
+     * @return Whether or not the photo's time of day is within 2 hours before or after the given time of day.
+     */
+    public boolean isSameTimeOfDay(int timeOfDay) {
+        // Get photo's time of day and create bounds for "same time of day"
+        int thisTimeOfDay = getTimeOfDay();
+        int lowTimeBound = (thisTimeOfDay - 120) % 1440, highTimeBound = (thisTimeOfDay + 120) % 1440;
+
+        if (timeOfDay >= lowTimeBound || timeOfDay <= highTimeBound) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
