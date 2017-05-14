@@ -23,7 +23,22 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class SetWallpaperService extends IntentService {
+
+    // codes for identifying which action the service has to execute
+    private static String CODE_KEY = "Order";
+    private static int CODE_NEXT_PHOTO = 1;
+    private static int CODE_PREVIOUS_PHOTO = 2;
+    private static int CODE_KARMA = 3;
+    private static int CODE_RELEASE = 4;
+    private static int CODE_DEFAULT_VALUE = 0;
+
+    private static final int INTERVAL_OFFSET = 5; // offset for the interval
+    private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    private static final long MIN_TO_MS = 60000; // a conversion factor from minutes to milliseconds
+
     private static Controller controller;
+    private static long interval = 10000;
 
     public SetWallpaperService() {
         super("WallpaperService");
@@ -32,21 +47,23 @@ public class SetWallpaperService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.i("Service Started", "SetWallpaper Service called");
+        Log.d("Service Started", "SetWallpaper Service called");
 
-        int order = intent.getIntExtra("Order", 0);
-        Log.i("i", Integer.toString(order));
-        if(order == 1) {
+        int order = intent.getIntExtra(CODE_KEY, CODE_DEFAULT_VALUE);
+
+        Log.d("Order Number", Integer.toString(order));
+
+        if(order == CODE_NEXT_PHOTO) {
             Photo nextPhoto = controller.getNextPhoto();
             controller.setWallpaper(nextPhoto);
-        }else if(order == 2){
+        }else if(order == CODE_PREVIOUS_PHOTO){
             Photo prevPhoto = controller.getPreviousPhoto();
             controller.setWallpaper(prevPhoto);
-        }else if(order == 3){
+        }else if(order == CODE_KARMA){
             controller.karmaPhoto();
-        }else if(order == 4){
+        }else if(order == CODE_RELEASE){
             controller.releasePhoto();
-        }else if(order == 0){
+        }else if(order == CODE_DEFAULT_VALUE){
             /*SHOULD NEVER GET HERE*/
         }else{
             /*ESPECIALLY SHOULD NEVER GET HERE*/
@@ -64,6 +81,14 @@ public class SetWallpaperService extends IntentService {
     @Override
     public void onDestroy(){
         super.onDestroy();
+    }
+
+    public static void updateInterval(int minutes) {
+        interval = minutes * MIN_TO_MS;
+    }
+
+    public static long getInterval() {
+        return interval;
     }
 
     /*
