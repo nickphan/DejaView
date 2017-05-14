@@ -70,9 +70,9 @@ public class GeoLocation {
             List<Address> addressName = geocoder.getFromLocation(getLatitude(), getLongitude(), 1);
             locationName = buildLocationName(addressName.listIterator().next());
         }
-        catch (IOException e) {
+        catch (Exception e) {
             // set location name to null if there was an error
-            locationName = null;
+            locationName = "";
         }
         return locationName;
     }
