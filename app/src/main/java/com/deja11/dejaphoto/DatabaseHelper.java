@@ -201,13 +201,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         }}catch (Exception e){
                         e.printStackTrace();
                     }
-
                 }
-                else{
-                    Toast.makeText(context,absolutePath + "is not inserted",Toast.LENGTH_SHORT).show();
-                }
-
-
             }
         }
     }
@@ -336,7 +330,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // if location is nearby, add 2 points
             photoGeoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
             if (photoGeoLocation.isNearCurrentLocation(deviceLocation)){
-                newPoint+=20;
+                newPoint+=10;
             }
 
             // if date is same add 2 points
@@ -355,13 +349,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int lowerTimeBound = (currentTimeOfDay - 120) % 1440, highTimeBound = (currentTimeOfDay + 120) % 1440;
 
             // 1 point for matching time of day
-            if (photoTimeOfDay >= lowerTimeBound || photoTimeOfDay <= highTimeBound) {
+            if (photoTimeOfDay >= lowerTimeBound && photoTimeOfDay <= highTimeBound) {
                 newPoint += 10;
             }
 
             // if it is karma add 1 point
             isKarma = res.getInt(7) > 0 ? true : false;
-            if(isKarma) {newPoint+=10;}
+            if(isKarma) {newPoint+=5;}
 
 
             updateField(id,COL_DEJA_6,newPoint);
@@ -394,14 +388,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String format = "MM-dd-yyyy HH:mm:ss";
             SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 
-            buffer.append("\n\nId :" + res.getString(0));
-            buffer.append("\nphone location:" + res.getString(1));
-            buffer.append("\ngeoLat :" + res.getString(2));
-            buffer.append("\ngeoLong :" + res.getString(3));
-            buffer.append("\ndate :" + formatter.format(new Date(Long.parseLong(res.getString(4)))));
-            buffer.append("\ndejapoints:" + res.getString(5));
-            buffer.append("\nrelease :" + res.getString(6));
-            buffer.append("\nkarma :" + res.getString(7));
+                buffer.append("\n\nId :" + res.getString(0));
+                buffer.append("\nphone location:" + res.getString(1));
+                buffer.append("\ngeoLat :" + res.getString(2));
+                buffer.append("\ngeoLong :" + res.getString(3));
+                buffer.append("\ndate :" + formatter.format(new Date(Long.parseLong(res.getString(4)))));
+                buffer.append("\ndejapoints:" + res.getString(5));
+                buffer.append("\nrelease :" + res.getString(6));
+                buffer.append("\nkarma :" + res.getString(7));
+
 
         }
         return buffer.toString();
