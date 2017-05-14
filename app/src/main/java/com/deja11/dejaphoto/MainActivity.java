@@ -37,8 +37,8 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_activity_main);
-        /*
+        setContentView(R.layout.activity_main);
+
 
         // Create database object
         myDb = new DatabaseHelper(this);
@@ -86,20 +86,20 @@ public class MainActivity extends Activity {
                 .build();
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        */
+
         // TODO: Do we need this?
         /*notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
         notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
         notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
         notification.defaults |= Notification.DEFAULT_SOUND; // Sound */
 
-        /*mNotificationManager.notify(5, notification);*/
+        mNotificationManager.notify(5, notification);
 
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm
-        /*
+
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -111,8 +111,15 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
-        });*/
+        });
 
+
+
+
+
+
+        /*Nick's shitty way of testing*/
+        /*
         controller = new Controller(this);
         Button button = (Button)findViewById(R.id.nextButton);
         button.setOnClickListener(new View.OnClickListener(){
@@ -133,7 +140,7 @@ public class MainActivity extends Activity {
                 controller.setWallpaper(photo);
             }
         });
-
+        */
     }
 
     public static class LeftReceiver extends BroadcastReceiver {

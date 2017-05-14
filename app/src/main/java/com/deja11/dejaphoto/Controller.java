@@ -172,6 +172,9 @@ public class Controller implements Parcelable{
             if(nextPhoto == -1) {
                 currPhoto = photo;
                 cache.add(photo);
+                if(cache.size() > 10){
+                    cache.remove(0);
+                }
             }else{
                 currPhoto = photo;
             }
@@ -180,6 +183,9 @@ public class Controller implements Parcelable{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
+                if(cache.size() > 10){
+                    cache.remove(0);
+                }
                 currPhoto = photo;
                 return setWallpaper(photo.phoneLocation, "Hello World");
             }else{
