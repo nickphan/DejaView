@@ -3,6 +3,7 @@ package com.deja11.dejaphoto;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +27,12 @@ public class GeoLocation {
 
         // call the location API to get the location name
         // this.locationName = locationName;
+    }
+
+    public GeoLocation(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        locationName = "";
     }
 
     /**
