@@ -1,26 +1,11 @@
 package com.deja11.dejaphoto;
 
-import android.app.Activity;
 import android.app.IntentService;
-import android.app.Service;
-import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Set;
+
 
 public class SetWallpaperService extends IntentService {
 
@@ -41,6 +26,9 @@ public class SetWallpaperService extends IntentService {
         super("WallpaperService");
     }
 
+    /**
+     * Use intent to figure out which button was clicked and respond accordingly
+     * */
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d("Service Started", "SetWallpaper Service called");
@@ -61,11 +49,15 @@ public class SetWallpaperService extends IntentService {
             controller.releasePhoto();
         }else if(order == CODE_DEFAULT_VALUE){
             /*SHOULD NEVER GET HERE*/
+            Log.i("Order", Integer.toString(0));
         }else{
             /*ESPECIALLY SHOULD NEVER GET HERE*/
+            Log.i("Error Order", "Service was started with an intent of " + Integer.toString(order));
         }
     }
 
+    /**
+     * Override to initialize a static controller object on the first service started*/
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         if(controller == null){
@@ -74,6 +66,7 @@ public class SetWallpaperService extends IntentService {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /* Call parent onDestroy*/
     @Override
     public void onDestroy(){
         super.onDestroy();
