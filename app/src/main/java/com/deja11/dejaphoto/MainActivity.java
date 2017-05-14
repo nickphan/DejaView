@@ -9,12 +9,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-<<<<<<< HEAD
-import android.content.pm.PackageManager;
-||||||| merged common ancestors
-=======
 import android.content.SharedPreferences;
->>>>>>> 1b3a746411c01df0799aa53e1e153f09c3aceff6
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
