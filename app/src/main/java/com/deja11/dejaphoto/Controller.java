@@ -9,15 +9,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -42,6 +45,9 @@ public class Controller implements Parcelable{
     DatabaseHelper databaseHelper;
     Context context;
     Photo currPhoto;
+    private static int X;
+    private static int Y;
+    //For prev
     LinkedList<Photo> cache;
 
     //For Parcelable
@@ -55,6 +61,12 @@ public class Controller implements Parcelable{
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
         cache = new LinkedList<Photo>();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        X= size.x;
+        Y= size.y;
     }
 
     /**
@@ -159,20 +171,23 @@ public class Controller implements Parcelable{
             }else{
                 currPhoto = photo;
             }
-            return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
-        }else{
+            return setWallpaper(photo.phoneLocation, "Hello");
+        }
+        else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
+                return setWallpaper(photo.phoneLocation, "Hello");
             }else{
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName());
+                return setWallpaper(photo.phoneLocation, "Hello");
             }
         }
     }
-    boolean setWallpaper(String photoPath, String geoLocation){
+
+    //set the wallpaper without a location displayed
+    boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
             try{
@@ -183,7 +198,7 @@ public class Controller implements Parcelable{
                 return false;
             }
         }
-        Uri data = Uri.parse(photoPath);
+        //Uri data = Uri.parse(photoPath);
         try {
             FileInputStream photoStream = new FileInputStream(new File(photoPath));
             myWallpaperManager.setStream(photoStream);
@@ -199,16 +214,46 @@ public class Controller implements Parcelable{
         }
     }
 
-    private BitmapDrawable writeTextOnWallpaper(Bitmap bitmap, String text){
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(15);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawText(text, 0, 0, paint);
-        return new BitmapDrawable(context.getResources(),bitmap);
+    //setting the wallpaper with the lcoation displayed
+    boolean setWallpaper(String photoPath, String geoLocation){
+        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        if(photoPath == null){
+            try{
+                myWallpaperManager.setResource(+R.drawable.default_image);
+                return false;
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        try {
+
+            Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
+            Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
+            writeBitmapOnMutable(mutableBitmap,bitmap);
+            writeTextOnWallpaper(mutableBitmap, geoLocation);
+            myWallpaperManager.setBitmap(mutableBitmap);
+            return true;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
+    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap){
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(bitmap,0,0,null);
+    }
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text){
+        Canvas canvas = new Canvas(mutableBitmap);
+        Paint paint = new Paint();
+        //paint.setTextAlign(Paint.Align.LEFT);
+        paint.setColor(Color.RED);
+        paint.setTextSize(60);
+        canvas.drawText("CSE110", 40, Y-paint.getTextSize(), paint);
 
+    }
 
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
