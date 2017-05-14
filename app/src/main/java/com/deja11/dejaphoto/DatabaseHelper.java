@@ -60,6 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_REL_7 = "RELEASED";
     public static final String COL_KARMA_8 = "KARMA";
 
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
@@ -67,9 +68,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE_NAME +
-                " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "PHONELOCATION TEXT, GEOLOCATIONLAT DECIMAL(10, 8)," +
+        db.execSQL("CREATE TABLE " + TABLE_NAME +
+                " (ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                " PHONELOCATION TEXT, GEOLOCATIONLAT DECIMAL(10, 8)," +
                 " GEOLOCATIONLONG FLOAT DECIMAL(11, 8), DATE TEXT, DEJAPOINTS INTEGER," +
                 " RELEASED INTEGER, KARMA INTEGER)");
     }
