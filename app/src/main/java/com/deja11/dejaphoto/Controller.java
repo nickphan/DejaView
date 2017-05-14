@@ -152,6 +152,7 @@ public class Controller implements Parcelable{
     void releasePhoto(){
         if(currPhoto != null){
             currPhoto.setReleased(true);
+            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
