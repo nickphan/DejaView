@@ -261,11 +261,6 @@ public class Controller implements Parcelable{
         return locationListener.getLastLocation();
     }
 
-    /**
-     * Give the current photo priority of appearance
-     */
-    void karmaPhoto(){ }
-
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
@@ -279,8 +274,6 @@ public class Controller implements Parcelable{
             }
         }
         try {
-
-
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
