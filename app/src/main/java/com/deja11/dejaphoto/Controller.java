@@ -229,9 +229,11 @@ public class Controller implements Parcelable{
         try {
 
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
-            Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
+            int height = myWallpaperManager.getDrawable().getIntrinsicHeight();
+            int width = myWallpaperManager.getDrawable().getIntrinsicWidth();
+            Bitmap mutableBitmap= Bitmap.createBitmap(width,height,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
-            //writeTextOnWallpaper(mutableBitmap, geoLocation);
+            writeTextOnWallpaper(mutableBitmap, geoLocation,height);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         }
@@ -245,13 +247,14 @@ public class Controller implements Parcelable{
         Canvas canvas = new Canvas(mutableBitmap);
         canvas.drawBitmap(bitmap,0,0,null);
     }
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text){
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height){
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         //paint.setTextAlign(Paint.Align.LEFT);
         paint.setColor(Color.RED);
         paint.setTextSize(60);
-        canvas.drawText("CSE110", 40, Y-paint.getTextSize(), paint);
+
+        canvas.drawText("CSE110", paint.getTextSize(), height-paint.getTextSize(), paint);
 
     }
 

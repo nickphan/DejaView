@@ -34,10 +34,26 @@ public class MainActivity extends Activity {
     DatabaseHelper myDb;
     Controller controller;
 
+    /**
+     * For testing purpose
+     */
+    private static MainActivity instance;
+    public static MainActivity getInstance() {
+        if(instance==null){
+            setInstance(instance);
+        }
+        return instance;
+    }
+    public static void setInstance(MainActivity instance) {
+        MainActivity.instance = instance;
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setInstance(this);
 
 
         // Create database object
@@ -110,7 +126,15 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
         });
+    }
 
+    /**
+     * For testing purpose
+     * @param view
+     */
+    public void settingsClicked(View view){
+        Intent intent = new Intent(MainActivity.this, SettingPreference.class);
+        startActivity(intent);
     }
 
     public static class LeftReceiver extends BroadcastReceiver {

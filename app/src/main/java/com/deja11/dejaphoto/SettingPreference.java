@@ -1,33 +1,41 @@
 package com.deja11.dejaphoto;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 
 public class SettingPreference extends Activity {
 
+    /**
+     * For testing purpose
+     */
+    private static SettingPreference instance;
+    public static SettingPreference getInstance() {
+        if(instance==null){
+            setInstance(instance);
+        }
+        return instance;
+    }
+    public static void setInstance(SettingPreference instance) {
+        SettingPreference.instance = instance;
+    }
+
     private int currentProgress = 5;
     private static int currentLocation;
 
+    // For testing
+    private TextView progressText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_preference);
+        setInstance(this);
         SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
         seekBar.setMax(25);
-        final TextView progressText = (TextView)findViewById(R.id.seekbarvalue);
+        progressText = (TextView)findViewById(R.id.seekbarvalue);
         //default
         currentProgress = getCurrentProgress();
         seekBar.setProgress(currentProgress);
@@ -57,6 +65,22 @@ public class SettingPreference extends Activity {
             }
         });
     }
+
+    /**
+     *  For Testing purpose
+     * @param seekBar
+     * @param progress
+     * @param fromUser
+     */
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+        currentProgress= progress;
+        int val = (progress * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
+        currentLocation= val;
+        saveProgressAndLocation();
+    }
+
+
     private void setText(SeekBar seekBar, TextView progressText, int progress, int val){
         progressText.setText(String.valueOf(progress+5) + " min");
         progressText.setX(seekBar.getX() + val + seekBar.getThumbOffset() / 2);
@@ -88,10 +112,6 @@ public class SettingPreference extends Activity {
         catch(Exception e){
             return 0;
         }
-    }
-
-    public int setTime(){
-        return currentProgress;
     }
 
 }
