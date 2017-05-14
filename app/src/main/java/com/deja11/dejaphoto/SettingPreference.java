@@ -113,5 +113,4 @@ public class SettingPreference extends Activity {
             return 0;
         }
     }
-
 }

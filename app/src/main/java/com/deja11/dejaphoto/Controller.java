@@ -1,33 +1,27 @@
 package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.CountDownTimer;
+import android.os.Bundle;
+import android.os.Looper;
+
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
-import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.io.InputStream;
-import java.util.Stack;
 
 /**
  * Created by shuai9532 on 5/6/17.
@@ -35,28 +29,19 @@ import java.util.Stack;
 
 public class Controller implements Parcelable{
 
-    /**
-     * TODO
-     *  - replace arraylists with databasehelper
-     *  - TEST THE SETWALLPAPER METHOD
-     * */
-
-
-    DatabaseHelper databaseHelper;
-    Context context;
-    Photo currPhoto;
+    private DatabaseHelper databaseHelper;
+    private Context context;
+    private Photo currPhoto;
     private static int X;
     private static int Y;
-    //For prev
-    LinkedList<Photo> cache;
-
-    //For Parcelable
-    int mData;
+    private LinkedList<Photo> cache;
+    private int mData;
 
     /**
      * Constructor with context
      * */
     public Controller(Context context){
+        Log.i("Initializing Controller", "New Controller");
         this.context = context;
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
@@ -67,22 +52,36 @@ public class Controller implements Parcelable{
         display.getSize(size);
         X= size.x;
         Y= size.y;
+        initialize();
     }
 
     /**
      * Get the next photo to display
-     * @return the next photo
-     *      either from cache or from DatabaseHelper
+     * @return the next photo either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
+        databaseHelper.updatePoint(getUserCurrentLocation());
+        Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
-            return databaseHelper.getNextPhoto();
+            if(photo.isReleased()){
+                return getNextPhoto();
+            }else{
+                return photo;
+            }
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
-                return databaseHelper.getNextPhoto();
+                if(photo.isReleased()){
+                    return getNextPhoto();
+                }else{
+                    return photo;
+                }
             }else if(currIndex == cache.size()-1){
-                return databaseHelper.getNextPhoto();
+                if(photo.isReleased()){
+                    return getNextPhoto();
+                }else{
+                    return photo;
+                }
             }else{
                 return cache.get(currIndex+1);
             }
@@ -91,8 +90,7 @@ public class Controller implements Parcelable{
 
     /**
      * Get the previous photo displayed
-     * @return the previous photo
-     *      from the cache or null if necessary
+     * @return the previous photo from the cache or null if necessary
      * */
     public Photo getPreviousPhoto() {
         if(currPhoto == null){
@@ -121,10 +119,15 @@ public class Controller implements Parcelable{
     /**
      * Set current photo karma field to true
      */
-    void karmaPhoto(){
+    public boolean karmaPhoto(){
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            databaseHelper.updateKarma(photo.getPhotoLocation());
+            return true;
+        }else{
+            //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -132,8 +135,9 @@ public class Controller implements Parcelable{
      * Remove the current photo shown on the homepage from the cycle
      */
     void releasePhoto(){
-        currPhoto.setReleased(true);
         if(currPhoto != null){
+            currPhoto.setReleased(true);
+            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
@@ -155,8 +159,6 @@ public class Controller implements Parcelable{
     /**
      * Set the desired photo to be the wallpaper
      * @param photo the photo acquired from getNextPhoto()
-     *        context the Activity context
-     *        contentResolver ...
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo){
@@ -168,25 +170,37 @@ public class Controller implements Parcelable{
             if(nextPhoto == -1) {
                 currPhoto = photo;
                 cache.add(photo);
+                if(cache.size() > 10){
+                    cache.remove(0);
+                }
             }else{
                 currPhoto = photo;
             }
-            return setWallpaper(photo.phoneLocation, "Hello");
-        }
-        else{
+            //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+            return setWallpaper(photo.getPhotoLocation());
+        }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 cache.add(currPhoto);
+                if(cache.size() > 10){
+                    cache.remove(0);
+                }
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
+                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation());
             }else{
                 currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
+                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation());
             }
         }
     }
 
-    //set the wallpaper without a location displayed
+    /**
+     * Set the desired photo to be the wallpaper
+     * @param photoPath the path of the photo as a string
+     * @return true if the wallpaper was set. false otherwise
+     */
     boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
@@ -198,15 +212,9 @@ public class Controller implements Parcelable{
                 return false;
             }
         }
-        //Uri data = Uri.parse(photoPath);
         try {
             FileInputStream photoStream = new FileInputStream(new File(photoPath));
             myWallpaperManager.setStream(photoStream);
-
-            //InputStream inputStream = context.getContentResolver().openInputStream(data);
-            //Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            //BitmapDrawable drawble = writeTextOnWallpaper(bitmap,geoLocation);
-            //myWallpaperManager.setBitmap(bitmap);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -214,7 +222,12 @@ public class Controller implements Parcelable{
         }
     }
 
-    //setting the wallpaper with the lcoation displayed
+    /**
+     * Set the desired photo to be the wallpaper
+     * @param photoPath, the path of the photo as a string
+     * @param geoLocation, the location of the photo to display
+     * @return true if the wallpaper was set. false otherwise
+     */
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
@@ -227,7 +240,6 @@ public class Controller implements Parcelable{
             }
         }
         try {
-
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             int height = myWallpaperManager.getDrawable().getIntrinsicHeight();
             int width = myWallpaperManager.getDrawable().getIntrinsicWidth();
@@ -243,20 +255,55 @@ public class Controller implements Parcelable{
         }
     }
 
+    /**
+     * Private helper method to create a canvas to write on
+     * @param mutableBitmap,
+     * @param bitmap,
+     * */
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap){
         Canvas canvas = new Canvas(mutableBitmap);
         canvas.drawBitmap(bitmap,0,0,null);
     }
+
+    /**
+     * Private helper method to place text on the wallpaper
+     * @param mutableBitmap, the bitmap of the image to be the wallpaper
+     * @param text, the text to be displayed
+     * */
     private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height){
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         //paint.setTextAlign(Paint.Align.LEFT);
         paint.setColor(Color.RED);
         paint.setTextSize(60);
-
-        canvas.drawText("CSE110", paint.getTextSize(), height-paint.getTextSize(), paint);
-
+        canvas.drawText(text, paint.getTextSize(), height-paint.getTextSize(), paint);
     }
+
+    /**
+     * Gets the user's current location
+     * @return The user's current location as a Location object, null if location permission not granted
+     */
+    public GeoLocation getUserCurrentLocation() {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        ControllerLocationListener locationListener = new ControllerLocationListener();
+        try {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
+        }
+        catch (SecurityException e) {
+            return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
+        }
+
+        return new GeoLocation(locationListener.getLastLocation());
+    }
+    /**
+     * Private helper method to run when object created*/
+
+    private void initialize(){
+        Photo photo = getNextPhoto();
+        setWallpaper(photo);
+    }
+
+
 
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
@@ -280,5 +327,30 @@ public class Controller implements Parcelable{
     };
     private Controller(Parcel in) {
         mData = in.readInt();
+    }
+
+    class ControllerLocationListener implements LocationListener {
+        private Location lastLocation;
+        private String locationProvider;
+
+        public Location getLastLocation() {
+            return lastLocation;
+        }
+
+        public void onLocationChanged(Location location) {
+            lastLocation = location;
+        }
+
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        public void onProviderEnabled (String provider) {
+            locationProvider = provider;
+        }
+
+        public void onStatusChanged (String provider, int status, Bundle extras) {
+
+        }
     }
 }

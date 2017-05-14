@@ -3,6 +3,7 @@ package com.deja11.dejaphoto;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,19 +14,23 @@ import java.util.List;
 
 public class GeoLocation {
 
-    // for isNearlocation()
-    int CONSTANT_CONSTRAINT = 1000;
-
     private double longitude;
     private double latitude;
     private String locationName;
 
+    // for isNearlocation()
+    private int CONSTANT_CONSTRAINT = 1000;
+
     public GeoLocation(double latitude,double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
+        locationName = "";
+    }
 
-        // call the location API to get the location name
-        // this.locationName = locationName;
+    public GeoLocation(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        locationName = "";
     }
 
     /**
@@ -41,6 +46,18 @@ public class GeoLocation {
     }
 
     /**
+     * Check if the geolocation of the photo is within 1000 feet of where the user is currently at
+     * @param deviceLocation the geoLocation of the user's current location
+     * @return true if the photo was taken nearby this current location
+     */
+    public boolean isNearCurrentLocation(GeoLocation deviceLocation){
+        double latitude = deviceLocation.getLatitude();
+        double longitude = deviceLocation.getLongitude();
+        return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
+                (this.latitude - latitude) * (this.latitude - latitude))
+                < CONSTANT_CONSTRAINT;
+    }
+    /**
      * Get the name of the location where the photo is taken
      *
      * @param context The context in which this method is being called
@@ -48,7 +65,6 @@ public class GeoLocation {
      */
     public String getLocationName(Context context){
         Geocoder geocoder = new Geocoder(context);
-
         try {
             // extract the location name using the Address created from the latitude and longitude coordinates
             List<Address> addressName = geocoder.getFromLocation(getLatitude(), getLongitude(), 1);
@@ -58,7 +74,6 @@ public class GeoLocation {
             // set location name to null if there was an error
             locationName = null;
         }
-
         return locationName;
     }
 
@@ -103,7 +118,6 @@ public class GeoLocation {
 
             name.append(address.getAdminArea());
         }
-
         if (address.getCountryName() != null) {
             // if something is already in the location name (i.e. a more specific part of the name), use a comma separator
             if (name.length() != 0) {

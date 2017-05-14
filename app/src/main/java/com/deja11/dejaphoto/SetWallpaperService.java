@@ -24,27 +24,46 @@ import java.util.Set;
 
 public class SetWallpaperService extends IntentService {
     private static Controller controller;
-    private static int i = 0;
 
     public SetWallpaperService() {
         super("WallpaperService");
-    }
-
-    public Controller getController() {
-        if (controller == null) {
-            controller = new Controller(getApplicationContext());
-        }
-
-        return controller;
+        //controller = getController();
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.i("Service Started", "SetWallpaper Service called");
-        Log.i("i", Integer.toString(i));
-        i++;
-        Photo nextPhoto = getController().getNextPhoto();
-        getController().setWallpaper(nextPhoto);
+
+        int order = intent.getIntExtra("Order", 0);
+        Log.i("i", Integer.toString(order));
+        if(order == 1) {
+            Photo nextPhoto = controller.getNextPhoto();
+            controller.setWallpaper(nextPhoto);
+        }else if(order == 2){
+            Photo prevPhoto = controller.getPreviousPhoto();
+            controller.setWallpaper(prevPhoto);
+        }else if(order == 3){
+            controller.karmaPhoto();
+        }else if(order == 4){
+            controller.releasePhoto();
+        }else if(order == 0){
+            /*SHOULD NEVER GET HERE*/
+        }else{
+            /*ESPECIALLY SHOULD NEVER GET HERE*/
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        if(controller == null){
+            controller = new Controller(getApplicationContext());
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
     }
 
     /*
