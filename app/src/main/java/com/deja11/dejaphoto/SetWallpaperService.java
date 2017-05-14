@@ -1,6 +1,7 @@
 package com.deja11.dejaphoto;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -10,6 +11,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,21 +22,57 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class SetWallpaperService extends Service {
-    ArrayList<String> photoPaths;
+public class SetWallpaperService extends IntentService {
+    private static Controller controller;
+    private static int i = 0;
 
     public SetWallpaperService() {
+        super("WallpaperService");
+        //controller = getController();
+    }
+
+
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        Log.i("Service Started", "SetWallpaper Service called");
+
+        int order = intent.getIntExtra("Order", 0);
+        Log.i("i", Integer.toString(order));
+        if(order == 1) {
+            Photo nextPhoto = controller.getNextPhoto();
+            controller.setWallpaper(nextPhoto);
+        }else if(order == 2){
+            Photo prevPhoto = controller.getPreviousPhoto();
+            controller.setWallpaper(prevPhoto);
+        }else if(order == 3){
+            controller.karmaPhoto();
+        }else if(order == 4){
+            controller.releasePhoto();
+        }else if(order == 0){
+            /*SHOULD NEVER GET HERE*/
+        }else{
+            /*ESPECIALLY SHOULD NEVER GET HERE*/
+        }
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+    public int onStartCommand(Intent intent, int flags, int startId){
+        if(controller == null){
+            controller = new Controller(getApplicationContext());
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+
+    /*
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        photoPaths = gatherPhotos(SetWallpaperService.this);
+        Toast.makeText(SetWallpaperService.this, "Started", Toast.LENGTH_SHORT);
 
         Thread thread = new Thread(new PhotoFileThread(startId));
         thread.start();
@@ -41,78 +80,24 @@ public class SetWallpaperService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private ArrayList<String> gatherPhotos(Context context) {
-        Uri uri;
-        Cursor cursor;
-        int columnIndexData;
-        int columnIndexFolder;
-
-        ArrayList<String> imageList = new ArrayList<String>();
-        String absolutePath = null;
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = {
-                MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
-        };
-
-        cursor = context.getContentResolver().query(uri, projection, null, null, null);
-
-        columnIndexData = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        columnIndexFolder = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-        while (cursor.moveToNext()) {
-            absolutePath = cursor.getString(columnIndexData);
-            imageList.add(absolutePath);
-        }
-
-        return imageList;
-    }
-
     final class PhotoFileThread implements Runnable {
         int startId;
-        int photoIndex;
 
         public PhotoFileThread(int startId) {
             this.startId = startId;
-            photoIndex = 0;
         }
         @Override
         public void run() {
-            WallpaperManager myWallpaperManager = WallpaperManager.getInstance(SetWallpaperService.this);
-
             synchronized (this) {
                 try {
-                    if (photoPaths.size() == 0) {
-                        try {
-                            myWallpaperManager.setResource(R.raw.test_photo);
-                        }
-                        catch (IOException e) {
-                            Toast.makeText(SetWallpaperService.this, "Error displaying wallpaper", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else {
-                        try {
-                            FileInputStream photoStream = new FileInputStream(new File(photoPaths.get(photoIndex)));
-                            myWallpaperManager.setStream(photoStream);
-                        }
-                        catch (Exception e) {
-                            Toast.makeText(SetWallpaperService.this, "Error displaying wallpaper from file", Toast.LENGTH_SHORT).show();
-                        }
-
-                        photoIndex++;
-                    }
-
-                    wait(15000);
-                }
-                catch (InterruptedException e) {
+                    Photo photo = controller.getNextPhoto();
+                    boolean setWallpaper = controller.setWallpaper(photo);
+                    Toast.makeText(SetWallpaperService.this, "Changed", Toast.LENGTH_SHORT);
+                    wait(10000);
+                }catch(Exception e){
                     e.printStackTrace();
-                }
-
-                if (photoIndex >= photoPaths.size()) {
-                    photoIndex = 0;
                 }
             }
         }
-    }
+    } */
 }
