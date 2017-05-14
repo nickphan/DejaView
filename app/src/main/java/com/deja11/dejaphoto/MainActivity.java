@@ -98,13 +98,20 @@ public class MainActivity extends Activity {
         //Button startButton = (Button)findViewById(R.id.startButton);
         //mNotificationManager.notify(5, notification);
 
-        // Setting up the alarm
+        // Setting up the alarm to change the photo every x minutes
 
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int defaultTimer = 60000;
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
+        int defaultTimer = 10000;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmPIntent);
+        }
+
+        else {
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), defaultTimer, alarmPIntent);
+        }
 
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +167,23 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Toast.makeText(context, "Next Button Clicked", Toast.LENGTH_SHORT).show();
+
+            // reset the alarm
+            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+            PendingIntent alarmPIntent = PendingIntent.getBroadcast(context, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+            int defaultTimer = 10000;
+
+            mAlarmManager.cancel(alarmPIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + defaultTimer, alarmPIntent);
+            }
+
+            else {
+                mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + defaultTimer, defaultTimer, alarmPIntent);
+            }
+
             Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
             nextButtonIntent.putExtra("Order", 1);
             context.startService(nextButtonIntent);
@@ -192,9 +216,19 @@ public class MainActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            //serviceIntent.putExtra("Order", 1);
-            //context.startService(serviceIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                // reset the alarm
+                Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+                PendingIntent alarmPIntent = PendingIntent.getBroadcast(context, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+                int defaultTimer = 10000;
+                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + defaultTimer, alarmPIntent);
+            }
+
+            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
+            serviceIntent.putExtra("Order", 1);
+            context.startService(serviceIntent);
         }
     }
 }
