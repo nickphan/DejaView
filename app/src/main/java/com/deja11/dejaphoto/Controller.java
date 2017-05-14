@@ -75,14 +75,27 @@ public class Controller implements Parcelable{
      *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
+        Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
-            return databaseHelper.getNextPhoto();
+            if(photo.isReleased()){
+                return getNextPhoto();
+            }else{
+                return photo;
+            }
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
-                return databaseHelper.getNextPhoto();
+                if(photo.isReleased()){
+                    return getNextPhoto();
+                }else{
+                    return photo;
+                }
             }else if(currIndex == cache.size()-1){
-                return databaseHelper.getNextPhoto();
+                if(photo.isReleased()){
+                    return getNextPhoto();
+                }else{
+                    return photo;
+                }
             }else{
                 return cache.get(currIndex+1);
             }
