@@ -16,6 +16,7 @@ import android.os.Looper;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import java.io.File;
@@ -40,6 +41,7 @@ public class Controller implements Parcelable{
      * Constructor with context
      * */
     public Controller(Context context){
+        Log.i("Initializing Controller", "New Controller");
         this.context = context;
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
@@ -50,6 +52,7 @@ public class Controller implements Parcelable{
         display.getSize(size);
         X= size.x;
         Y= size.y;
+        initialize();
     }
 
     /**
@@ -290,6 +293,13 @@ public class Controller implements Parcelable{
         }
 
         return new GeoLocation(locationListener.getLastLocation());
+    }
+    /**
+     * Private helper method to run when object created*/
+
+    private void initialize(){
+        Photo photo = getNextPhoto();
+        setWallpaper(photo);
     }
 
 
