@@ -115,13 +115,7 @@ public class Photo {
         // Get photo's time of day and create bounds for "same time of day"
         int thisTimeOfDay = getTimeOfDay();
         int lowTimeBound = (thisTimeOfDay - 120) % 1440, highTimeBound = (thisTimeOfDay + 120) % 1440;
-
-        if (timeOfDay >= lowTimeBound || timeOfDay <= highTimeBound) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return timeOfDay >= lowTimeBound || timeOfDay <= highTimeBound;
     }
 
     /**
@@ -161,7 +155,7 @@ public class Photo {
      * @return true if the photos share the same path, false otherwise
      * */
     public boolean equals(Photo photo){
-        return this.phoneLocation == photo.phoneLocation;
+        return this.phoneLocation.equals(photo.phoneLocation);
     }
 
 }
