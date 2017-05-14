@@ -6,9 +6,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Looper;
 
 import java.io.InputStream;
 
@@ -28,6 +31,8 @@ public class Controller {
 
     // cache that stores the previous 10 photos
     // someDataStructure cache;
+
+
 
 
     public Controller(){
@@ -70,14 +75,16 @@ public class Controller {
      */
     public Location getUserCurrentLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        ControllerLocationListener locationListener = new ControllerLocationListener();
 
-        // Get last known location from GPS, return null if permission not granted
         try {
-            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
         }
         catch (SecurityException e) {
-            return null;
+            return new Location(LocationManager.GPS_PROVIDER);
         }
+
+        return locationListener.getLastLocation();
     }
 
     /**
@@ -92,5 +99,30 @@ public class Controller {
      */
     void releasePhoto(){
 
+    }
+
+    class ControllerLocationListener implements LocationListener {
+        private Location lastLocation;
+        private String locationProvider;
+
+        public Location getLastLocation() {
+            return lastLocation;
+        }
+
+        public void onLocationChanged(Location location) {
+            lastLocation = location;
+        }
+
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        public void onProviderEnabled (String provider) {
+            locationProvider = provider;
+        }
+
+        public void onStatusChanged (String provider, int status, Bundle extras) {
+
+        }
     }
 }
