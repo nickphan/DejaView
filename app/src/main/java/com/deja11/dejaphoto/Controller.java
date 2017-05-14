@@ -1,9 +1,7 @@
 package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -13,28 +11,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Looper;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.view.Display;
 import android.view.WindowManager;
-import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
-import java.io.InputStream;
-import java.util.Stack;
 
 /**
  * Created by shuai9532 on 5/6/17.
@@ -42,13 +28,13 @@ import java.util.Stack;
 
 public class Controller implements Parcelable{
 
-    DatabaseHelper databaseHelper;
-    Context context;
-    Photo currPhoto;
+    private DatabaseHelper databaseHelper;
+    private Context context;
+    private Photo currPhoto;
     private static int X;
     private static int Y;
-    LinkedList<Photo> cache;
-    int mData;
+    private LinkedList<Photo> cache;
+    private int mData;
 
     /**
      * Constructor with context
@@ -68,11 +54,9 @@ public class Controller implements Parcelable{
 
     /**
      * Get the next photo to display
-     * @return the next photo
-     *      either from cache or from DatabaseHelper
+     * @return the next photo either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
-
         databaseHelper.updatePoint(getUserCurrentLocation());
         Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
@@ -103,8 +87,7 @@ public class Controller implements Parcelable{
 
     /**
      * Get the previous photo displayed
-     * @return the previous photo
-     *      from the cache or null if necessary
+     * @return the previous photo from the cache or null if necessary
      * */
     public Photo getPreviousPhoto() {
         if(currPhoto == null){
@@ -173,8 +156,6 @@ public class Controller implements Parcelable{
     /**
      * Set the desired photo to be the wallpaper
      * @param photo the photo acquired from getNextPhoto()
-     *        context the Activity context
-     *        contentResolver ...
      * @return true if the wallpaper was set. false otherwise
      */
     boolean setWallpaper(Photo photo){
@@ -193,7 +174,7 @@ public class Controller implements Parcelable{
                 currPhoto = photo;
             }
             //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-            return setWallpaper(photo.phoneLocation);
+            return setWallpaper(photo.getPhotoLocation());
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
@@ -203,16 +184,20 @@ public class Controller implements Parcelable{
                 }
                 currPhoto = photo;
                 //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-                return setWallpaper(photo.phoneLocation);
+                return setWallpaper(photo.getPhotoLocation());
             }else{
                 currPhoto = photo;
                 //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-                return setWallpaper(photo.phoneLocation);
+                return setWallpaper(photo.getPhotoLocation());
             }
         }
     }
 
-    //set the wallpaper without a location displayed
+    /**
+     * Set the desired photo to be the wallpaper
+     * @param photoPath the path of the photo as a string
+     * @return true if the wallpaper was set. false otherwise
+     */
     boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
@@ -234,27 +219,12 @@ public class Controller implements Parcelable{
         }
     }
 
-
     /**
-     * Gets the user's current location
-     * @return The user's current location as a Location object, null if location permission not granted
+     * Set the desired photo to be the wallpaper
+     * @param photoPath, the path of the photo as a string
+     * @param geoLocation, the location of the photo to display
+     * @return true if the wallpaper was set. false otherwise
      */
-    public GeoLocation getUserCurrentLocation() {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        ControllerLocationListener locationListener = new ControllerLocationListener();
-
-        try {
-            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
-        }
-        catch (SecurityException e) {
-            return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
-        }
-      
-        return new GeoLocation(locationListener.getLastLocation());
-    }
-
-
-    //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
@@ -280,10 +250,21 @@ public class Controller implements Parcelable{
         }
     }
 
+    /**
+     * Private helper method to create a canvas to write on
+     * @param mutableBitmap,
+     * @param bitmap,
+     * */
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap){
         Canvas canvas = new Canvas(mutableBitmap);
         canvas.drawBitmap(bitmap,0,0,null);
     }
+
+    /**
+     * Private helper method to place text on the wallpaper
+     * @param mutableBitmap, the bitmap of the image to be the wallpaper
+     * @param text, the text to be displayed
+     * */
     private void writeTextOnWallpaper(Bitmap mutableBitmap, String text){
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
@@ -294,11 +275,24 @@ public class Controller implements Parcelable{
 
     }
 
-
     /**
      * Gets the user's current location
      * @return The user's current location as a Location object, null if location permission not granted
      */
+    public GeoLocation getUserCurrentLocation() {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        ControllerLocationListener locationListener = new ControllerLocationListener();
+        try {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.getMainLooper());
+        }
+        catch (SecurityException e) {
+            return new GeoLocation(new Location(LocationManager.GPS_PROVIDER));
+        }
+
+        return new GeoLocation(locationListener.getLastLocation());
+    }
+
+
 
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
