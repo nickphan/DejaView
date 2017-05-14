@@ -77,6 +77,8 @@ public class Controller implements Parcelable{
      *      either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
+
+        databaseHelper.updatePoint(getUserCurrentLocation());
         Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
             if(photo.isReleased()){
@@ -245,7 +247,7 @@ public class Controller implements Parcelable{
      * @param context The Context from which this method is being called
      * @return The user's current location as a Location object, null if location permission not granted
      */
-    public Location getUserCurrentLocation(Context context) {
+    public Location getUserCurrentLocation() {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Get last known location from GPS, return null if permission not granted
@@ -257,10 +259,7 @@ public class Controller implements Parcelable{
         }
     }
 
-    /**
-     * Give the current photo priority of appearance
-     */
-    void karmaPhoto(){ }
+
 
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){

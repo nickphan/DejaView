@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -140,12 +141,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
         StringBuffer buffer = new StringBuffer();
         //buffer.append(res.getCount() + "");
-        chooseNextPath();
+        //chooseNextPath();
 
         //updateField(2,COL_KARMA_8,"1");
         //updateField(3,COL_DEJA_6,50);
         //updateField(2,COL_DEJA_6,25);
         //updateField(3,COL_KARMA_8,1);
+
+
 
 
         buffer.append(printAll(context));
@@ -239,7 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         * */
 
         //update all points
-        updatePoint();
+
 
         int randomNumber;
         int randomPosition = 0;
@@ -298,7 +301,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void updatePoint(){
+    public void updatePoint(GeoLocation deviceLocation){
         // loop throught all rows
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
@@ -306,7 +309,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int newPoint = 0;
         int id = 0;
-        GeoLocation geoLocation;
+        GeoLocation photoGeoLocation;
         Date date ;
         boolean isKarma;
 
@@ -316,7 +319,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
             // if location is nearby, add 2 points
-            geoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
+            photoGeoLocation = new GeoLocation(res.getDouble(2),res.getDouble(3));
+            if (photoGeoLocation.isNearCurrentLocation(deviceLocation)){
+            //    newPoint+=20;
+            }
 
             // if date is same add 2 points
             date = new Date(Long.parseLong(res.getString(4)));
