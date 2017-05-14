@@ -171,19 +171,11 @@ public class Controller implements Parcelable{
             }else{
                 currPhoto = photo;
             }
+            return setWallpaper(photo.phoneLocation, "Hello World");
+        }else{
             return setWallpaper(photo.phoneLocation, "Hello");
         }
-        else{
-            int currIndex = cache.indexOf(currPhoto);
-            if(currIndex == -1){
-                cache.add(currPhoto);
-                currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
-            }else{
-                currPhoto = photo;
-                return setWallpaper(photo.phoneLocation, "Hello");
-            }
-        }
+
     }
 
     //set the wallpaper without a location displayed

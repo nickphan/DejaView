@@ -18,6 +18,6 @@ public class JUnitTest1 {
 
     @Test
     public void test1(){
-        /*Test whether */
+
     }
 }
