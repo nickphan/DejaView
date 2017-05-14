@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -182,20 +183,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             double latitude = 0.0;
             double longitude = 0.0;
 
+            String str2 = "DCIM";
+
             while (cursor.moveToNext()) {
                 absolutePath = cursor.getString(columnIndexPath); //path to the photo
                 dateAdded = cursor.getString(columnIndexDate); //date in string format
                 latitude = cursor.getDouble(columnIndexLat);
                 longitude = cursor.getDouble(columnIndexLong);
 
-                try{
-                Cursor res = db.rawQuery("SELECT id FROM photo_table WHERE phonelocation = '" + absolutePath + "'", null);
-                if(res.getCount() ==0) {
-                    this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                    Toast.makeText(context,absolutePath,Toast.LENGTH_SHORT).show();
-                }}catch (Exception e){
-                    e.printStackTrace();
+                if (absolutePath.toLowerCase().contains(str2.toLowerCase())){
+                    try{
+                        Cursor res = db.rawQuery("SELECT id FROM photo_table WHERE phonelocation = '" + absolutePath + "'", null);
+                        if(res.getCount() ==0) {
+                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                            Toast.makeText(context,"Yass : "+absolutePath,Toast.LENGTH_SHORT).show();
+                            Log.i("Database insertion", absolutePath+" is now in the table");
+                        }}catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }
+                else{
+                    Toast.makeText(context,absolutePath + "is not inserted",Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         }
     }
