@@ -40,6 +40,13 @@ public class GeoLocation {
                          < CONSTANT_CONSTRAINT;
     }
 
+    public boolean isNearCurrentLocation(GeoLocation deviceLocation){
+        double latitude = deviceLocation.getLatitude();
+        double longitude = deviceLocation.getLongitude();
+        return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
+                (this.latitude - latitude) * (this.latitude - latitude))
+                < CONSTANT_CONSTRAINT;
+    }
     /**
      * Get the name of the location where the photo is taken
      *
