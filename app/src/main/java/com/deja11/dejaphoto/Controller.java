@@ -6,6 +6,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -138,6 +140,7 @@ public class Controller implements Parcelable{
         Photo photo = getCurrentWallpaper();
         if(!photo.isKarma()){
             photo.setKarma(true);
+            databaseHelper.updateKarma(photo.getPhotoLocation());
             return true;
         }else{
             //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
@@ -151,6 +154,7 @@ public class Controller implements Parcelable{
     void releasePhoto(){
         if(currPhoto != null){
             currPhoto.setReleased(true);
+            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 currPhoto = cache.getLast();
@@ -236,6 +240,28 @@ public class Controller implements Parcelable{
         }
     }
 
+    /**
+     * Gets the user's current location
+     * @param context The Context from which this method is being called
+     * @return The user's current location as a Location object, null if location permission not granted
+     */
+    public Location getUserCurrentLocation(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        // Get last known location from GPS, return null if permission not granted
+        try {
+            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        catch (SecurityException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Give the current photo priority of appearance
+     */
+    void karmaPhoto(){ }
+
     //setting the wallpaper with the lcoation displayed
     boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
@@ -249,6 +275,7 @@ public class Controller implements Parcelable{
             }
         }
         try {
+
 
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             Bitmap mutableBitmap= Bitmap.createBitmap(X,Y,bitmap.getConfig());
