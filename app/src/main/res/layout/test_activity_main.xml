@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="100dp"
+
+        android:id="@+id/prevButton"
+        android:text="Prev"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/prevButton"
+        android:layout_marginTop="70dp"
+
+        android:id="@+id/karmaButton"
+        android:text="Karma"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/karmaButton"
+        android:layout_toRightOf="@id/prevButton"
+        android:id="@+id/releaseButton"
+        android:text="Release"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/karmaButton"
+        android:layout_marginTop="100dp"
+
+        android:id="@+id/nextButton"
+        android:text="Next"/>
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_below="@id/releaseButton"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="50dp"
+
+        android:id="@+id/imageView"/>
+
+    <ImageButton
+        android:id="@+id/settingtest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_settings_black_18dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
+
+</RelativeLayout>
