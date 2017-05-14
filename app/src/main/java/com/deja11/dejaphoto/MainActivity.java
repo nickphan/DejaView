@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
@@ -17,9 +18,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -106,6 +107,18 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, photo.phoneLocation, Toast.LENGTH_SHORT).show();
             }
         });
+
+       /* PreferenceManager.setDefaultValues(this, R.xml.prefalse);*/
+
+        ImageButton setting = (ImageButton) findViewById(R.id.settingtest);
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingPreference.class));
+            }
+        });
+
+
         /*
     /*karmaButton.setOnClickListener(new View.OnClickListener()
     {
@@ -148,4 +161,5 @@ public class MainActivity extends Activity {
             Toast.makeText(context, "Release Button Clicked", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

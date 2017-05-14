@@ -32,4 +32,13 @@
 
         android:id="@+id/imageView"/>
 
+    <ImageButton
+        android:id="@+id/settingtest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_settings_black_18dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
+
 </RelativeLayout>
