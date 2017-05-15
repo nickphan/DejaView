@@ -42,18 +42,42 @@ public class GeoLocation {
      * @return true if the photo was taken nearby this current location
      */
     public boolean isNearCurrentLocation(double latitude, double longitude){
-        return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
-                         (this.latitude - latitude) * (this.latitude - latitude))
-                         < CONSTANT_CONSTRAINT;
+        return feetBetweenCoordinates(this.latitude, this.longitude, latitude, longitude) < CONSTANT_CONSTRAINT;
     }
 
     public boolean isNearCurrentLocation(GeoLocation deviceLocation){
         double latitude = deviceLocation.getLatitude();
         double longitude = deviceLocation.getLongitude();
-        return Math.sqrt((this.longitude - longitude) * (this.longitude - longitude) +
-                (this.latitude - latitude) * (this.latitude - latitude))
-                < CONSTANT_CONSTRAINT;
+
+        return feetBetweenCoordinates(this.latitude, this.longitude, latitude, longitude) < CONSTANT_CONSTRAINT;
     }
+
+    /**
+     * Uses the Haversine Formula to calculate the great-circle distance between two lat-long coordinates, in feet.
+     * Adapted from code provided by http://www.movable-type.co.uk/scripts/latlong.html
+     *
+     * @param latitude1 The latitude of the first coordinate pair
+     * @param longitude1 The longitude of the first coordinate pair
+     * @param latitude2 The latitude of the second coordinate pair
+     * @param longitude2 The longitude of the second coordinate pair
+     * @return The great-circle distance between the two coordinate pairs, in feet.
+     */
+
+    private double feetBetweenCoordinates(double latitude1, double longitude1, double latitude2, double longitude2) {
+        int radiusOfEarth = 20903520; // mean radius of Earth in feet
+        double deltaLat = Math.toRadians(latitude2 - latitude1); // change in latitude
+        double deltaLong = Math.toRadians(longitude2 - longitude1); // change in longitude
+        latitude1 = Math.toRadians(latitude1);
+        latitude2 = Math.toRadians(latitude2);
+
+        double varA = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                        Math.cos(latitude1) * Math.cos(latitude2) *
+                        Math.sin(deltaLong / 2) * Math.sin(deltaLong / 2);
+        double varC = 2 * Math.atan2(Math.sqrt(varA), Math.sqrt(1 - varA));
+
+        return radiusOfEarth * varC;
+    }
+
     /**
      * Get the name of the location where the photo is taken
      *
