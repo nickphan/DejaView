@@ -188,6 +188,7 @@ public class MainActivity extends Activity implements
             SetWallpaperService.updateInterval(minutes);
             Log.d("Preference Changed", "Updated interval to " + minutes + " minutes");
         }
+    }
 
     /**
      * For testing purpose
