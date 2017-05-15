@@ -1,20 +1,12 @@
 package com.deja11.dejaphoto;
 
-import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.rule.ActivityTestRule;
 
-import static android.R.attr.id;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_LAT_3;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_LONG_4;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_DATE_5;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
 
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static org.junit.Assert.*;
