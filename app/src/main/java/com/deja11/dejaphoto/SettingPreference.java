@@ -11,6 +11,8 @@ public class SettingPreference extends Activity {
 
     final int TIME_OFFSET = 5;
     final int MAX_TIME = 25;
+    final String KEY_POSITION = "position";
+    final String KEY_INTERVAL = "interval";
 
     //For testing purpose
     private static SettingPreference instance;
@@ -92,14 +94,14 @@ public class SettingPreference extends Activity {
 
     private void saveProgressAndLocation() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPrefs.edit().putInt("interval", currentInterval).apply();
-        mSharedPrefs.edit().putInt("position", currentPosition).apply();
+        mSharedPrefs.edit().putInt(KEY_INTERVAL, currentInterval).apply();
+        mSharedPrefs.edit().putInt(KEY_POSITION, currentPosition).apply();
     }
 
     private int getCurrentProgress() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
-            int interval = mSharedPrefs.getInt("interval", 0);
+            int interval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
             return interval;
         } catch (Exception e) {
             return 0;
@@ -109,7 +111,7 @@ public class SettingPreference extends Activity {
     private int getCurrentLocation() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
-            int position = mSharedPrefs.getInt("position", 0);
+            int position = mSharedPrefs.getInt(KEY_POSITION, 0);
             return position;
         } catch (Exception e) {
             return 0;
