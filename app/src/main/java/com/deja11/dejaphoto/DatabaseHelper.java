@@ -392,7 +392,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param deviceLocation
      */
 
-    public void updatePoint(GeoLocation deviceLocation){
+    public void updatePoint(GeoLocation deviceLocation, Calendar deviceCalendar){
         // loop throught all rows
         SQLiteDatabase db = this.getWritableDatabase();
         //select * from photo_table
@@ -417,102 +417,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 newPoint+=10;
             }
 
-            // If same day of the week, add 10 points
+            // Get date and time of the photo
             date = new Date(Long.parseLong(res.getString(4)));
+
+            //Convert to calendar object
             Calendar photoTime = Calendar.getInstance();
             photoTime.setTime(date);
 
-            Calendar currentTime = Calendar.getInstance();
-
-            // 1 point for matching day of week
-            if (currentTime.get(Calendar.DAY_OF_WEEK) == photoTime.get(Calendar.DAY_OF_WEEK)) {
+            // If same day of the week, add 10 points
+            if (deviceCalendar.get(Calendar.DAY_OF_WEEK) == photoTime.get(Calendar.DAY_OF_WEEK)) {
                 newPoint += 10;
             }
 
             int photoTimeOfDay = (photoTime.get(Calendar.HOUR_OF_DAY) * 60) + photoTime.get(Calendar.MINUTE);
-            int currentTimeOfDay = (currentTime.get(Calendar.HOUR_OF_DAY) * 60) + currentTime.get(Calendar.MINUTE);
+            int currentTimeOfDay = (deviceCalendar.get(Calendar.HOUR_OF_DAY) * 60) + deviceCalendar.get(Calendar.MINUTE);
             int lowerTimeBound = (currentTimeOfDay - 120) % 1440, highTimeBound = (currentTimeOfDay + 120) % 1440;
 
-            // 1 point for matching time of day
+            // If same day of the week, add 10 points
             if (photoTimeOfDay >= lowerTimeBound && photoTimeOfDay <= highTimeBound) {
                 newPoint += 10;
             }
 
-            // if it is karma add 1 point
+            // if it is karma, add 5 points
             isKarma = res.getInt(7) > 0 ? true : false;
-            if(isKarma) {newPoint+=5;}
+            if(isKarma) {
+                newPoint+=5;
+            }
 
+            // update deja points
             updateField(id,COL_DEJA_6,newPoint);
+
             newPoint = 0;
         }
+        Log.d(TAGDATABASE,"Points updated");
     }
 
-    public String printAll(Context context) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res;
-        StringBuffer buffer = new StringBuffer();
 
-
-        res = db.rawQuery("select * from " + TABLE_NAME , null);
-        //res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, null, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(3));
-        //res = db.query(true, TABLE_NAME, null, COL_REL_7+ "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(3));
-        //res = db.query(true, TABLE_NAME, new String[]{COL_ID_1,COL_PATH_2,COL_DEJA_6}, COL_REL_7+ "= 0", null, null, null, null, null);
-
-
-        buffer.append(res.getCount() + "\n");
-
-        while (res.moveToNext()) {
-
-            //buffer.append(res.moveToPosition(4)+"\n");
-
-            String format = "MM-dd-yyyy HH:mm:ss";
-            SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
-
-                buffer.append("\n\nId :" + res.getString(0));
-                buffer.append("\nphone location:" + res.getString(1));
-                buffer.append("\ngeoLat :" + res.getString(2));
-                buffer.append("\ngeoLong :" + res.getString(3));
-                buffer.append("\ndate :" + formatter.format(new Date(Long.parseLong(res.getString(4)))));
-                buffer.append("\ndejapoints:" + res.getString(5));
-                buffer.append("\nrelease :" + res.getString(6));
-                buffer.append("\nkarma :" + res.getString(7));
-
-
-        }
-        return buffer.toString();
-    }
-
-    public void test(Context context){
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        //Cursor res = db.rawQuery("select * from " + TABLE_NAME , null);
-        StringBuffer buffer = new StringBuffer();
-        //buffer.append(res.getCount() + "");
-        //chooseNextPath();
-
-        //updateField(2,COL_KARMA_8,"1");
-        //updateField(3,COL_DEJA_6,50);
-        //updateField(2,COL_DEJA_6,25);
-        //updateField(3,COL_KARMA_8,1);
-
-
-
-
-        buffer.append(printAll(context));
-
-        showMessage("Data",buffer.toString(),context);
-
-
-
-    }
-    // for displaying a message board
-    public void showMessage(String title, String message,Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(true);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.show();
-    }
 }
 
 
