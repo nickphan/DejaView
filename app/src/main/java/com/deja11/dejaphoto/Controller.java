@@ -268,8 +268,8 @@ public class Controller implements Parcelable{
 
     /**
      * Private helper method to create a canvas to write on
-     * @param mutableBitmap,
-     * @param bitmap,
+     * @param mutableBitmap the container where the drawing is done
+     * @param bitmap the photo
      * */
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap){
         Canvas canvas = new Canvas(mutableBitmap);
