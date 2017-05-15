@@ -14,9 +14,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -37,8 +35,8 @@ public class MainActivity extends Activity implements
     private static final int KARMA_PENDING_INTENT_RC = 2;
     private static final int RELEASE_PENDING_INTENT_RC = 3;
     private static final int ALARM_PENDING_INTENT_RC = 4;
-
     private static final int NOTIFICATION_ID = 123;
+
 
     // codes for identifying which action the service has to execute
     private static final String CODE_KEY = "Order";
@@ -49,22 +47,17 @@ public class MainActivity extends Activity implements
 
     DatabaseHelper myDb;
 
-    /**
-     * For testing purpose
-     */
+    // For testing purpose
     private static MainActivity instance;
-
     public static MainActivity getInstance() {
         if (instance == null) {
             setInstance(instance);
         }
         return instance;
     }
-
     public static void setInstance(MainActivity instance) {
         MainActivity.instance = instance;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

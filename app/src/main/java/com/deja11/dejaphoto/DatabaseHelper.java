@@ -31,7 +31,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -65,17 +64,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Create a table in the database to store all the photo
+     * ID : primary key and auto increment
+     * PHONELOCATION : string containing path of the photo in the device
+     * GEOLOCATIONLAT/GEOLOCATIONLONG : latitiude and longitude of the location of photo
+     * DATE : the timestamp of the photo, milliseconds in string format
+     * DEJAPOINTS : points assigned to each photo
+     * RELEASED, KARMA : value 0 or 1 determined whether a photo is released or karma'd
      *
      * @param db database to be created
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // ID : primary key and auto increment
-        // PHONELOCATION : string containing path of the photo in the device
-        // GEOLOCATIONLAT/GEOLOCATIONLONG : latitiude and longitude of the location of photo
-        // DATE : the timestamp of the photo, milliseconds in string format
-        // DEJAPOINTS : points assigned to each photo
-        // RELEASED, KARMA : value 0 or 1 determined whether a photo is released or karma'd
+
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
                 COL_ID_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_PATH_2 + " TEXT, " +
@@ -104,10 +104,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAGDATABASE, "Table recreated");
     }
 
-    /*
-        Insert a new photo into the database
-     */
-
     /**
      * Insert a new photo into the database
      *
@@ -135,7 +131,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Log.i(TAGDATABASE, "Data inserted correctly");
         return db.insert(TABLE_NAME, null, contentValues) != -1;
-
     }
 
     /**
@@ -191,7 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Find the id in the databas
+     * Find the id in the database
      *
      * @param column Column name
      * @param value  Value in that column
@@ -355,10 +350,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // get a random photo an then get all their information
         // Select * from photo_table where phonelocation = chooseNextPath()
         Cursor res = db.query(true, TABLE_NAME, null, COL_PATH_2 + "='" + chooseNextPath() + "'", null, null, null, null, null);
-
-        //Cursor res = db.query(true, TABLE_NAME, null, COL_PATH_2+ " = " + chooseNextPath(), null, null, null, null, null);
-        //Cursor res = db.rawQuery("SELECT * FROM photo_table WHERE phonelocation = '" + chooseNextPath() + "'", null);
-
 
         res.moveToNext();
 

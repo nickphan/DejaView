@@ -10,16 +10,11 @@ import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Looper;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.Display;
-import android.view.WindowManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Calendar;
@@ -34,10 +29,8 @@ public class Controller implements Parcelable {
     private DatabaseHelper databaseHelper;
     private Context context;
     private Photo currPhoto;
-    private static int X;
-    private static int Y;
     private LinkedList<Photo> cache;
-    private int mData;
+    private int mData = 0;
 
     /**
      * Constructor with context to use for changing wallpaper
@@ -48,12 +41,6 @@ public class Controller implements Parcelable {
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
         cache = new LinkedList<Photo>();
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        X = size.x;
-        Y = size.y;
         initialize();
     }
 
@@ -185,7 +172,6 @@ public class Controller implements Parcelable {
                 currPhoto = photo;
             }
             return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-            //return setWallpaper(photo.getPhotoLocation());
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -195,22 +181,17 @@ public class Controller implements Parcelable {
                 }
                 currPhoto = photo;
                 return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-                //return setWallpaper(photo.getPhotoLocation());
             } else {
                 currPhoto = photo;
                 return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-                //return setWallpaper(photo.getPhotoLocation());
             }
         }
     }
 
-
-
     /*PRIVATE HELPER METHODS*/
 
-
     /**
-     * Set the desired photo to be the wallpaper
+     * Set the desired photo without location to be the wallpaper (for testing purpose)
      *
      * @param photoPath the path of the photo as a string
      * @return true if the wallpaper was set. false otherwise
@@ -239,8 +220,8 @@ public class Controller implements Parcelable {
     /**
      * Set the desired photo to be the wallpaper
      *
-     * @param photoPath,   the path of the photo as a string
-     * @param geoLocation, the location of the photo to display
+     * @param photoPath   the path of the photo as a string
+     * @param geoLocation the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
     private boolean setWallpaper(String photoPath, String geoLocation) {
@@ -258,7 +239,6 @@ public class Controller implements Parcelable {
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             int height = getHeightFromString(photoPath);
             int width = getWidthFromString(photoPath);
-            //int width = myWallpaperManager.getDrawable().getIntrinsicWidth();
             Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap, bitmap);
             writeTextOnWallpaper(mutableBitmap, geoLocation, height);
@@ -273,8 +253,8 @@ public class Controller implements Parcelable {
     /**
      * Private helper method to create a canvas to write on
      *
-     * @param mutableBitmap,
-     * @param bitmap,
+     * @param mutableBitmap the container where the drawing is done
+     * @param bitmap the photo
      */
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap) {
         Canvas canvas = new Canvas(mutableBitmap);
@@ -284,16 +264,14 @@ public class Controller implements Parcelable {
     /**
      * Private helper method to place text on the wallpaper
      *
-     * @param mutableBitmap, the bitmap of the image to be the wallpaper
-     * @param text,          the text to be displayed
+     * @param mutableBitmap the bitmap of the image to be the wallpaper
+     * @param text the text to be displayed
      */
     private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height) {
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
-        //paint.setTextAlign(Paint.Align.LEFT);
         paint.setColor(Color.RED);
         paint.setTextSize(canvas.getHeight() / 50);
-
         canvas.drawText(text, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
     }
 
@@ -348,7 +326,6 @@ public class Controller implements Parcelable {
     /**
      * Private helper method to run when object created
      */
-
     private void initialize() {
         Photo photo = getNextPhoto();
         setWallpaper(photo);
@@ -360,7 +337,6 @@ public class Controller implements Parcelable {
     }
 
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
-
     @Override
     public int describeContents() {
         return 0;

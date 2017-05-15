@@ -5,8 +5,6 @@ import android.support.test.rule.ActivityTestRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -49,11 +47,6 @@ public class ControllerTest {
             controller.setWallpaper(nextPhoto);
             assertEquals(previousPhoto, controller.getPreviousPhoto());
         }
-        /*Photo photo = null;
-        while(controller.getPreviousPhoto() != null){
-            photo = controller.getPreviousPhoto();
-        }
-        assertEquals(firstPhoto, photo);*/
     }
 
     @Test

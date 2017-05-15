@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-
 public class SetWallpaperService extends IntentService {
 
     // codes for identifying which action the service has to execute
@@ -33,8 +32,6 @@ public class SetWallpaperService extends IntentService {
         Log.d("Service Started", "SetWallpaper Service called");
 
         int order = intent.getIntExtra(CODE_KEY, CODE_DEFAULT_VALUE);
-
-
         Log.d("Order Number", Integer.toString(order));
 
         if(order == CODE_NEXT_PHOTO) {
@@ -77,36 +74,4 @@ public class SetWallpaperService extends IntentService {
         interval = minutes * MIN_TO_MS;
         Log.d("Interval updated to", Long.toString(interval));
     }
-
-    /*
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(SetWallpaperService.this, "Started", Toast.LENGTH_SHORT);
-
-        Thread thread = new Thread(new PhotoFileThread(startId));
-        thread.start();
-
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    final class PhotoFileThread implements Runnable {
-        int startId;
-
-        public PhotoFileThread(int startId) {
-            this.startId = startId;
-        }
-        @Override
-        public void run() {
-            synchronized (this) {
-                try {
-                    Photo photo = controller.getNextPhoto();
-                    boolean setWallpaper = controller.setWallpaper(photo);
-                    Toast.makeText(SetWallpaperService.this, "Changed", Toast.LENGTH_SHORT);
-                    wait(10000);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    } */
 }

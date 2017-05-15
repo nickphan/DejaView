@@ -1,6 +1,5 @@
 package com.deja11.dejaphoto;
 
-import java.util.Calendar;
 import java.util.Date;
 
 /**
