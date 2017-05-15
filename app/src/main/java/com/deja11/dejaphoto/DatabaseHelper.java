@@ -208,7 +208,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Select id from photo_table where column = value
         Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, column + "='" + value + "'", null, null, null, null, null);
 
-
         if (res.getCount() >= 0) {
             res.moveToNext();
             Log.i(TAGDATABASE, value + " is found at id = " + res.getInt(0));
@@ -217,8 +216,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.d(TAGDATABASE, value + " is not found");
             return -1;
         }
-
-
     }
 
 
@@ -277,11 +274,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
     }
-
-
-    /*
-
-     */
 
     /**
      * Gather all the information in the photo.
@@ -455,7 +447,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         Log.d(TAGDATABASE, "Points updated");
     }
-
 
 }
 
