@@ -38,7 +38,7 @@ public class Controller implements Parcelable{
     private int mData;
 
     /**
-     * Constructor with context
+     * Constructor with context to use for changing wallpaper
      * */
     public Controller(Context context){
         Log.i("Initializing Controller", "New Controller");
@@ -94,13 +94,14 @@ public class Controller implements Parcelable{
      * */
     public Photo getPreviousPhoto() {
         if(currPhoto == null){
-            /*SOME ERROR MESSAGE*/
+            Log.i("getPreviousPhoto", "currPhoto is null");
             return null;
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
                 return cache.getLast();
             }else if(currIndex == 0){
+                Log.i("getPreviousPhoto", "beginning of cache");
                 return null;
             }else{
                 return cache.get(currIndex-1);
@@ -126,7 +127,7 @@ public class Controller implements Parcelable{
             databaseHelper.updateKarma(photo.getPhotoLocation());
             return true;
         }else{
-            //Toast.makeText(context, "Photo has already been Karma'd", Toast.LENGTH_SHORT).show();
+            Log.i("karmaPhoto", "photo karma is true");
             return false;
         }
     }
@@ -154,6 +155,7 @@ public class Controller implements Parcelable{
                 setWallpaper(cache.get(currIndex));
             }
         }
+        Log.i("releasePhoto", "currPhoto is null already");
     }
 
     /**
@@ -161,7 +163,7 @@ public class Controller implements Parcelable{
      * @param photo the photo acquired from getNextPhoto()
      * @return true if the wallpaper was set. false otherwise
      */
-    boolean setWallpaper(Photo photo){
+    public boolean setWallpaper(Photo photo){
         if(photo == null){
             return false;
         }
@@ -176,8 +178,8 @@ public class Controller implements Parcelable{
             }else{
                 currPhoto = photo;
             }
-            //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-            return setWallpaper(photo.getPhotoLocation());
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+            //return setWallpaper(photo.getPhotoLocation());
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
@@ -186,22 +188,27 @@ public class Controller implements Parcelable{
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-                return setWallpaper(photo.getPhotoLocation());
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                //return setWallpaper(photo.getPhotoLocation());
             }else{
                 currPhoto = photo;
-                //return setWallpaper(photo.phoneLocation, photo.geoLocation.getLocationName(context));
-                return setWallpaper(photo.getPhotoLocation());
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                //return setWallpaper(photo.getPhotoLocation());
             }
         }
     }
+
+
+
+    /*PRIVATE HELPER METHODS*/
+
 
     /**
      * Set the desired photo to be the wallpaper
      * @param photoPath the path of the photo as a string
      * @return true if the wallpaper was set. false otherwise
      */
-    boolean setWallpaper(String photoPath){
+    private boolean setWallpaper(String photoPath){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
             try{
@@ -228,7 +235,7 @@ public class Controller implements Parcelable{
      * @param geoLocation, the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
-    boolean setWallpaper(String photoPath, String geoLocation){
+    private boolean setWallpaper(String photoPath, String geoLocation){
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if(photoPath == null){
             try{
