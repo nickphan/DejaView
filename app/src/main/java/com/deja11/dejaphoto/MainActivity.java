@@ -59,15 +59,34 @@ public class MainActivity extends Activity implements
 
     DatabaseHelper myDb;
 
+    /**
+     * For testing purpose
+     */
+    private static MainActivity instance;
+    public static MainActivity getInstance() {
+        if(instance==null){
+            setInstance(instance);
+        }
+        return instance;
+    }
+    public static void setInstance(MainActivity instance) {
+        MainActivity.instance = instance;
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // For Junit test
+        setInstance(this);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
         }
 
-        // load the preferences
+        // initialize the value of the interval using shared preferences, if applicable
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         SetWallpaperService.updateInterval(mSharedPref.getInt(INTERVAL_KEY, INTERVAL_DEFAULT)
                 + INTERVAL_OFFSET);
@@ -109,7 +128,6 @@ public class MainActivity extends Activity implements
         PendingIntent releaseButtonPIntent = PendingIntent.getBroadcast(this,
                 RELEASE_PENDING_INTENT_RC, releaseButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.release, releaseButtonPIntent);
-
         //set the icon and time and build the notification of deja photo
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_wallpaper)
@@ -126,7 +144,6 @@ public class MainActivity extends Activity implements
         //mNotificationManager.notify(5, notification);
 
         // Setting up the alarm to change the photo every x minutes
-
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this,
                 ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -171,6 +188,14 @@ public class MainActivity extends Activity implements
             SetWallpaperService.updateInterval(minutes);
             Log.d("Preference Changed", "Updated interval to " + minutes + " minutes");
         }
+
+    /**
+     * For testing purpose
+     * @param view
+     */
+    public void settingsClicked(View view){
+        Intent intent = new Intent(MainActivity.this, SettingPreference.class);
+        startActivity(intent);
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
