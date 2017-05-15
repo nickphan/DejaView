@@ -310,7 +310,10 @@ public class Controller implements Parcelable{
         setWallpaper(photo);
     }
 
-
+    /*For JUnit testing purposes*/
+    public LinkedList getCache(){
+        return cache;
+    }
 
     /*NECESSARY METHODS TO IMPLEMENT PARCELABLE*/
 
