@@ -14,15 +14,18 @@ public class SettingPreference extends Activity {
 
     //For testing purpose
     private static SettingPreference instance;
+
     public static SettingPreference getInstance() {
-        if(instance==null){
+        if (instance == null) {
             setInstance(instance);
         }
         return instance;
     }
+
     public static void setInstance(SettingPreference instance) {
         SettingPreference.instance = instance;
     }
+
     // For testing
     private TextView intervalText;
 
@@ -38,76 +41,77 @@ public class SettingPreference extends Activity {
         setInstance(this);
 
         // Initialize the seekbar
-        SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
+        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setMax(MAX_TIME);
-        intervalText = (TextView)findViewById(R.id.seekbarvalue);
+        intervalText = (TextView) findViewById(R.id.seekbarvalue);
         currentInterval = getCurrentProgress();
         seekBar.setProgress(currentInterval);
-        currentPosition=getCurrentLocation();
-        setText(seekBar,intervalText,currentInterval,currentPosition);
+        currentPosition = getCurrentLocation();
+        setText(seekBar, intervalText, currentInterval, currentPosition);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
 
-                currentInterval= interval;
+                currentInterval = interval;
                 int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
-                currentPosition= val;
+                currentPosition = val;
                 setText(seekBar, intervalText, currentInterval, val);
                 saveProgressAndLocation();
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
     /**
-     *  For Testing purpose
-     * @param seekBar the seekbar object
+     * For Testing purpose
+     *
+     * @param seekBar  the seekbar object
      * @param interval the current time interval
      * @param fromUser true if the user updates the tme interval
      */
     public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
-        currentInterval= interval;
+        currentInterval = interval;
         int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
-        currentPosition= val;
+        currentPosition = val;
         saveProgressAndLocation();
     }
 
-    private void setText(SeekBar seekBar, TextView progressText, int interval, int val){
-        progressText.setText(String.valueOf(interval+TIME_OFFSET) + " min");
+    private void setText(SeekBar seekBar, TextView progressText, int interval, int val) {
+        progressText.setText(String.valueOf(interval + TIME_OFFSET) + " min");
         progressText.setX(seekBar.getX() + val + seekBar.getThumbOffset() / 2);
 
     }
 
-    private void saveProgressAndLocation(){
+    private void saveProgressAndLocation() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPrefs.edit().putInt("interval",currentInterval).apply();
-        mSharedPrefs.edit().putInt("position",currentPosition).apply();
+        mSharedPrefs.edit().putInt("interval", currentInterval).apply();
+        mSharedPrefs.edit().putInt("position", currentPosition).apply();
     }
 
-    private int getCurrentProgress(){
+    private int getCurrentProgress() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        try{
-            int interval = mSharedPrefs.getInt("interval",0);
+        try {
+            int interval = mSharedPrefs.getInt("interval", 0);
             return interval;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }
 
-    private int getCurrentLocation(){
+    private int getCurrentLocation() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        try{
-            int position = mSharedPrefs.getInt("position",0);
+        try {
+            int position = mSharedPrefs.getInt("position", 0);
             return position;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }

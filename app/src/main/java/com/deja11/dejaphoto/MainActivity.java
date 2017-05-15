@@ -39,7 +39,7 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 public class MainActivity extends Activity {
 
     private static int INTERVAL_OFFSET = 5; // offset for the interval
-    private static String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    private static String INTERVAL_KEY = "interval"; // the key for the interval in the shared preferences
     private static int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
     private static int MIN_TO_MS = 60000; // a conversion factor from minutes to milliseconds
 
