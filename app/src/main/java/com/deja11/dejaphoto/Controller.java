@@ -252,8 +252,8 @@ public class Controller implements Parcelable{
         try {
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             int height = getHeightFromString(photoPath);
-            int width = getWidthFromString(photoPath);
-
+            //int width = getWidthFromString(photoPath);
+            int width = myWallpaperManager.getDrawable().getIntrinsicWidth();
             Bitmap mutableBitmap= Bitmap.createBitmap(width,height,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
             writeTextOnWallpaper(mutableBitmap, geoLocation,height);
@@ -285,14 +285,15 @@ public class Controller implements Parcelable{
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         //paint.setTextAlign(Paint.Align.LEFT);
-        paint.setColor(Color.TRANSPARENT);
+        paint.setColor(Color.BLACK);
         paint.setTextSize(15);
-        canvas.drawText(text, paint.getTextSize(), height-paint.getTextSize(), paint);
+        canvas.drawText(text, 2*paint.getTextSize(), height-paint.getTextSize(), paint);
     }
 
     /**Private helper method to get the width of the photo
      * @param photoPath the string of the location of the photo
-     * @return the width of the photo*/
+     * @return the width of the photo
+     * */
     private int getWidthFromString(String photoPath){
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
