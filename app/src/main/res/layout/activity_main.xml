@@ -16,6 +16,7 @@
         android:src="@drawable/ic_settings_black_18dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:onClick="settingsClicked"
          />
 
     <LinearLayout
