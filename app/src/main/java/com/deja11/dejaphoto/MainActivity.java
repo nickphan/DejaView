@@ -11,8 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,21 +19,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Set;
 
 public class MainActivity extends Activity implements
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int INTERVAL_OFFSET = 5; // offset for the interval
     private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
@@ -63,12 +53,14 @@ public class MainActivity extends Activity implements
      * For testing purpose
      */
     private static MainActivity instance;
+
     public static MainActivity getInstance() {
-        if(instance==null){
+        if (instance == null) {
             setInstance(instance);
         }
         return instance;
     }
+
     public static void setInstance(MainActivity instance) {
         MainActivity.instance = instance;
     }
@@ -82,8 +74,8 @@ public class MainActivity extends Activity implements
         // For Junit test
         setInstance(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
 
         // initialize the value of the interval using shared preferences, if applicable
@@ -94,20 +86,9 @@ public class MainActivity extends Activity implements
         // register the mainActivity to detect any changes in preferences
         mSharedPref.registerOnSharedPreferenceChangeListener(this);
 
-        // Create database object
-        //myDb = new DatabaseHelper(this);
-        //myDb.initialize(this);
-        //myDb.test(this);
-
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
-
-        // add onClickListeners
-        // 1. create class that extends BroadcastReceiver (and add it to the manifest)
-        // 2. create an intent that calls the class
-        // 3. create a pending intent that contains this intent
-        // 4. call setOnClickPendingIntent of the view with the appropriate button and pending intent
 
         Intent leftButtonIntent = new Intent("left_button_receiver");
         PendingIntent leftButtonPIntent = PendingIntent.getBroadcast(this,
@@ -140,21 +121,28 @@ public class MainActivity extends Activity implements
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, notification);
 
-        //Button startButton = (Button)findViewById(R.id.startButton);
-        //mNotificationManager.notify(5, notification);
-
-        // Setting up the alarm to change the photo every x minutes
+        // Setting up the alarm
+        int timer;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            timer = 300000 + sharedPreferences.getInt("Progress", 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            timer = 300000;
+        }
+        Log.i("TIMER", Integer.toString(timer));
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this,
                 ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), alarmPIntent);
         }
 
-        else {
+        else{
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
         }
@@ -192,9 +180,10 @@ public class MainActivity extends Activity implements
 
     /**
      * For testing purpose
+     *
      * @param view
      */
-    public void settingsClicked(View view){
+    public void settingsClicked(View view) {
         Intent intent = new Intent(MainActivity.this, SettingPreference.class);
         startActivity(intent);
     }
@@ -216,9 +205,7 @@ public class MainActivity extends Activity implements
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-            }
-
-            else {
+            } else {
                 mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + SetWallpaperService.interval,
                         SetWallpaperService.interval, alarmPIntent);
@@ -250,7 +237,7 @@ public class MainActivity extends Activity implements
                         System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
             }
 
-            else {
+            else{
                 mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + SetWallpaperService.interval,
                         SetWallpaperService.interval, alarmPIntent);
@@ -293,9 +280,7 @@ public class MainActivity extends Activity implements
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-            }
-
-            else {
+            } else {
                 mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + SetWallpaperService.interval,
                         SetWallpaperService.interval, alarmPIntent);

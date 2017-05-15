@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 
-
 public class SetWallpaperService extends IntentService {
 
     // codes for identifying which action the service has to execute
@@ -28,12 +27,13 @@ public class SetWallpaperService extends IntentService {
 
     /**
      * Use intent to figure out which button was clicked and respond accordingly
-     * */
+     */
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d("Service Started", "SetWallpaper Service called");
 
         int order = intent.getIntExtra(CODE_KEY, CODE_DEFAULT_VALUE);
+
 
         Log.d("Order Number", Integer.toString(order));
 
@@ -50,17 +50,18 @@ public class SetWallpaperService extends IntentService {
         }else if(order == CODE_DEFAULT_VALUE){
             /*SHOULD NEVER GET HERE*/
             Log.i("Order", Integer.toString(0));
-        }else{
+        } else {
             /*ESPECIALLY SHOULD NEVER GET HERE*/
             Log.i("Error Order", "Service was started with an intent of " + Integer.toString(order));
         }
     }
 
     /**
-     * Override to initialize a static controller object on the first service started*/
+     * Override to initialize a static controller object on the first service started
+     */
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
-        if(controller == null){
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (controller == null) {
             controller = new Controller(getApplicationContext());
         }
         return super.onStartCommand(intent, flags, startId);
@@ -68,7 +69,7 @@ public class SetWallpaperService extends IntentService {
 
     /* Call parent onDestroy*/
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
     }
 
