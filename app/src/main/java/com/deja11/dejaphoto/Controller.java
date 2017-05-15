@@ -178,8 +178,8 @@ public class Controller implements Parcelable{
             }else{
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-            //return setWallpaper(photo.getPhotoLocation());
+            //return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+            return setWallpaper(photo.getPhotoLocation());
         }else{
             int currIndex = cache.indexOf(currPhoto);
             if(currIndex == -1){
@@ -188,12 +188,12 @@ public class Controller implements Parcelable{
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-                //return setWallpaper(photo.getPhotoLocation());
+                //return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation());
             }else{
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
-                //return setWallpaper(photo.getPhotoLocation());
+                //return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation());
             }
         }
     }
