@@ -22,6 +22,8 @@ import android.view.Display;
 import android.view.WindowManager;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 
 /**
@@ -61,7 +63,7 @@ public class Controller implements Parcelable{
      * @return the next photo either from cache or from DatabaseHelper
      * */
     public Photo getNextPhoto(){
-        databaseHelper.updatePoint(getUserCurrentLocation());
+        databaseHelper.updatePoint(getUserCurrentLocation(), getUserCalendar());
         Photo photo = databaseHelper.getNextPhoto();
         if(currPhoto == null){
             if(photo.isReleased()){
@@ -322,6 +324,11 @@ public class Controller implements Parcelable{
         }
 
         return new GeoLocation(locationListener.getLastLocation());
+    }
+
+    public Calendar getUserCalendar(){
+        Calendar currTime = Calendar.getInstance();
+        return currTime;
     }
     /**
      * Private helper method to run when object created*/
