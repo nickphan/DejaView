@@ -20,6 +20,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -49,19 +50,36 @@ public class MainActivity extends Activity {
     private static int RELEASE_PENDING_INTENT_RC = 3;
     private static int ALARM_PENDING_INTENT_RC = 4;
 
-
     DatabaseHelper myDb;
     Controller controller;
     private static long interval; // the time in between a photo change
+
+    /**
+     * For testing purpose
+     */
+    private static MainActivity instance;
+    public static MainActivity getInstance() {
+        if(instance==null){
+            setInstance(instance);
+        }
+        return instance;
+    }
+    public static void setInstance(MainActivity instance) {
+        MainActivity.instance = instance;
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // For Junit test
+        setInstance(this);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
         }
-
 
         // initialize the value of the interval using shared preferences, if applicable
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -129,7 +147,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
             timer = 300000;
         }
-
+        Log.i("TIMER", Integer.toString(timer));
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this, 6, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -149,8 +167,15 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
         });
+    }
 
-
+    /**
+     * For testing purpose
+     * @param view
+     */
+    public void settingsClicked(View view){
+        Intent intent = new Intent(MainActivity.this, SettingPreference.class);
+        startActivity(intent);
     }
 
     public static class LeftReceiver extends BroadcastReceiver {
