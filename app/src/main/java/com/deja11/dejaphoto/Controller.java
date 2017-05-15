@@ -285,7 +285,7 @@ public class Controller implements Parcelable{
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         //paint.setTextAlign(Paint.Align.LEFT);
-        paint.setColor(Color.RED);
+        paint.setColor(Color.TRANSPARENT);
         paint.setTextSize(15);
         canvas.drawText(text, paint.getTextSize(), height-paint.getTextSize(), paint);
     }
