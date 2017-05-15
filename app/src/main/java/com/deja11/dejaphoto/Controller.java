@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 
@@ -248,8 +249,9 @@ public class Controller implements Parcelable{
         }
         try {
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
-            int height = myWallpaperManager.getDrawable().getIntrinsicHeight();
-            int width = myWallpaperManager.getDrawable().getIntrinsicWidth();
+            int height = getHeightFromString(photoPath);
+            int width = getWidthFromString(photoPath);
+
             Bitmap mutableBitmap= Bitmap.createBitmap(width,height,bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap,bitmap);
             writeTextOnWallpaper(mutableBitmap, geoLocation,height);
@@ -282,8 +284,27 @@ public class Controller implements Parcelable{
         Paint paint = new Paint();
         //paint.setTextAlign(Paint.Align.LEFT);
         paint.setColor(Color.RED);
-        paint.setTextSize(30);
+        paint.setTextSize(15);
         canvas.drawText(text, paint.getTextSize(), height-paint.getTextSize(), paint);
+    }
+
+    /**Private helper method to get the width of the photo
+     * @param photoPath the string of the location of the photo
+     * @return the width of the photo*/
+    private int getWidthFromString(String photoPath){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(photoPath, options);
+        return options.outWidth;
+    }
+    /**Private helper method to get the height of the photo
+     * @param photoPath the string of the location of the photo
+     * @return the height of the photo*/
+    private int getHeightFromString(String photoPath){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(photoPath, options);
+        return options.outHeight;
     }
 
     /**
