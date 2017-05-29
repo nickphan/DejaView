@@ -86,4 +86,83 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/photoviewswitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/locationswitch">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Viewing My Photos"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+        <Switch
+            android:id="@+id/switch3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:checked="true"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:thumbTint="#46bdbf" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/friendsswitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/photoviewswitch">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Friends' Photos"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+        <Switch
+            android:id="@+id/switch4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:checked="true"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:thumbTint="#46bdbf" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/shareswitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/friendsswitch"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sharing"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+
+        <Switch
+            android:id="@+id/switch5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:checked="true"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:thumbTint="#46bdbf" />
+    </RelativeLayout>
+
 </LinearLayout>
