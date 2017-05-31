@@ -11,8 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
@@ -21,6 +23,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import android.net.Uri;
+import android.graphics.Bitmap;
+import java.io.File;
+import java.io.InputStream;
 
 public class MainActivity extends Activity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
@@ -36,6 +42,7 @@ public class MainActivity extends Activity implements
     private static final int RELEASE_PENDING_INTENT_RC = 3;
     private static final int ALARM_PENDING_INTENT_RC = 4;
     private static final int NOTIFICATION_ID = 123;
+    private static final int PHOTO_PICKER_CODE = 5;
 
 
     // codes for identifying which action the service has to execute
@@ -307,6 +314,33 @@ public class MainActivity extends Activity implements
             Intent serviceIntent = new Intent(context, SetWallpaperService.class);
             serviceIntent.putExtra(CODE_KEY, CODE_NEXT_PHOTO);
             context.startService(serviceIntent);
+        }
+    }
+
+    /***/
+    public void getImageFromGallery(View view){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        Uri data = Uri.parse(pictureDirectoryPath);
+        photoPickerIntent.setDataAndType(data, "image/*");
+        startActivityForResult(photoPickerIntent, PHOTO_PICKER_CODE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == RESULT_OK){
+            if(requestCode == PHOTO_PICKER_CODE){
+                Uri imageData = data.getData();
+                InputStream inputStream;
+
+                try{
+                    inputStream = getContentResolver().openInputStream(imageData);
+                    Bitmap image = BitmapFactory.decodeStream(inputStream);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
