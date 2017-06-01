@@ -187,17 +187,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         new Thread(){
             public void run(){
                 while(true){
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
                     runOnUiThread (new Runnable() {
                         @Override
                         public void run() {
                             sync();
-                            Toast.makeText(MainActivity.this, "thread running", Toast.LENGTH_SHORT).show();
-                        }
+                            Toast.makeText(MainActivity.this, "thread running", Toast.LENGTH_SHORT).show();}
                     });
                 }
             }
