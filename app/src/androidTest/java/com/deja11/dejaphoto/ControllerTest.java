@@ -58,6 +58,7 @@ public class ControllerTest {
                 assertTrue(photo.isKarma());
             }
             photo = controller.getNextPhoto();
+            controller.setWallpaper(photo);
         }
     }
 
