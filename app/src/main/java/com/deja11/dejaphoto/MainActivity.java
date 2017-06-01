@@ -7,12 +7,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
@@ -21,6 +23,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import android.net.Uri;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
@@ -36,7 +42,8 @@ public class MainActivity extends Activity implements
     private static final int RELEASE_PENDING_INTENT_RC = 3;
     private static final int ALARM_PENDING_INTENT_RC = 4;
     private static final int NOTIFICATION_ID = 123;
-
+    private static final int PHOTO_PICKER_SINGLE_CODE = 5;
+    private static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
 
     // codes for identifying which action the service has to execute
     private static final String CODE_KEY = "Order";
@@ -63,6 +70,9 @@ public class MainActivity extends Activity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //setContentView(R.layout.test_photo_picker);
+
+
 
         // For Junit test
         setInstance(this);
@@ -148,6 +158,8 @@ public class MainActivity extends Activity implements
                 startActivity(new Intent(MainActivity.this, SettingPreference.class));
             }
         });
+
+
     }
 
     @Override
@@ -309,4 +321,57 @@ public class MainActivity extends Activity implements
             context.startService(serviceIntent);
         }
     }
+
+    public void getSingleImageFromGallery(View view){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        Uri data = Uri.parse(pictureDirectoryPath);
+        photoPickerIntent.setDataAndType(data, "image/*");
+        startActivityForResult(photoPickerIntent, PHOTO_PICKER_SINGLE_CODE);
+    }
+    /***/
+    public void getMultipleImagesFromGallery(View view){
+        Intent photoPickerIntent = new Intent();
+        photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        photoPickerIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        Uri data = Uri.parse(pictureDirectoryPath);
+        photoPickerIntent.setDataAndType(data, "image/*");
+        startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), PHOTO_PICKER_MULTIPLE_CODE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == RESULT_OK){
+            if(requestCode == PHOTO_PICKER_SINGLE_CODE){
+                Uri imageData = data.getData();
+                /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
+            }
+            if(requestCode == PHOTO_PICKER_MULTIPLE_CODE){
+                /* SINGLE RETURNED. SHOULD NEVER COME HERE */
+                if(data.getData() != null){
+                    Uri imageData = data.getData();
+
+                }
+                /* MULTIPLE RETURNED. SHOULD ONLY EVER COME HERE */
+                else{
+                    if(data.getClipData() != null){
+                        ClipData clipData = data.getClipData();
+                        ArrayList<Uri> uriArrayList = new ArrayList<Uri>();
+                        for(int i = 0; i < clipData.getItemCount(); i++){
+                            ClipData.Item item = clipData.getItemAt(i);
+                            Uri uri = item.getUri();
+                            uriArrayList.add(uri);
+                        }
+                        /* ADD CONTENTS OF ARRAYLIST TO DEJA ALBUM CARL*/
+                    }
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 }
