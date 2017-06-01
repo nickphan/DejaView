@@ -22,6 +22,12 @@ import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class MainActivity extends Activity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -46,6 +52,8 @@ public class MainActivity extends Activity implements
     private static final int CODE_RELEASE = 4;
 
     DatabaseHelper myDb;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myFirebaseRef = database.getReference();
 
     // For testing purpose
     private static MainActivity instance;
@@ -63,6 +71,22 @@ public class MainActivity extends Activity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myFirebaseRef = database.getReference().child("name").child("123");
+        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+
+                Toast.makeText(getBaseContext(),data.toString(),Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         // For Junit test
         setInstance(this);
