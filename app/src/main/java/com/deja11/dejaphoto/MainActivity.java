@@ -460,34 +460,6 @@ public class MainActivity extends Activity implements
     }
 
 
-    public boolean login(String user, String pass){
-        final String userEnterPassword = pass;
 
-        DatabaseReference databaseReference = myFirebaseRef.child("user");
-        Query queryRef = databaseReference.orderByChild("username").equalTo(user);
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot == null || dataSnapshot.getValue() == null){
-                    /*Username doesn't exist*/
-
-                }else{
-                    if(userEnterPassword == dataSnapshot.child("password").getValue().toString()){
-                        /*idk they logged on or something*/
-                    }else{
-                        /*wrong password*/
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-        return false;
-    }
 
 }
