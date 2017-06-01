@@ -366,7 +366,7 @@ public class MainActivity extends Activity implements
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
                         }
-                        /* ADD CONTENTS OF ARRAYLIST TO DEJA ALBUM */
+                        /* ADD CONTENTS OF ARRAYLIST TO DEJA ALBUM CARL*/
                     }
                 }
             }
