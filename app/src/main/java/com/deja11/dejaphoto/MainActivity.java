@@ -16,11 +16,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 import android.net.Uri;
@@ -32,6 +35,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends Activity implements
@@ -61,6 +65,7 @@ public class MainActivity extends Activity implements
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
+
 
     // For testing purpose
     private static MainActivity instance;
@@ -346,6 +351,10 @@ public class MainActivity extends Activity implements
         }
     }
 
+    /**
+     * Launches the gallery for a single photo
+     * @param view, the view that calls it
+     * */
     public void getSingleImageFromGallery(View view){
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -354,7 +363,10 @@ public class MainActivity extends Activity implements
         photoPickerIntent.setDataAndType(data, "image/*");
         startActivityForResult(photoPickerIntent, PHOTO_PICKER_SINGLE_CODE);
     }
-    /***/
+    /**
+     * Launches the gallery and lets you select photos
+     * @param view, the view that calls this method
+     * */
     public void getMultipleImagesFromGallery(View view){
         Intent photoPickerIntent = new Intent();
         photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -368,6 +380,12 @@ public class MainActivity extends Activity implements
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), PHOTO_PICKER_MULTIPLE_CODE);
     }
 
+    /**
+     * Handler for whenever an activity is returned
+     * @param requestCode, the code for whatever activity was started
+     * @param resultCode the code for how things went
+     * @param data the returned intent with the data we want
+     * */
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == PHOTO_PICKER_SINGLE_CODE){
@@ -396,6 +414,80 @@ public class MainActivity extends Activity implements
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+
+    public boolean checkUserExists(String username){
+        boolean check = false;
+        DatabaseReference databaseReference = myFirebaseRef.child("user");
+        Query queryRef = databaseReference.orderByChild("username").equalTo(username);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    /*User doesn't exist*/
+                    check = false;
+                }else{
+                    /*User exists*/
+                    check = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        return false;
+    }
+
+
+    /**
+     * shitty code. don't worry about it
+     * */
+    public void onLoginClick(View view){
+        //EditText usernameEditText = (EditText)findViewById(/*whatever the field was named*/);
+        //EditText passwordEditText = (EditText)findViewById(/*whatever the field was named*/);
+        /*String username = usernameEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        int period = username.indexOf('.');
+        String usernameFix = username.substring(0, period) + username.substring(period+1);
+        login(usernameFix, password);
+        */
+    }
+
+
+    public boolean login(String user, String pass){
+        final String userEnterPassword = pass;
+
+        DatabaseReference databaseReference = myFirebaseRef.child("user");
+        Query queryRef = databaseReference.orderByChild("username").equalTo(user);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    /*Username doesn't exist*/
+
+                }else{
+                    if(userEnterPassword == dataSnapshot.child("password").getValue().toString()){
+                        /*idk they logged on or something*/
+                    }else{
+                        /*wrong password*/
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        return false;
     }
 
 }
