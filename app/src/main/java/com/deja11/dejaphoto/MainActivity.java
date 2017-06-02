@@ -418,8 +418,21 @@ public class MainActivity extends Activity implements
 
 
 
+    /**
+     *  -On first user, user registers a name
+        -From then on, that name is in the Firebase and is linked to that device
+            -sharing
+            -username
+            -friendsList with true/false
+
+     -No password is necessary
+     -No user class is necessary
+     -Just get user's information from firebase
+     *
+     * */
+
     public boolean checkUserExists(String username){
-        boolean check = false;
+        final boolean[] check = new boolean[1];
         DatabaseReference databaseReference = myFirebaseRef.child("user");
         Query queryRef = databaseReference.orderByChild("username").equalTo(username);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -427,10 +440,10 @@ public class MainActivity extends Activity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     /*User doesn't exist*/
-                    check = false;
+                    check[0] = false;
                 }else{
                     /*User exists*/
-                    check = true;
+                    check[0] = true;
                 }
             }
 
@@ -439,27 +452,15 @@ public class MainActivity extends Activity implements
 
             }
         });
-
-        return false;
+        return check[0];
     }
 
+    public void register(String username){
+        SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPref.edit().putString("username", username).apply();
 
-    /**
-     * shitty code. don't worry about it
-     * */
-    public void onLoginClick(View view){
-        //EditText usernameEditText = (EditText)findViewById(/*whatever the field was named*/);
-        //EditText passwordEditText = (EditText)findViewById(/*whatever the field was named*/);
-        /*String username = usernameEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-
-        int period = username.indexOf('.');
-        String usernameFix = username.substring(0, period) + username.substring(period+1);
-        login(usernameFix, password);
-        */
+        User firstUser = new User();
+        myFirebaseRef.child("user").setValue(firstUser);// ???maybe???
     }
-
-
-
 
 }

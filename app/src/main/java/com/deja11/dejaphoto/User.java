@@ -21,14 +21,12 @@ import static junit.framework.Assert.assertEquals;
 public class User {
     private boolean sharing;
     private String username;
-    private String password;
     private HashMap<String, String> friends;
 
 
     public User(){
         sharing = false;
         username = "";
-        password = "";
         friends = new HashMap<String, String>();
     }
 
@@ -38,9 +36,7 @@ public class User {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 username = dataSnapshot.getKey();
-                password = dataSnapshot.child("password").getValue().toString();
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -57,9 +53,6 @@ public class User {
     }
     public void setUsername(String user){
         username = user;
-    }
-    public void setPassword(String pass){
-        password = pass;
     }
     public void setFriend(String name, boolean mutual){
         friends.put(name, String.valueOf(mutual));
@@ -79,9 +72,6 @@ public class User {
     }
     public String getUsername(){
         return username;
-    }
-    public String getPassword(){
-        return password;
     }
     public boolean isFriendOf(String name){
         if(friends.containsKey(name)){
