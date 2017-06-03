@@ -184,6 +184,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         });
 
         // create a new thread for syncing
+       /* interacting with front end
         new Thread(){
             public void run(){
                 while(true){
@@ -194,13 +195,21 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             sync();
                             Toast.makeText(MainActivity.this, "thread running", Toast.LENGTH_SHORT).show();}
                     });
+
                 }
             }
         }.start();
+        */
+        new Thread(new Sync()).start();
     }
-
-    private void sync(){
-
+    class Sync implements Runnable{
+        @Override
+        public void run() {
+            while(true){
+                try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
+                downloadPhotos();
+            }
+        }
     }
 
     @Override
