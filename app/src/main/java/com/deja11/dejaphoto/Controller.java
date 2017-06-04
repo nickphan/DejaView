@@ -32,15 +32,16 @@ public class Controller implements Parcelable {
     private LinkedList<Photo> cache;
     private int mData = 0;
 
+    private User user;
     /**
      * Constructor with context to use for changing wallpaper
      */
     public Controller(Context context) {
-        Log.i("Initializing Controller", "New Controller");
         this.context = context;
         databaseHelper = new DatabaseHelper(this.context);
         databaseHelper.initialize(this.context);
         cache = new LinkedList<Photo>();
+        user = new User();
         initialize();
     }
 
@@ -386,4 +387,6 @@ public class Controller implements Parcelable {
 
         }
     }
+
+
 }

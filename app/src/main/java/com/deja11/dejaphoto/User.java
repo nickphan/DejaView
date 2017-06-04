@@ -1,5 +1,8 @@
 package com.deja11.dejaphoto;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,7 +13,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -19,28 +25,53 @@ import static junit.framework.Assert.assertEquals;
  */
 
 public class User {
+
     private boolean sharing;
     private String username;
     private HashMap<String, String> friends;
+
+
 
 
     public User(){
         sharing = false;
         username = "";
         friends = new HashMap<String, String>();
+
     }
 
     public User(DatabaseReference databaseReference){
-        Query queryRef = databaseReference.child("Test@gmailcom");
+        Query queryRef = databaseReference;
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                username = dataSnapshot.getKey();
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    /*User doesn't exist*/
+                    //POINT 1
+                }else{
+                    /*User exists*/
+                    username = dataSnapshot.getKey();
+                    String share = dataSnapshot.child("sharing").getValue().toString();
+                    if(share.equals("true")){
+                        sharing = true;
+                    }else{
+                        sharing = false;
+                    }
+                    
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+        //POINT 2
+        while(username == null){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -73,16 +104,30 @@ public class User {
     public String getUsername(){
         return username;
     }
+    public ArrayList<String> getFriends(){
+        ArrayList<String> myFriends = new ArrayList<String>();
+        Set<String> keys = friends.keySet();
+        for(String key: keys){
+            String value = friends.get(key);
+            if(value.equals("true")){
+                myFriends.add(key);
+            }
+        }
+        return myFriends;
+    }
     public boolean isFriendOf(String name){
         if(friends.containsKey(name)){
-            if(friends.get(name) == "true"){
+            if(friends.get(name).equals("true")){
                 return true;
             }else{
                 return false;
             }
-
         }else{
             return false;
         }
+    }
+
+    public void refresh(){
+
     }
 }

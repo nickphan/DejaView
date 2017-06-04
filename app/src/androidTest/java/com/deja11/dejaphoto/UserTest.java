@@ -29,41 +29,31 @@ public class UserTest {
 
     @Test
     public void TestInitializeWithDatabaseReference(){
-        DatabaseReference databaseReference = myFirebaseRef;
-
-        //User testUser = new User(databaseReference);
 
         final String username = "Test@gmailcom";
         final String password = "valueOfPassword";
 
-        User testUser = new User();
 
-        testUser.setFromDatabaseReference(databaseReference);
-
-        /*
-        Query queryRef = databaseReference.child("Test@gmailcom");
+        Query queryRef = myFirebaseRef.child("Test@gmailcom");
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                assertEquals(username, dataSnapshot.getKey());
-                assertEquals(password, dataSnapshot.child("password").getValue().toString());
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    /*User doesn't exist*/
+                    //POINT 1
+                }else{
+                    /*User exists*/
+                    assertEquals(username, dataSnapshot.getKey());
+                }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
-        });*/
+        });
 
 
-        //assertEquals(username, databaseReference.getKey());
+        User testUser = new User(myFirebaseRef.child("Test@gmailcom"));
         assertEquals(username, testUser.getUsername());
-        assertEquals(password, testUser.getPassword());
-        //assertFalse(testUser.isSharing());
-
-        //assertTrue(testUser.isFriendOf("friend1"));
-        //assertTrue(testUser.isFriendOf("friend2"));
-        //assertFalse(testUser.isFriendOf("friend3"));
-        //assertTrue(testUser.isFriendOf("friend4"));
 
     }
 
