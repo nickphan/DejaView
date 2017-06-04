@@ -8,13 +8,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
@@ -38,8 +42,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends Activity implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int INTERVAL_OFFSET = 5; // offset for the interval
     private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
@@ -81,11 +84,10 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
-
-
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -93,7 +95,7 @@ public class MainActivity extends Activity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
 
-                Toast.makeText(getBaseContext(),data.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), data.toString(), Toast.LENGTH_LONG).show();
 
             }
 
@@ -172,9 +174,7 @@ public class MainActivity extends Activity implements
 
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), alarmPIntent);
-        }
-
-        else{
+        } else {
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
         }
@@ -188,16 +188,48 @@ public class MainActivity extends Activity implements
             }
         });
 
+        // create a new thread for syncing
+       /* interacting with front end
+        new Thread(){
+            public void run(){
+                while(true){
+                    try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
+                    runOnUiThread (new Runnable() {
+                        @Override
+                        public void run() {
+                            sync();
+                            Toast.makeText(MainActivity.this, "thread running", Toast.LENGTH_SHORT).show();}
+                    });
 
+                }
+            }
+        }.start();
+        */
+        new Thread(new Sync()).start();
+    }
+    class Sync implements Runnable{
+        @Override
+        public void run() {
+            while(true){
+                try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
+                downloadPhotos();
+            }
+        }
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
+       /*
+        if(isBound){
+            unbindService(serviceConnection);
+            isBound = false;
+        }
+*/
+       super.onDestroy();
         // unregister the MainActivity as a listener for preference changes
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.unregisterOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
