@@ -77,6 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_REL_7 = "RELEASED";
     public static final String COL_KARMA_8 = "KARMA";
     public static final String COL_FILE_NAME_9 = "FILENAME";
+    public static final String COL_OWNER_10 = "OWNER";
 
     private static final String currentUserName = "Teehee@heeheecom";
 
@@ -111,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DATE_5 + " TEXT, " +
                 COL_DEJA_6 + " INTEGER, " +
                 COL_REL_7 + " INTEGER, " +
-                COL_KARMA_8 + " INTEGER , FILENAME TEXT )");
+                COL_KARMA_8 + " INTEGER , FILENAME TEXT, OWNER TEXT )");
 
         Log.i(TAGDATABASE, "Table created");
     }
@@ -143,8 +144,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
+    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
         SQLiteDatabase db = this.getWritableDatabase();
+
 
         // Put all data in a container
         ContentValues contentValues = new ContentValues();
@@ -155,6 +157,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_DEJA_6, dejapoints);
         contentValues.put(COL_REL_7, isReleased);
         contentValues.put(COL_KARMA_8, isKarma);
+        contentValues.put(COL_FILE_NAME_9, photoName);
+        contentValues.put(COL_OWNER_10,currentUserName);
+
 
         Log.i(TAGDATABASE, "Data inserted correctly");
         return db.insert(TABLE_NAME, null, contentValues) != -1;
@@ -194,6 +199,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
 
+        //TODO FIREBASE
+
+        updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
+
+
         Log.i(TAGDATABASE, photoLocation + " set to karma'd");
     }
 
@@ -208,6 +218,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Delegate to updated field
         updateField(id, COL_REL_7, 1);
+
+        //TODO FIREBASE
+
+        updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+
+
 
         Log.i(TAGDATABASE, photoLocation + " set to released");
     }
@@ -276,8 +292,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
 
                     // TODO Firebase
-                    this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                    insertFirebaseStorage(absolutePath);
+
 
 
 
@@ -286,8 +301,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
 
                         if (res.getCount() == 0) {
-                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                            String photoName = Uri.fromFile(new File (absolutePath)).getLastPathSegment();
+                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
                             Log.i("Database insertion", absolutePath + " is now in the table");
+                            this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                            insertFirebaseStorage(absolutePath);
                         }
 
                     } catch (Exception e) {
@@ -510,6 +528,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_REL_7, isReleased+"");
         contentValues.put(COL_KARMA_8, isKarma+"");
         contentValues.put(COL_FILE_NAME_9,photoName);
+        contentValues.put(COL_OWNER_10,currentUserName);
 
 
         mdejaRef.child("images").child(currentUserName).child(photoNameFix).setValue(contentValues);
@@ -541,7 +560,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                                         String photoName;
                                                         for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
                                                             photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                                                            downloadAPhoto(photoName);
+                                                            downloadAPhoto(currentUserName, photoName);
                                                         }
                                                     }
                                                     @Override
@@ -601,8 +620,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void downloadAPhoto(String photoName){
+    public void downloadAPhoto(String userName, String photoName){
+
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
+
         // Create direcorty if not exists
         if(!storagePath.exists()) {
             //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
@@ -610,7 +631,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         File myFile = new File(storagePath,photoName);
-        StorageReference riversRef = mdejaStorage.child("images").child(currentUserName +"/"+photoName);
+        StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
         riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
@@ -630,24 +651,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public void updateFirebase(String userName, String photoLocation, String column ,String newValue){
 
-
-    // for displaying a message board
-    public void showMessage(String title, String message,Context context) {
-        /*
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(printAll(context));
-
-        showMessage("Data",buffer.toString(),context);
-         */
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(true);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.show();
+        String photoName = Uri.fromFile(new File (photoLocation)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+        mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue("1");
+        //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
+        Log.e("FIREBASE",userName+"/"+photoName+"/"+column+"/"+newValue);
     }
-
 }
 
 
