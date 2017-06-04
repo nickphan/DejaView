@@ -53,8 +53,8 @@ public class GalleryDatabaseTest {
 
         // Insert data
         db.delete(TABLE_NAME, null, null);
-        assertEquals(testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma), true);
-        assertEquals(testDb.insertData("GenericPath2", 2.5454545, -6.822234, "99887766", 100, 1, 0), true);
+        //assertEquals(testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma), true);
+        //assertEquals(testDb.insertData("GenericPath2", 2.5454545, -6.822234, "99887766", 100, 1, 0), true);
 
         // Check if inserted properly, gives correct size, data is correct
         res = db.query(true, TABLE_NAME, null, null, null, null, null, null, null);
@@ -96,7 +96,7 @@ public class GalleryDatabaseTest {
 
         // Insert data
         db.delete(TABLE_NAME, null, null);
-        testDb.insertData(testPath, testLat, testLong, testDate, 25, testRelease, testKarma);
+        //testDb.insertData(testPath, testLat, testLong, testDate, 25, testRelease, testKarma);
 
         // Select ID from photo_table where phonelocation = testpath
         res = db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+testPath+"'",null,null,null,null,null);
@@ -134,7 +134,7 @@ public class GalleryDatabaseTest {
 
         // Insert data
         db.delete(TABLE_NAME, null, null);
-        testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma);
+        //testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma);
 
         testDb.updateKarma(testPath);
 
@@ -162,7 +162,7 @@ public class GalleryDatabaseTest {
 
         // Insert data
         db.delete(TABLE_NAME, null, null);
-        testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma);
+        //testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma);
 
         testDb.updateRelease(testPath);
 

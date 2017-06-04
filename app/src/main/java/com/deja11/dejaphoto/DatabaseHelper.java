@@ -658,7 +658,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
         mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue("1");
         //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
-        Log.e("FIREBASE",userName+"/"+photoName+"/"+column+"/"+newValue);
+
     }
 }
 
