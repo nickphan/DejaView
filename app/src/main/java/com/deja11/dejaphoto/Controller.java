@@ -42,6 +42,9 @@ public class Controller implements Parcelable {
         databaseHelper.initialize(this.context);
         cache = new LinkedList<Photo>();
         initialize();
+
+        //TODO
+        databaseHelper.downloadFriendPhotos(context);
     }
 
     /**
