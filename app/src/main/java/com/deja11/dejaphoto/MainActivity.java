@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,7 +22,11 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +38,10 @@ import android.widget.Toast;
 import android.net.Uri;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import com.google.firebase.database.DataSnapshot;
@@ -86,10 +95,20 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        //setContentView(R.layout.test_photo_picker);
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.test_photo_picker);
 
-        myFirebaseRef = database.getReference().child("name").child("123");
+        int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionGranted = PackageManager.PERMISSION_GRANTED;
+
+        Log.i("Has Permission", hasPermission + "");
+        Log.i("Permission Granted", permissionGranted + "");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+
+        /*myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -205,14 +224,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             }
         }.start();
         */
-        new Thread(new Sync()).start();
+        //new Thread(new Sync()).start();
     }
     class Sync implements Runnable{
         @Override
         public void run() {
             while(true){
                 try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
-                downloadPhotos();
+                //downloadPhotos();
             }
         }
     }
@@ -439,13 +458,70 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             ClipData.Item item = clipData.getItemAt(i);
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
+                            Log.i("Image URI", uri.getPath());
+                            Log.i("Image Authority", uri.getAuthority());
+                            Log.i("Scheme", uri.getScheme());
+                            Log.i("Id", DocumentsContract.getDocumentId(uri));
                         }
-                        /* ADD CONTENTS OF ARRAYLIST TO DEJA ALBUM CARL*/
+
+                        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
+                        Log.i("Folder Path", storagePath.getAbsolutePath());
+                        if (!storagePath.exists()) {
+                            boolean result = storagePath.mkdirs();
+                            Log.i("Directory made", result + " ");
+                        }
+
+                        for (Uri u : uriArrayList) {
+                            try {
+                                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
+                                File source = new File(getPath(id));
+                                File destination = new File(storagePath, source.getName());
+                                copyPhoto(source, destination);
+                                Log.i("Photo Copy", "Successful");
+                            } catch (Exception e) {
+                                Toast.makeText(getApplicationContext(),
+                                        "Error copying a photo", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 }
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /*
+        Copies the source file photo into the specified destination.
+
+        Code credits to: https://examples.javacodegeeks.com/core-java/io/file/4-ways-to-copy-file-in-java/
+                            #2: copy files using channels
+     */
+    private void copyPhoto(File source, File destination) throws IOException {
+        FileChannel inputChannel = null;
+        FileChannel outputChannel = null;
+
+        inputChannel = new FileInputStream(source).getChannel();
+        outputChannel = new FileOutputStream(destination).getChannel();
+        outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+
+        inputChannel.close();
+        outputChannel.close();
+
+    }
+
+
+    private String getPath(String[] id) throws IllegalArgumentException {
+        String[] projection = {MediaStore.Images.Media.DATA };
+        Cursor cursor = getApplicationContext().getContentResolver()
+                .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, "_id=?", id, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            return cursor.getString(index);
+        }
+
+        return null;
     }
 
 
