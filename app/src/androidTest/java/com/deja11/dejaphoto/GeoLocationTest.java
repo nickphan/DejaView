@@ -53,4 +53,21 @@ public class GeoLocationTest {
         assertNotEquals(47.620506, geiselLibrary.getLatitude(), 0);
         assertNotEquals(-122.349277, geiselLibrary.getLongitude(), 0);
     }
+
+    @Test
+    public void testCustomLocationName() {
+        // Name is correctly updated in the GeoLocation object
+        geiselLibrary.setCustomLocationName("Geisel Library, San Diego, California, United States");
+        assertEquals("Geisel Library, San Diego, California, United States",
+                        geiselLibrary.getLocationName(InstrumentationRegistry.getTargetContext()));
+
+        // Name is correctly reset to normal auto-generated name after custom name is cleared
+        geiselLibrary.clearCustomLocationName();
+        assertEquals("Library Walk, Library Walk, San Diego, California, United States",
+                geiselLibrary.getLocationName(InstrumentationRegistry.getTargetContext()));
+
+        // Correctly recognizes empty string as a valid custom name
+        geiselLibrary.setCustomLocationName("");
+        assertEquals("", geiselLibrary.getLocationName(InstrumentationRegistry.getTargetContext()));
+    }
 }
