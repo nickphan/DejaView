@@ -15,8 +15,19 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.util.Pair;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ThrowOnExtraProperties;
+import com.google.firebase.database.ValueEventListener;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -34,17 +45,24 @@ public class Controller implements Parcelable {
     private LinkedList<Photo> cache;
     private int mData = 0;
 
+    private User user;
+    private FirebaseDatabase database;
+    private DatabaseReference myFirebaseRef;
     /**
      * Constructor with context to use for changing wallpaper
      */
     public Controller(Context context) {
-        Log.i("Initializing Controller", "New Controller");
         this.context = context;
 
         databaseMediator = new DatabaseMediator(context);
         //databaseMediator.init(this.context);
 
         cache = new LinkedList<Photo>();
+        user = new User();
+
+        database = FirebaseDatabase.getInstance();
+        myFirebaseRef = database.getReference();
+
         initialize();
 
         //TODO
@@ -393,4 +411,58 @@ public class Controller implements Parcelable {
 
         }
     }
+
+
+    /**
+     *      USER METHODS
+     *
+     *
+     * */
+    public ArrayList<String> checkForRequests(){
+        ArrayList<String> localFriends = user.getFriends();
+        final ArrayList<String> firebaseFriends = new ArrayList<>();
+        ArrayList<String> friended = new ArrayList<>();
+
+        DatabaseReference databaseReference = myFirebaseRef.child(user.getUsername());
+        Query query = databaseReference;
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot friendSnapShot: dataSnapshot.child("friends").getChildren()){
+                    String key = friendSnapShot.getKey();
+                    String val = friendSnapShot.getValue().toString();
+                    firebaseFriends.add(key);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(firebaseFriends.size() < localFriends.size()){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        for(int i = 0; i < firebaseFriends.size(); i++){
+            String friend = firebaseFriends.get(i);
+            if(!localFriends.contains(friend)){
+                friended.add(friend);
+            }
+        }
+        return friended;
+    }
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
 }

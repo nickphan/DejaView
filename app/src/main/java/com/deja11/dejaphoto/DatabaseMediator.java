@@ -41,6 +41,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -185,5 +186,33 @@ public class DatabaseMediator {
         Log.i(TAGDATABASE, "Successfully access storage");
         return context.getContentResolver().query(uri, projection, null, null, null);
 
+    }
+
+
+    public void addFriendFirebase(String user, String friend){
+        firebaseHelper.addFriend(user, friend);
+    }
+
+    /**
+     *      FIREBASE SETTERS
+     *
+     * */
+
+    public void setSharing(String user, boolean value){
+        firebaseHelper.setSharing(user, value);
+    }
+
+    /**
+     *      FIREBASE GETTERS
+     *
+     * */
+    public String getUsername(String username){
+        return  firebaseHelper.getUsername(username);
+    }
+    public boolean getSharing(String username){
+        return firebaseHelper.getSharing(username);
+    }
+    public ArrayList<Pair<String, String>> getFriends(String username){
+        return firebaseHelper.getFriends(username);
     }
 }
