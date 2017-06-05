@@ -497,4 +497,39 @@ public class Controller implements Parcelable {
             }
         }
     }
+
+    public void addFriendViaFirebase(final String user, final String friend){
+        final boolean[] check = new boolean[1];
+        DatabaseReference databaseReference = myFirebaseRef.child("users");
+        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    //he hasn't added you yet
+                    myFirebaseRef.child("users").child(friend).child("friends").child(user).setValue("false");
+                    check[0] = true;
+                }else{
+                    if(dataSnapshot.getValue().toString().equals("false")){
+                        myFirebaseRef.child("users").child(user).child("friends").child(friend).setValue("true");
+                        myFirebaseRef.child("users").child(friend).child("friends").child(user).setValue("true");
+                        check[0] = true;
+                    }
+                    check[0] = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 }
