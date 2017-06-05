@@ -254,9 +254,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Look through all the photo in the camera album and add any photos that are not in the database yet
      * to the database
      *
-     * @param context the context to of the activity
+     *  context the context to of the activity
      */
-    public void initialize(Context context) {
+    /*public void initialize(Context context) {
 
         // Ensure that app has permission to access the storage
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -312,7 +312,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
-    }
+    }*/
 
     public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
 

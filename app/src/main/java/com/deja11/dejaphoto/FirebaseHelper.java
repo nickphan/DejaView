@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -65,12 +66,11 @@ public class FirebaseHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
+    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
 
 
 
         HashMap<String , String> contentValues = new HashMap<>();
-        String photoName = Uri.fromFile(new File(phoneLocation)).getLastPathSegment();
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
 
@@ -176,7 +176,43 @@ public class FirebaseHelper {
 
     }
 
-    public void downloadAPhoto(String userName, String photoName){
+    public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName) {
+
+
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        Query queryRef = mdejaRef.child("images").child(currentUserName).child(photoNameFix);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+
+
+                if (snapshot == null || snapshot.getValue() == null) {
+                    //Toast.makeText(MainActivity.this, "No record found", Toast.LENGTH_SHORT).show();
+                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName);
+                    insertFirebaseStorage(absolutePath);
+
+                }
+                else {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG1", "Failed to read value.", error.toException());
+            }
+        });
+
+
+
+
+
+    }
+
+        public void downloadAPhoto(String userName, String photoName){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
 

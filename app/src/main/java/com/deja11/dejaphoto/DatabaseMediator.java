@@ -110,8 +110,9 @@ public class DatabaseMediator {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
 
-                    firebaseHelper.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                    firebaseHelper.insertFirebaseStorage(absolutePath);
+                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
+
+
                 }
                 }
         }
