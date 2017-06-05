@@ -126,8 +126,11 @@ public class User {
             return false;
         }
     }
-
-    public void refresh(){
-
+    public boolean friendExists(String name){
+        if(friends.containsKey(name)){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
