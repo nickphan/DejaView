@@ -262,13 +262,18 @@ public class FirebaseHelper {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String sharingString = dataSnapshot.child("sharing").getValue().toString();
-                if(sharingString.equals("true")){
-                    sharing[0] = true;
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     sharing[1] = true;
-                }else{
                     sharing[0] = false;
-                    sharing[1] = true;
+                }else{
+                    String sharingString = dataSnapshot.child("sharing").getValue().toString();
+                    if(sharingString.equals("true")){
+                        sharing[0] = true;
+                        sharing[1] = true;
+                    }else{
+                        sharing[0] = false;
+                        sharing[1] = true;
+                    }
                 }
             }
 
@@ -294,14 +299,18 @@ public class FirebaseHelper {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
-                    String key = friendSnapshot.getKey();
-                    String val = friendSnapshot.getValue().toString();
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    check[0] = true;
+                }else{
+                    for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
+                        String key = friendSnapshot.getKey();
+                        String val = friendSnapshot.getValue().toString();
 
-                    Pair<String, String> pair = new Pair<String, String>(key, val);
-                    friends.add(pair);
+                        Pair<String, String> pair = new Pair<String, String>(key, val);
+                        friends.add(pair);
+                    }
+                    check[0] = true;
                 }
-                check[0] = true;
             }
 
             @Override
@@ -326,8 +335,13 @@ public class FirebaseHelper {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                name[0] = dataSnapshot.getKey();
-                check[0] = true;
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    check[0] = true;
+                    name[0] = "";
+                }else{
+                    name[0] = dataSnapshot.getKey();
+                    check[0] = true;
+                }
             }
 
             @Override

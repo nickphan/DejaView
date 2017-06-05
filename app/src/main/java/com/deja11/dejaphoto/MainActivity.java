@@ -493,9 +493,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void register(String username){
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.edit().putString("username", username).apply();
-
-        User firstUser = new User();
-        myFirebaseRef.child("user").setValue(firstUser);// ???maybe???
     }
 
 }
