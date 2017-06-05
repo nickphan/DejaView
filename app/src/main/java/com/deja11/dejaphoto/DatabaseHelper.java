@@ -79,7 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_FILE_NAME_9 = "FILENAME";
     public static final String COL_OWNER_10 = "OWNER";
 
-    private static final String currentUserName = "Teehee@heeheecom";
+    public static final String currentUserName = "Teehee@heeheecom";
 
 
 
@@ -199,9 +199,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
 
-        //TODO FIREBASE
 
-        updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
 
 
         Log.i(TAGDATABASE, photoLocation + " set to karma'd");
@@ -221,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //TODO FIREBASE
 
-        updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+
 
 
 
@@ -304,8 +302,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             String photoName = Uri.fromFile(new File (absolutePath)).getLastPathSegment();
                             this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
                             Log.i("Database insertion", absolutePath + " is now in the table");
-                            this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                            insertFirebaseStorage(absolutePath);
+
                         }
 
                     } catch (Exception e) {
@@ -317,14 +314,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Gather all the information in the photo.
-     * This method was based on the website
-     * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
-     *
-     * @param context the context to of the activity
-     * @return cursor containing information of photo
-     */
+    public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Check if it already exist before inserting to avoid duplicated
+        try {
+            Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
+
+            if (res.getCount() == 0) {
+
+                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName);
+                Log.i("Database insertion", absolutePath + " is now in the table");
+                //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                //insertFirebaseStorage(absolutePath);
+            }
+
+        } catch (Exception e) {
+            Log.d(TAGDATABASE, absolutePath + "Already");
+            e.printStackTrace();
+        }
+    }
+
+
+
+        /**
+         * Gather all the information in the photo.
+         * This method was based on the website
+         * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
+         *
+         * @param context the context to of the activity
+         * @return cursor containing information of photo
+         */
     public Cursor gatherPhotoInfo(Context context) {
         Uri uri;
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -486,179 +506,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             newPoint = 0;
         }
         Log.d(TAGDATABASE, "Points updated");
-    }
-
-
-
-    //TODO Firebase stuff
-    // TODO remove
-    FirebaseDatabase dejabase = FirebaseDatabase.getInstance();
-    DatabaseReference mdejaRef = dejabase.getReference();
-
-    FirebaseStorage dejaStorage = FirebaseStorage.getInstance();
-    StorageReference mdejaStorage = dejaStorage.getReference();
-    /**
-     * Insert a new photo into the database
-     *
-     * @param phoneLocation path to the photo
-     * @param geoLat        Latitude of the location photo was taken
-     * @param geoLong       Longtitude of the location photo was taken
-     * @param date          Date and time photo was taken
-     * @param dejapoints    point assigned to the photo
-     * @param isReleased    whether or not the photo is released
-     * @param isKarma       whether or not the photo is karma'd
-     * @return true if insertion is successful, otherwise false
-     */
-    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
-
-
-
-        HashMap<String , String> contentValues = new HashMap<>();
-        String photoName = Uri.fromFile(new File (phoneLocation)).getLastPathSegment();
-        int period = photoName.indexOf('.');
-        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-
-
-        // Put all data in a container
-        contentValues.put(COL_PATH_2, phoneLocation);
-        contentValues.put(COL_LAT_3, geoLat+"");
-        contentValues.put(COL_LONG_4, geoLong+"");
-        contentValues.put(COL_DATE_5, date);
-        contentValues.put(COL_DEJA_6, dejapoints+"");
-        contentValues.put(COL_REL_7, isReleased+"");
-        contentValues.put(COL_KARMA_8, isKarma+"");
-        contentValues.put(COL_FILE_NAME_9,photoName);
-        contentValues.put(COL_OWNER_10,currentUserName);
-
-
-        mdejaRef.child("images").child(currentUserName).child(photoNameFix).setValue(contentValues);
-
-        //mdejaRef.child("images").child(currentUserName).child(""+index++).setValue(Uri.fromFile(new File (phoneLocation)).getLastPathSegment());
-        Log.i(TAGDATABASE, "Data inserted correctly");
-    }
-
-
-    public void insertFirebaseStorage(String phoneLocation){
-        //insert into storage
-        UploadTask uploadTask;
-        Uri file = Uri.fromFile(new File(phoneLocation));
-        StorageReference photoRef = mdejaStorage.child("images/"+currentUserName+"/"+file.getLastPathSegment());
-        uploadTask = photoRef.putFile(file);
-    }
-
-    public void downloadFriendPhotos(final Context context){
-
-
-        // Create a director if it doesn't exit
-
-
-        Query queryRef = mdejaRef.child("images").child(currentUserName);
-
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        String photoName;
-                                                        for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                                                            photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                                                            downloadAPhoto(currentUserName, photoName);
-                                                        }
-                                                    }
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {}});
-
-
-
-
-
-
-
-
-
-
-/*
-        Query queryRef = mdejaRef.child("images").child(currentUserName);
-
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) { //
-                    Toast.makeText(context, eventSnapshot.getKey(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-*/
-                //StorageReference folderRef = mStorage.child("images").child("Teehee@gmailcom");
-                //Query queryRef = myFirebaseRef.child("User").orderByChild("age");//.limitToFirst(1);
-
-
-                //String root = Environment.getExternalStorageDirectory().toString();
-        /*
-        final File myFile = new File(storagePath,"6_eiffel_tower.jpg");
-
-        StorageReference riversRef = mStorage.child("images/6_eiffel_tower.jpg");
-
-
-        riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                // Local temp file has been created
-                Toast.makeText(getBaseContext(), "file created",Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Toast.makeText(getBaseContext(), "not created",Toast.LENGTH_LONG).show();
-
-            }
-        });*/
-
-    }
-
-    public void downloadAPhoto(String userName, String photoName){
-
-        File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
-
-        // Create direcorty if not exists
-        if(!storagePath.exists()) {
-            //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
-            storagePath.mkdirs();
-        }
-
-        File myFile = new File(storagePath,photoName);
-        StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
-        riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                // Local temp file has been created
-                //Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
-
-            }
-        });
-        //Toast.makeText(context, listOfPhotosToDownload.get(i++), Toast.LENGTH_SHORT).show();
-
-
-    }
-
-    public void updateFirebase(String userName, String photoLocation, String column ,String newValue){
-
-        String photoName = Uri.fromFile(new File (photoLocation)).getLastPathSegment();
-        int period = photoName.indexOf('.');
-        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-        mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue("1");
-        //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
-
     }
 }
 
