@@ -37,7 +37,11 @@ public class User {
         sharing = false;
         username = "";
         friends = new HashMap<String, String>();
-
+    }
+    public User(String user){
+        sharing = false;
+        username = user;
+        friends = new HashMap<String, String>();
     }
 
     public User(DatabaseReference databaseReference){
