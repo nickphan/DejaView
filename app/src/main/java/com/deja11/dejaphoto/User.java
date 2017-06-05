@@ -88,6 +88,9 @@ public class User {
     public void setFriend(String name, boolean mutual){
         friends.put(name, String.valueOf(mutual));
     }
+    public void setFriend(String name, String mutual){
+        friends.put(name, mutual);
+    }
 
 
 

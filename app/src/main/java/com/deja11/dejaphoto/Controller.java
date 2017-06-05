@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -454,86 +455,14 @@ public class Controller implements Parcelable {
         return friended;
     }
     public void updateUser(){
-        user.setUsername("");
-        user.setSharing(false);
-
-        DatabaseReference databaseReference = myFirebaseRef.child(user.getUsername());
-        Query query = databaseReference;
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user.setUsername(dataSnapshot.getKey());
-                String share = dataSnapshot.child("sharing").getValue().toString();
-                if(share.equals("true")){
-                    user.setSharing(true);
-                }else{
-                    user.setSharing(false);
-                }
-                for(DataSnapshot friendSnapShot: dataSnapshot.child("friends").getChildren()){
-                    String key = friendSnapShot.getKey();
-                    String val = friendSnapShot.getValue().toString();
-                    if(user.friendExists(key)){
-                        if(!user.isFriendOf(key) && val.equals("true")){
-                            user.setFriend(key, true);
-                        }
-                    }else{
-                        if(val.equals("true")){
-                            user.setFriend(key, true);
-                        }else{
-                            user.setFriend(key, false);
-                        }
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        while(user.getUsername().equals("")){
-            try{
-                Thread.sleep(500);
-            }catch (Exception e){
-
-            }
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
         }
     }
 
-    public void addFriendViaFirebase(final String user, final String friend){
-        final boolean[] check = new boolean[1];
-        DatabaseReference databaseReference = myFirebaseRef.child("users");
-        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot == null || dataSnapshot.getValue() == null){
-                    //he hasn't added you yet
-                    myFirebaseRef.child("users").child(friend).child("friends").child(user).setValue("false");
-                    check[0] = true;
-                }else{
-                    if(dataSnapshot.getValue().toString().equals("false")){
-                        myFirebaseRef.child("users").child(user).child("friends").child(friend).setValue("true");
-                        myFirebaseRef.child("users").child(friend).child("friends").child(user).setValue("true");
-                        check[0] = true;
-                    }
-                    check[0] = true;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        while(check[0]){
-            try{
-                Thread.sleep(500);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
 }

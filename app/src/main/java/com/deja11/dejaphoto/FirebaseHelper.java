@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -276,21 +277,29 @@ public class FirebaseHelper {
 
             }
         });
+        while(!sharing[1]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         return sharing[0];
     }
 
-    public ArrayList<String> getFriends(String username){
-        final ArrayList<String> friends = new ArrayList<String>();
+    public ArrayList<Pair<String, String>> getFriends(String username){
+        final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
         final boolean[] check = new boolean[1];
         DatabaseReference databaseReference = mdejaRef.child("users").child(username);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
-                    String isFriend = friendSnapshot.getValue().toString();
-                    if(isFriend.equals("true")){
-                        friends.add(friendSnapshot.getKey());
-                    }
+                    String key = friendSnapshot.getKey();
+                    String val = friendSnapshot.getValue().toString();
+
+                    Pair<String, String> pair = new Pair<String, String>(key, val);
+                    friends.add(pair);
                 }
                 check[0] = true;
             }
@@ -308,9 +317,38 @@ public class FirebaseHelper {
                 e.printStackTrace();
             }
         }
-
-
         return friends;
+    }
+    public String getUsername(String username){
+        final boolean[] check = new boolean[1];
+        final String[] name = new String[1];
+        final DatabaseReference databaseReference = mdejaRef.child("user").child(username);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                name[0] = dataSnapshot.getKey();
+                check[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return name[0];
+    }
+
+
+    public void setSharing(String name, boolean value){
+        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
+        databaseReference.setValue(String.valueOf(value));
     }
 
 }
