@@ -36,7 +36,9 @@ import java.util.LinkedList;
 
 public class Controller implements Parcelable {
 
-    private DatabaseHelper databaseHelper;
+
+
+    private DatabaseMediator databaseMediator;
     private Context context;
     private Photo currPhoto;
     private LinkedList<Photo> cache;
@@ -50,8 +52,10 @@ public class Controller implements Parcelable {
      */
     public Controller(Context context) {
         this.context = context;
-        databaseHelper = new DatabaseHelper(this.context);
-        databaseHelper.initialize(this.context);
+
+        databaseMediator = new DatabaseMediator(context);
+        //databaseMediator.init(this.context);
+
         cache = new LinkedList<Photo>();
         user = new User();
 
@@ -61,7 +65,7 @@ public class Controller implements Parcelable {
         initialize();
 
         //TODO
-        databaseHelper.downloadFriendPhotos(context);
+        databaseMediator.downloadFriendPhotos(context);
     }
 
     /**
@@ -70,8 +74,8 @@ public class Controller implements Parcelable {
      * @return the next photo either from cache or from DatabaseHelper
      */
     public Photo getNextPhoto() {
-        databaseHelper.updatePoint(getUserCurrentLocation(), getUserCalendar());
-        Photo photo = databaseHelper.getNextPhoto();
+        databaseMediator.updatePoint(getUserCurrentLocation(), getUserCalendar());
+        Photo photo = databaseMediator.getNextPhoto();
         if (currPhoto == null) {
             if (photo.isReleased()) {
                 return getNextPhoto();
@@ -136,7 +140,7 @@ public class Controller implements Parcelable {
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
-            databaseHelper.updateKarma(photo.getPhotoLocation());
+            databaseMediator.updateKarma(photo.getPhotoLocation());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");
@@ -150,7 +154,7 @@ public class Controller implements Parcelable {
     void releasePhoto() {
         if (currPhoto != null) {
             currPhoto.setReleased(true);
-            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
+            databaseMediator.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
                 currPhoto = cache.getLast();
