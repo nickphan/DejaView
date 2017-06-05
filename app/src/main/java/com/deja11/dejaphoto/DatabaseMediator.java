@@ -98,6 +98,7 @@ public class DatabaseMediator {
             String dateAdded = null;
             double latitude = 0.0;
             double longitude = 0.0;
+            String defaultLocation = "default";
 
             while (cursor.moveToNext()) {
                 absolutePath = cursor.getString(columnIndexPath); //path to the photo
@@ -108,9 +109,11 @@ public class DatabaseMediator {
                 // Make sure it is in the camera album
                 if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
-                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
+                    GeoLocation tempLoc = new GeoLocation(latitude,longitude);
+                    defaultLocation = tempLoc.getLocationName(context);
+                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, currentUserName, defaultLocation);
 
-                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
+                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,currentUserName,defaultLocation);
 
 
                 }

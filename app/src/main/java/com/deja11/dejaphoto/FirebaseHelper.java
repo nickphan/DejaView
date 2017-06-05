@@ -27,6 +27,7 @@ import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_FILE_NAME_9;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_OWNER_10;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
@@ -66,7 +67,7 @@ public class FirebaseHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
+    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName,String userName, String locationName) {
 
 
 
@@ -84,10 +85,12 @@ public class FirebaseHelper {
         contentValues.put(COL_REL_7, isReleased+"");
         contentValues.put(COL_KARMA_8, isKarma+"");
         contentValues.put(COL_FILE_NAME_9,photoName);
-        contentValues.put(COL_OWNER_10,currentUserName);
+        contentValues.put(COL_OWNER_10,userName);
+        contentValues.put(COL_LOC_NAME_11,locationName);
 
 
-        mdejaRef.child("images").child(currentUserName).child(photoNameFix).setValue(contentValues);
+
+        mdejaRef.child("images").child(userName).child(photoNameFix).setValue(contentValues);
 
         //mdejaRef.child("images").child(currentUserName).child(""+index++).setValue(Uri.fromFile(new File (phoneLocation)).getLastPathSegment());
         Log.i(TAGDATABASE, "Data inserted correctly");
@@ -176,7 +179,8 @@ public class FirebaseHelper {
 
     }
 
-    public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName) {
+    public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName, final
+                                    String userName, final String locationName) {
 
 
         int period = photoName.indexOf('.');
@@ -190,7 +194,7 @@ public class FirebaseHelper {
 
                 if (snapshot == null || snapshot.getValue() == null) {
                     //Toast.makeText(MainActivity.this, "No record found", Toast.LENGTH_SHORT).show();
-                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName);
+                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, userName,locationName);
                     insertFirebaseStorage(absolutePath);
 
                 }

@@ -78,6 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_KARMA_8 = "KARMA";
     public static final String COL_FILE_NAME_9 = "FILENAME";
     public static final String COL_OWNER_10 = "OWNER";
+    public static final String COL_LOC_NAME_11="LOCATIONNAME";
 
     public static final String currentUserName = "Teehee@heeheecom";
 
@@ -112,7 +113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DATE_5 + " TEXT, " +
                 COL_DEJA_6 + " INTEGER, " +
                 COL_REL_7 + " INTEGER, " +
-                COL_KARMA_8 + " INTEGER , FILENAME TEXT, OWNER TEXT )");
+                COL_KARMA_8 + " INTEGER , FILENAME TEXT, OWNER TEXT, LOCATIONNAME TEXT  )");
 
         Log.i(TAGDATABASE, "Table created");
     }
@@ -144,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
+    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName) {
         SQLiteDatabase db = this.getWritableDatabase();
 
 
@@ -158,7 +159,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_REL_7, isReleased);
         contentValues.put(COL_KARMA_8, isKarma);
         contentValues.put(COL_FILE_NAME_9, photoName);
-        contentValues.put(COL_OWNER_10,currentUserName);
+        contentValues.put(COL_OWNER_10,owner);
+        contentValues.put(COL_LOC_NAME_11,locationName);
 
 
         Log.i(TAGDATABASE, "Data inserted correctly");
@@ -314,7 +316,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }*/
 
-    public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName) {
+    public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         // Check if it already exist before inserting to avoid duplicated
@@ -323,7 +325,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             if (res.getCount() == 0) {
 
-                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName);
+                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName, owner, locationName);
                 Log.i("Database insertion", absolutePath + " is now in the table");
                 //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
                 //insertFirebaseStorage(absolutePath);
