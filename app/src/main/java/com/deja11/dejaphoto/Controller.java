@@ -59,6 +59,9 @@ public class Controller implements Parcelable {
         myFirebaseRef = database.getReference();
 
         initialize();
+
+        //TODO
+        databaseHelper.downloadFriendPhotos(context);
     }
 
     /**
