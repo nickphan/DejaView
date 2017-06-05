@@ -57,4 +57,41 @@ public class UserTest {
 
     }
 
+    @Test
+    public void TestFirebaseIdeas(){
+
+        final boolean[] check = new boolean[1];
+        final boolean[] sharing = new boolean[1];
+
+        check[0] = false;
+
+        final DatabaseReference databaseReference = myFirebaseRef.child("Test@gmailcom");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String sharingString = dataSnapshot.child("sharing").getValue().toString();
+                if(sharingString.equals("true")){
+                    check[0] = true;
+                    sharing[0] = true;
+                }else{
+                    check[0] = true;
+                    sharing[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        assertFalse(sharing[0]);
+    }
+
 }

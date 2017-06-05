@@ -186,4 +186,15 @@ public class DatabaseMediator {
         return context.getContentResolver().query(uri, projection, null, null, null);
 
     }
+
+
+    public void addFriendFirebase(String user, String friend){
+        firebaseHelper.addFriend(user, friend);
+    }
+    public boolean getSharing(String username){
+        return firebaseHelper.getSharing(username);
+    }
+    public ArrayList<String> getFriends(String username){
+        return firebaseHelper.getFriends(username);
+    }
 }
