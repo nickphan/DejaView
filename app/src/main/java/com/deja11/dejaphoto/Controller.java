@@ -26,6 +26,29 @@ import java.util.LinkedList;
 
 public class Controller implements Parcelable {
 
+    public static final int INTERVAL_OFFSET = 5; // offset for the interval
+    public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    public static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+
+    // request codes for each pending intent
+    public static final int LEFT_PENDING_INTENT_RC = 0;
+    public static final int RIGHT_PENDING_INTENT_RC = 1;
+    public static final int KARMA_PENDING_INTENT_RC = 2;
+    public static final int RELEASE_PENDING_INTENT_RC = 3;
+    public static final int ALARM_PENDING_INTENT_RC = 4;
+    public static final int NOTIFICATION_ID = 123;
+    public static final int PHOTO_PICKER_SINGLE_CODE = 5;
+    public static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
+
+    // codes for identifying which action the service has to execute
+    public static final String CODE_KEY = "Order";
+    public static final int CODE_NEXT_PHOTO = 1;
+    public static final int CODE_PREVIOUS_PHOTO = 2;
+    public static final int CODE_KARMA = 3;
+    public static final int CODE_RELEASE = 4;
+    
+    
+
     private DatabaseHelper databaseHelper;
     private Context context;
     private Photo currPhoto;

@@ -53,27 +53,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private static final int INTERVAL_OFFSET = 5; // offset for the interval
-    private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
-    private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
-
-    // request codes for each pending intent
-    private static final int LEFT_PENDING_INTENT_RC = 0;
-    private static final int RIGHT_PENDING_INTENT_RC = 1;
-    private static final int KARMA_PENDING_INTENT_RC = 2;
-    private static final int RELEASE_PENDING_INTENT_RC = 3;
-    private static final int ALARM_PENDING_INTENT_RC = 4;
-    private static final int NOTIFICATION_ID = 123;
-    private static final int PHOTO_PICKER_SINGLE_CODE = 5;
-    private static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
-
-    // codes for identifying which action the service has to execute
-    private static final String CODE_KEY = "Order";
-    private static final int CODE_NEXT_PHOTO = 1;
-    private static final int CODE_PREVIOUS_PHOTO = 2;
-    private static final int CODE_KARMA = 3;
-    private static final int CODE_RELEASE = 4;
-
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
@@ -108,7 +87,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
-        /*myFirebaseRef = database.getReference().child("name").child("123");
+        myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -123,7 +102,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
             }
         });
-
+/*
         // For Junit test
         setInstance(this);
 
@@ -255,9 +234,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         // the interval settings is changed
-        if (key.equals(INTERVAL_KEY)) {
-            int minutes = sharedPreferences.getInt(INTERVAL_KEY, INTERVAL_DEFAULT)
-                    + INTERVAL_OFFSET;
+        if (key.equals(Controller.INTERVAL_KEY)) {
+            int minutes = sharedPreferences.getInt(Controller.INTERVAL_KEY, Controller.INTERVAL_DEFAULT)
+                    + Controller.INTERVAL_OFFSET;
             SetWallpaperService.updateInterval(minutes);
             Log.d("Preference Changed", "Updated interval to " + minutes + " minutes");
         }
@@ -273,135 +252,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         startActivity(intent);
     }
 
-    public static class LeftReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Button Clicked", "Left Button / Previous Photo Button");
-
-            // reset the alarm by cancelling then rescheduling
-            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-            PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
-                    ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-
-            mAlarmManager.cancel(alarmPIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-            } else {
-                mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval,
-                        SetWallpaperService.interval, alarmPIntent);
-            }
-
-            // create an intent to call the SetWallpaperServices with the appropriate code
-            Intent prevButtonIntent = new Intent(context, SetWallpaperService.class);
-            prevButtonIntent.putExtra(CODE_KEY, CODE_PREVIOUS_PHOTO);
-            context.startService(prevButtonIntent);
-        }
-    }
-
-    public static class RightReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Button Clicked", "Right Button / Next Photo Button");
-
-            // reset the alarm by cancelling then rescheduling
-            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-            PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
-                    ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-
-            mAlarmManager.cancel(alarmPIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-            }
-
-            else{
-                mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval,
-                        SetWallpaperService.interval, alarmPIntent);
-            }
-
-            // create an intent to call the SetWallpaperServices with the appropriate code
-            Intent nextButtonIntent = new Intent(context, SetWallpaperService.class);
-            nextButtonIntent.putExtra(CODE_KEY, CODE_NEXT_PHOTO);
-            context.startService(nextButtonIntent);
-        }
-    }
-
-    public static class KarmaReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Photo karma'ed", Toast.LENGTH_SHORT).show();
-
-            // create an intent to call the SetWallpaperServices with the appropriate code
-            Intent karmaButtonIntent = new Intent(context, SetWallpaperService.class);
-            karmaButtonIntent.putExtra(CODE_KEY, CODE_KARMA);
-            context.startService(karmaButtonIntent);
-        }
-    }
-
-    public static class ReleaseReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Photo released", Toast.LENGTH_SHORT).show();
-
-            // reset the alarm by cancelling then rescheduling
-            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-            PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
-                    ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-
-            mAlarmManager.cancel(alarmPIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-            } else {
-                mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval,
-                        SetWallpaperService.interval, alarmPIntent);
-            }
-
-            // create an intent to call the SetWallpaperServices with the appropriate code
-            Intent releaseButtonIntent = new Intent(context, SetWallpaperService.class);
-            releaseButtonIntent.putExtra(CODE_KEY, CODE_RELEASE);
-            context.startService(releaseButtonIntent);
-        }
-    }
-
-    public static class AlarmReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Alarm", "Scheduled alarm fired");
-
-            // for SDKs higher than 19 (KITKAT), we have to reschedule the alarm
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-                PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
-                        ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-                mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
-
-            }
-
-            // create an intent to call the SetWallpaperServices with the appropriate code
-            Intent serviceIntent = new Intent(context, SetWallpaperService.class);
-            serviceIntent.putExtra(CODE_KEY, CODE_NEXT_PHOTO);
-            context.startService(serviceIntent);
-        }
-    }
-
     /**
      * Launches the gallery for a single photo
      * @param view, the view that calls it
@@ -412,7 +262,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         String pictureDirectoryPath = pictureDirectory.getPath();
         Uri data = Uri.parse(pictureDirectoryPath);
         photoPickerIntent.setDataAndType(data, "image/*");
-        startActivityForResult(photoPickerIntent, PHOTO_PICKER_SINGLE_CODE);
+        startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
     }
     /**
      * Launches the gallery and lets you select photos
@@ -428,7 +278,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         String pictureDirectoryPath = pictureDirectory.getPath();
         Uri data = Uri.parse(pictureDirectoryPath);
         photoPickerIntent.setDataAndType(data, "image/*");
-        startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), PHOTO_PICKER_MULTIPLE_CODE);
+        startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), Controller.PHOTO_PICKER_MULTIPLE_CODE);
     }
 
     /**
@@ -439,11 +289,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      * */
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK){
-            if(requestCode == PHOTO_PICKER_SINGLE_CODE){
+            if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
                 Uri imageData = data.getData();
                 /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
             }
-            if(requestCode == PHOTO_PICKER_MULTIPLE_CODE){
+            if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
                 /* SINGLE RETURNED. SHOULD NEVER COME HERE */
                 if(data.getData() != null){
                     Uri imageData = data.getData();
@@ -497,6 +347,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         Code credits to: https://examples.javacodegeeks.com/core-java/io/file/4-ways-to-copy-file-in-java/
                             #2: copy files using channels
+                 and to: https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
      */
     private void copyPhoto(File source, File destination) throws IOException {
         FileChannel inputChannel = null;
