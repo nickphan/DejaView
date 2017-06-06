@@ -124,20 +124,6 @@ public class DatabaseMediator {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void updatePoint(GeoLocation deviceLocation, Calendar deviceCalendar) {
         databaseHelper.updatePoint(deviceLocation, deviceCalendar);
     }

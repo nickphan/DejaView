@@ -499,4 +499,8 @@ public class Controller implements Parcelable {
         }
     }
 
+    public void sync(){
+        databaseMediator.downloadFriendPhotos(context);
+    }
+
 }

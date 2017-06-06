@@ -14,6 +14,7 @@ public class SetWallpaperService extends IntentService {
     private static int CODE_KARMA = 3;
     private static int CODE_RELEASE = 4;
     private static int CODE_DEFAULT_VALUE = 0;
+    private static int CODE_SYNC = 5;
 
     public static long interval = 10000; // interval between Wallpaper changes (5 minutes default)
     private static final long MIN_TO_MS = 60000; // a conversion factor from minutes to milliseconds
@@ -47,6 +48,8 @@ public class SetWallpaperService extends IntentService {
         }else if(order == CODE_DEFAULT_VALUE){
             /*SHOULD NEVER GET HERE*/
             Log.i("Order", Integer.toString(0));
+        } else if(order == CODE_SYNC){
+            controller.sync();
         } else {
             /*ESPECIALLY SHOULD NEVER GET HERE*/
             Log.i("Error Order", "Service was started with an intent of " + Integer.toString(order));
