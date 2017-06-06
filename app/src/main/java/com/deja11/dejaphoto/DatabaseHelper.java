@@ -197,13 +197,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param photoLocation location of the photo that has been karma'd
      */
-    public void updateKarma(String photoLocation) {
+    public void updateKarma(String photoLocation, int totalKarma) {
 
         int id = findIdByColumn(COL_PATH_2, photoLocation);
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
-
-
+        updateField(id, COL_TOTAL_KARMA_12, totalKarma+1);
 
 
         Log.i(TAGDATABASE, photoLocation + " set to karma'd");
@@ -442,10 +441,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isReleased = res.getInt(6) > 0 ? true : false;
         boolean isKarma = res.getInt(7) > 0 ? true : false;
 
+        int totalKarma = res.getInt(11);
+
         /*code to get total karma as int*/
 
         Log.i(TAGDATABASE, "Next photo object returned");
-        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma);
+        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma);
     }
 
     /**

@@ -142,7 +142,7 @@ public class Controller implements Parcelable {
         if (!photo.isKarma()) {
             photo.setKarma(true);
             photo.incrementKarma();
-            databaseMediator.updateKarma(photo.getPhotoLocation());
+            databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");

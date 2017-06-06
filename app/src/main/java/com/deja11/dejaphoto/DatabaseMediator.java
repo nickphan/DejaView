@@ -22,6 +22,7 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
 import static com.deja11.dejaphoto.DatabaseHelper.currentUserName;
@@ -145,10 +146,12 @@ public class DatabaseMediator {
         return databaseHelper.getNextPhoto();
     }
 
-    public void updateKarma(String photoLocation) {
-        databaseHelper.updateKarma(photoLocation);
+    public void updateKarma(String photoLocation, int totalKarma) {
+        databaseHelper.updateKarma(photoLocation, totalKarma);
         //TODO FIREBASE
         firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
+        int karma = totalKarma+1;
+        firebaseHelper.updateFirebase(currentUserName, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
     }
 
     public void updateRelease(String photoLocation) {
