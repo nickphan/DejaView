@@ -114,7 +114,6 @@ public class FirebaseHelper {
 
         // Create a director if it doesn't exit
 
-
         Query queryRef = mdejaRef.child("images").child(friendUserName);
 
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -347,7 +346,6 @@ public class FirebaseHelper {
                     for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
                         String key = friendSnapshot.getKey();
                         String val = friendSnapshot.getValue().toString();
-
                         Pair<String, String> pair = new Pair<String, String>(key, val);
                         friends.add(pair);
                     }

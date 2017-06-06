@@ -500,6 +500,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void register(String username){
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.edit().putString("username", username).apply();
+
+        //
+        //mSharedPref.getString("username", "none");
     }
 
 }

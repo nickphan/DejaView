@@ -206,4 +206,22 @@ public class DatabaseMediator {
     public ArrayList<Pair<String, String>> getFriends(String username){
         return firebaseHelper.getFriends(username);
     }
+
+
+
+
+
+
+    /**
+     *      Info that needs to get pulled from firebase for each photo
+     *          total karma
+     *          release value
+     *              if anyone releases a photo, reflect that change in sql
+     *              if an owner releases a photo, reflect that change in sql and firebase
+     *          location name
+     *              if anyone renames a photo, reflect that change in sql
+     *              if the owner of the photo renames it, reflect that change in sql and firebase
+     *
+     *
+     * */
 }
