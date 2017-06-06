@@ -66,7 +66,7 @@ public class Controller implements Parcelable {
         initialize();
 
         //TODO
-        databaseMediator.downloadFriendPhotos(context);
+        //databaseMediator.downloadFriendPhotos(context);
     }
 
     /**
