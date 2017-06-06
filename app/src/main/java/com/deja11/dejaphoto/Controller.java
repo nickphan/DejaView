@@ -141,6 +141,7 @@ public class Controller implements Parcelable {
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
+            photo.incrementKarma();
             databaseMediator.updateKarma(photo.getPhotoLocation());
             return true;
         } else {
@@ -196,7 +197,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), String.valueOf(photo.getTotalKarma()));
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -266,7 +267,33 @@ public class Controller implements Parcelable {
             int width = getWidthFromString(photoPath);
             Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap, bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation, height);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, height, "");
+            myWallpaperManager.setBitmap(mutableBitmap);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma){
+        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        if (photoPath == null) {
+            try {
+                myWallpaperManager.setResource(+R.drawable.default_image);
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
+            int height = getHeightFromString(photoPath);
+            int width = getWidthFromString(photoPath);
+            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
+            writeBitmapOnMutable(mutableBitmap, bitmap);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, height, totalKarma);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         } catch (Exception e) {
@@ -290,14 +317,21 @@ public class Controller implements Parcelable {
      * Private helper method to place text on the wallpaper
      *
      * @param mutableBitmap the bitmap of the image to be the wallpaper
-     * @param text the text to be displayed
+     * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText, int height, String karmaText) {
+        String cutText = locationText;
+        if(cutText.length() > 30){
+            cutText = locationText.substring(0, 30);
+            cutText = cutText.concat("...");
+        }
+
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setTextSize(canvas.getHeight() / 50);
-        canvas.drawText(text, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
+        canvas.drawText(cutText, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
+        canvas.drawText(karmaText, (float)(0.95 * canvas.getWidth()), (float)(0.95 * canvas.getHeight()), paint);
     }
 
     /**

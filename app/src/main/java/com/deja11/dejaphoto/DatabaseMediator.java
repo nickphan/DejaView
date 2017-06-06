@@ -142,10 +142,8 @@ public class DatabaseMediator {
     }
 
     public void updateKarma(String photoLocation) {
-
         databaseHelper.updateKarma(photoLocation);
         //TODO FIREBASE
-
         firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
     }
 

@@ -195,7 +195,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updateKarma(String photoLocation) {
 
         int id = findIdByColumn(COL_PATH_2, photoLocation);
-
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
 
@@ -437,6 +436,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         boolean isReleased = res.getInt(6) > 0 ? true : false;
         boolean isKarma = res.getInt(7) > 0 ? true : false;
+
+        /*code to get total karma as int*/
 
         Log.i(TAGDATABASE, "Next photo object returned");
         return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma);
