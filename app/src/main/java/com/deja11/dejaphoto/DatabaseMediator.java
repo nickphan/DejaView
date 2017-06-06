@@ -160,7 +160,7 @@ public class DatabaseMediator {
 
 
     public void downloadFriendPhotos(Context context) {
-        firebaseHelper.downloadFriendPhotos(context, "Teehee@heeheecom");
+        firebaseHelper.downloadFriendPhotos(context, "physicalDevice@teesphonecom");
     }
 
     public void insertFirebase(String path, Objects object){
