@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
+import android.util.Pair;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,6 +22,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
@@ -262,4 +264,151 @@ public class FirebaseHelper {
         //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
 
     }
+
+    public void addFriend(final String user, final String friend){
+        final boolean[] check = new boolean[1];
+        check[0] = false;
+        DatabaseReference databaseReference = mdejaRef.child("users");
+        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    //he hasn't added you yet
+                    mdejaRef.child("users").child(friend).child("friends").child(user).setValue("false");
+                    check[0] = true;
+                }else{
+                    if(dataSnapshot.getValue().toString().equals("false")){
+                        mdejaRef.child("users").child(user).child("friends").child(friend).setValue("true");
+                        mdejaRef.child("users").child(friend).child("friends").child(user).setValue("true");
+                        check[0] = true;
+                    }
+                    check[0] = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public boolean getSharing(String username){
+        final boolean[] sharing = new boolean[2];
+        DatabaseReference databaseReference = mdejaRef.child("user").child(username);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    sharing[1] = true;
+                    sharing[0] = false;
+                }else{
+                    String sharingString = dataSnapshot.child("sharing").getValue().toString();
+                    if(sharingString.equals("true")){
+                        sharing[0] = true;
+                        sharing[1] = true;
+                    }else{
+                        sharing[0] = false;
+                        sharing[1] = true;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!sharing[1]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return sharing[0];
+    }
+
+    public ArrayList<Pair<String, String>> getFriends(String username){
+        final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
+        final boolean[] check = new boolean[1];
+        DatabaseReference databaseReference = mdejaRef.child("users").child(username);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    check[0] = true;
+                }else{
+                    for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
+                        String key = friendSnapshot.getKey();
+                        String val = friendSnapshot.getValue().toString();
+
+                        Pair<String, String> pair = new Pair<String, String>(key, val);
+                        friends.add(pair);
+                    }
+                    check[0] = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return friends;
+    }
+    public String getUsername(String username){
+        final boolean[] check = new boolean[1];
+        final String[] name = new String[1];
+        final DatabaseReference databaseReference = mdejaRef.child("user").child(username);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot == null || dataSnapshot.getValue() == null){
+                    check[0] = true;
+                    name[0] = "";
+                }else{
+                    name[0] = dataSnapshot.getKey();
+                    check[0] = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return name[0];
+    }
+
+
+    public void setSharing(String name, boolean value){
+        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
+        databaseReference.setValue(String.valueOf(value));
+    }
+
 }

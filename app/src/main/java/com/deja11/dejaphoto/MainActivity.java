@@ -64,10 +64,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private static final int CODE_PREVIOUS_PHOTO = 2;
     private static final int CODE_KARMA = 3;
     private static final int CODE_RELEASE = 4;
+    private static final int CODE_SYNC = 5;
 
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
+    Context myContext;
 
 
     // For testing purpose
@@ -88,7 +90,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
-
+        myContext = getApplicationContext();
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -211,8 +213,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         @Override
         public void run() {
             while(true){
-                try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
-                downloadPhotos();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
+                syncIntent.putExtra(CODE_KEY, CODE_SYNC);
             }
         }
     }
@@ -462,37 +469,37 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      -Just get user's information from firebase
      *
      * */
-
     public boolean checkUserExists(String username){
-        final boolean[] check = new boolean[1];
         DatabaseReference databaseReference = myFirebaseRef.child("user");
+
+
         Query queryRef = databaseReference.orderByChild("username").equalTo(username);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     /*User doesn't exist*/
-                    check[0] = false;
                 }else{
                     /*User exists*/
-                    check[0] = true;
+                    //POINT 1
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-        return check[0];
+        //POINT 2
+
+
+        return false;
     }
+
+
 
     public void register(String username){
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.edit().putString("username", username).apply();
-
-        User firstUser = new User();
-        myFirebaseRef.child("user").setValue(firstUser);// ???maybe???
     }
 
 }
