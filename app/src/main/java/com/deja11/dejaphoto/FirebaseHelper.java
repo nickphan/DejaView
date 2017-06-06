@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 import android.util.Pair;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,9 +29,11 @@ import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_FILE_NAME_9;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_OWNER_10;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
 import static com.deja11.dejaphoto.DatabaseHelper.currentUserName;
@@ -67,12 +70,11 @@ public class FirebaseHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
+    public void insertFirebaseData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName,String userName, String locationName, String totalKarma) {
 
 
 
         HashMap<String , String> contentValues = new HashMap<>();
-        String photoName = Uri.fromFile(new File(phoneLocation)).getLastPathSegment();
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
 
@@ -86,10 +88,13 @@ public class FirebaseHelper {
         contentValues.put(COL_REL_7, isReleased+"");
         contentValues.put(COL_KARMA_8, isKarma+"");
         contentValues.put(COL_FILE_NAME_9,photoName);
-        contentValues.put(COL_OWNER_10,currentUserName);
+        contentValues.put(COL_OWNER_10,userName);
+        contentValues.put(COL_LOC_NAME_11,locationName);
+        contentValues.put(COL_TOTAL_KARMA_12,totalKarma);
 
 
-        mdejaRef.child("images").child(currentUserName).child(photoNameFix).setValue(contentValues);
+
+        mdejaRef.child("images").child(userName).child(photoNameFix).setValue(contentValues);
 
         //mdejaRef.child("images").child(currentUserName).child(""+index++).setValue(Uri.fromFile(new File (phoneLocation)).getLastPathSegment());
         Log.i(TAGDATABASE, "Data inserted correctly");
@@ -104,13 +109,13 @@ public class FirebaseHelper {
         uploadTask = photoRef.putFile(file);
     }
 
-    public void downloadFriendPhotos(final Context context){
+    public void downloadFriendPhotos(final Context context, final String friendUserName){
 
 
         // Create a director if it doesn't exit
 
 
-        Query queryRef = mdejaRef.child("images").child(currentUserName);
+        Query queryRef = mdejaRef.child("images").child(friendUserName);
 
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -118,7 +123,7 @@ public class FirebaseHelper {
                 String photoName;
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                    downloadAPhoto(currentUserName, photoName);
+                    downloadAPhoto(friendUserName, photoName);
                 }
             }
             @Override
@@ -178,7 +183,44 @@ public class FirebaseHelper {
 
     }
 
-    public void downloadAPhoto(String userName, String photoName){
+    public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName, final
+                                    String userName, final String locationName, final String totalKarma) {
+
+
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        Query queryRef = mdejaRef.child("images").child(currentUserName).child(photoNameFix);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+
+
+                if (snapshot == null || snapshot.getValue() == null) {
+                    //Toast.makeText(MainActivity.this, "No record found", Toast.LENGTH_SHORT).show();
+                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, userName,locationName, totalKarma);
+                    insertFirebaseStorage(absolutePath);
+
+                }
+                else {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG1", "Failed to read value.", error.toException());
+            }
+        });
+
+
+
+
+
+    }
+
+        public void downloadAPhoto(String userName, String photoName){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
 
