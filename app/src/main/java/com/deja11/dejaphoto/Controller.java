@@ -10,13 +10,19 @@ import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -407,6 +413,29 @@ public class Controller implements Parcelable {
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
+        }
+    }
+
+    public void copyPhotos(ArrayList<Uri> uriArrayList) {
+        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
+        Log.i("Folder Path", storagePath.getAbsolutePath());
+        if (!storagePath.exists()) {
+            boolean result = storagePath.mkdirs();
+            Log.i("Directory made", result + " ");
+        }
+
+        for (Uri u : uriArrayList) {
+            try {
+                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
+                File source = new File(AlbumUtils.getPath(context, id));
+                File destination = new File(storagePath, source.getName());
+                AlbumUtils.copyPhoto(source, destination);
+                Log.i("Photo Copy", "Successful");
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "Error copying a photo", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         }
     }
 }

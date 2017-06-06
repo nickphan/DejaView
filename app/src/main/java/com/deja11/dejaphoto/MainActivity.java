@@ -53,6 +53,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    Controller controller;
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
@@ -76,6 +77,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
+
+        controller = new Controller(this);
 
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionGranted = PackageManager.PERMISSION_GRANTED;
@@ -314,26 +317,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             Log.i("Id", DocumentsContract.getDocumentId(uri));
                         }
 
-                        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
-                        Log.i("Folder Path", storagePath.getAbsolutePath());
-                        if (!storagePath.exists()) {
-                            boolean result = storagePath.mkdirs();
-                            Log.i("Directory made", result + " ");
-                        }
-
-                        for (Uri u : uriArrayList) {
-                            try {
-                                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
-                                File source = new File(getPath(id));
-                                File destination = new File(storagePath, source.getName());
-                                copyPhoto(source, destination);
-                                Log.i("Photo Copy", "Successful");
-                            } catch (Exception e) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Error copying a photo", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
-                        }
+                        controller.copyPhotos(uriArrayList);
 
                     }
                 }
@@ -341,41 +325,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-    /*
-        Copies the source file photo into the specified destination.
-
-        Code credits to: https://examples.javacodegeeks.com/core-java/io/file/4-ways-to-copy-file-in-java/
-                            #2: copy files using channels
-                 and to: https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-     */
-    private void copyPhoto(File source, File destination) throws IOException {
-        FileChannel inputChannel = null;
-        FileChannel outputChannel = null;
-
-        inputChannel = new FileInputStream(source).getChannel();
-        outputChannel = new FileOutputStream(destination).getChannel();
-        outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
-
-        inputChannel.close();
-        outputChannel.close();
-
-    }
-
-
-    private String getPath(String[] id) throws IllegalArgumentException {
-        String[] projection = {MediaStore.Images.Media.DATA };
-        Cursor cursor = getApplicationContext().getContentResolver()
-                .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, "_id=?", id, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            return cursor.getString(index);
-        }
-
-        return null;
-    }
-
-
 
     /**
      *  -On first user, user registers a name
