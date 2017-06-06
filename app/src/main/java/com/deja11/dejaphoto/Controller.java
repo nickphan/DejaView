@@ -52,8 +52,12 @@ public class Controller implements Parcelable {
     public static final int CODE_PREVIOUS_PHOTO = 2;
     public static final int CODE_KARMA = 3;
     public static final int CODE_RELEASE = 4;
-    
-    
+
+    // string paths of the dejaFolders
+    public static final String DEJAPHOTOPATH = Environment.getExternalStorageDirectory() + "/DejaPhoto";
+    public static final String DEJAPHOTOCOPIEDPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoCopied";
+    public static final String DEJAPHOTOFRIENDSPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoFriends";
+
 
     private DatabaseHelper databaseHelper;
     private Context context;

@@ -90,6 +90,16 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
+        // creating folders for the app if they do not exist
+        File dejaPhotoFolder = new File(Controller.DEJAPHOTOPATH);
+        File dejaPhotoCopiedFolder = new File(Controller.DEJAPHOTOCOPIEDPATH);
+        File dejaPhotoFriendsFolder = new File(Controller.DEJAPHOTOFRIENDSPATH);
+
+        if (!dejaPhotoFolder.exists()) dejaPhotoFolder.mkdirs();
+        if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
+        if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
+
+
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
