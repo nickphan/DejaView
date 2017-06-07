@@ -64,38 +64,32 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/location"
         android:columnCount="1"
-        android:rowCount="4"
+        android:rowCount="3"
         android:id="@+id/buttons">
 
         <Button
-            android:id="@+id/mydeja"
+            android:id="@+id/add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="my Deja"
-            android:layout_row="2"
+            android:text="Add Friends"
+            android:layout_row="0"
             android:layout_gravity="center" />
 
-        <Button
-            android:id="@+id/friendsdeja"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="friend's deja"
-            android:layout_row="1"
-            android:layout_gravity="center"/>
         <Button
             android:id="@+id/importphotos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="import photos"
-            android:layout_row="2"
+            android:layout_row="1"
             android:layout_gravity="center"/>
         <Button
-            android:id="@+id/friends"
+            android:id="@+id/renamelocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="friends"
-            android:layout_row="3"
+            android:text="rename location"
+            android:layout_row="2"
             android:layout_gravity="center"/>
+
     </GridLayout>
 
     <ImageButton

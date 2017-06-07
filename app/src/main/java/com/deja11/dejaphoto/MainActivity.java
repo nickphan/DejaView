@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
 
@@ -43,6 +46,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
 
     private static final int INTERVAL_OFFSET = 5; // offset for the interval
     private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
@@ -82,12 +86,31 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         MainActivity.instance = instance;
     }
 
+    //login email
+    private String email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
+
+        SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        email = mSharedPrefcheck.getString("name", "unknown");
+        if(email.equals("unknown")){
+            View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            final EditText mEmail = (EditText) v.findViewById(R.id.username);
+            builder.setView(v).setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    email = mEmail.getText().toString();
+                    Log.e("the input username: ", "email");
+                }
+            });
+            //pop out the window
+            builder.create().show();
+        }
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -212,7 +235,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         public void run() {
             while(true){
                 try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
-                downloadPhotos();
+                Log.d("Sync", "Happening");
             }
         }
     }

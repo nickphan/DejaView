@@ -4,6 +4,8 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,7 +16,11 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Calendar;
@@ -33,6 +39,8 @@ public class Controller implements Parcelable {
     private Photo currPhoto;
     private LinkedList<Photo> cache;
     private int mData = 0;
+    private int screenw;
+    private int screenh;
 
     /**
      * Constructor with context to use for changing wallpaper
@@ -49,6 +57,11 @@ public class Controller implements Parcelable {
 
         //TODO
         databaseMediator.downloadFriendPhotos(context);
+
+        int width= context.getResources().getDisplayMetrics().widthPixels;
+        screenw = width;
+        int height= context.getResources().getDisplayMetrics().heightPixels;
+        screenh = height;
     }
 
     /**
@@ -246,9 +259,15 @@ public class Controller implements Parcelable {
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             int height = getHeightFromString(photoPath);
             int width = getWidthFromString(photoPath);
-            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
-            writeBitmapOnMutable(mutableBitmap, bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation, height);
+
+            //create the bitmap that has the same size as the screen
+            Bitmap mutableBitmap = Bitmap.createBitmap(screenw, screenh, bitmap.getConfig());
+
+            // inside the method, we need to adjust the photo size
+            writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
+
+            writeTextOnWallpaper(mutableBitmap, geoLocation,0);
+
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         } catch (Exception e) {
@@ -263,9 +282,12 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the container where the drawing is done
      * @param bitmap the photo
      */
-    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap) {
+    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photow, int photoh) {
+
         Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, null);
+        Matrix m = new Matrix();
+        m.setScale((float) mutableBitmap.getWidth() / photow, (float) mutableBitmap.getHeight() / photoh);
+        canvas.drawBitmap(bitmap, m, new Paint());
     }
 
     /**
@@ -274,12 +296,13 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the bitmap of the image to be the wallpaper
      * @param text the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text,int karma) {
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setTextSize(canvas.getHeight() / 50);
-        canvas.drawText(text, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(canvas.getHeight() / 40);
+        canvas.drawText(text, canvas.getHeight() / 40, (float)canvas.getHeight()-canvas.getHeight()/40, paint);
+        canvas.drawText(karma+"", canvas.getWidth()-3*canvas.getHeight()/40,canvas.getHeight()-canvas.getHeight()/40,paint);
     }
 
     /**
@@ -371,6 +394,7 @@ public class Controller implements Parcelable {
 
     class ControllerLocationListener implements LocationListener {
         private Location lastLocation;
+
         private String locationProvider;
 
         public Location getLastLocation() {
@@ -381,9 +405,7 @@ public class Controller implements Parcelable {
             lastLocation = location;
         }
 
-        public void onProviderDisabled(String provider) {
-
-        }
+        public void onProviderDisabled(String provider) {   }
 
         public void onProviderEnabled(String provider) {
             locationProvider = provider;
