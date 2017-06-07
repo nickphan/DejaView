@@ -19,6 +19,15 @@ import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.Toast;
+import android.util.Pair;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ThrowOnExtraProperties;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +40,7 @@ import java.util.LinkedList;
  */
 
 public class Controller implements Parcelable {
+
 
     public static final int INTERVAL_OFFSET = 5; // offset for the interval
     public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
@@ -60,21 +70,38 @@ public class Controller implements Parcelable {
 
 
     private DatabaseHelper databaseHelper;
+
+
+
+    private DatabaseMediator databaseMediator;
+
     private Context context;
     private Photo currPhoto;
     private LinkedList<Photo> cache;
     private int mData = 0;
 
+    private User user;
+    private FirebaseDatabase database;
+    private DatabaseReference myFirebaseRef;
     /**
      * Constructor with context to use for changing wallpaper
      */
     public Controller(Context context) {
-        Log.i("Initializing Controller", "New Controller");
         this.context = context;
-        databaseHelper = new DatabaseHelper(this.context);
-        databaseHelper.initialize(this.context);
+
+        databaseMediator = new DatabaseMediator(context);
+        //databaseMediator.init(this.context);
+
         cache = new LinkedList<Photo>();
+        user = new User();
+
+        database = FirebaseDatabase.getInstance();
+        myFirebaseRef = database.getReference();
+
         initialize();
+
+        //TODO
+        //databaseMediator.downloadFriendPhotos(context);
     }
 
     /**
@@ -83,8 +110,8 @@ public class Controller implements Parcelable {
      * @return the next photo either from cache or from DatabaseHelper
      */
     public Photo getNextPhoto() {
-        databaseHelper.updatePoint(getUserCurrentLocation(), getUserCalendar());
-        Photo photo = databaseHelper.getNextPhoto();
+        databaseMediator.updatePoint(getUserCurrentLocation(), getUserCalendar());
+        Photo photo = databaseMediator.getNextPhoto();
         if (currPhoto == null) {
             if (photo.isReleased()) {
                 return getNextPhoto();
@@ -149,7 +176,8 @@ public class Controller implements Parcelable {
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
-            databaseHelper.updateKarma(photo.getPhotoLocation());
+            photo.incrementKarma();
+            databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");
@@ -163,7 +191,7 @@ public class Controller implements Parcelable {
     void releasePhoto() {
         if (currPhoto != null) {
             currPhoto.setReleased(true);
-            databaseHelper.updateRelease(currPhoto.getPhotoLocation());
+            databaseMediator.updateRelease(currPhoto.getPhotoLocation());
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
                 currPhoto = cache.getLast();
@@ -204,7 +232,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), String.valueOf(photo.getTotalKarma()));
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -274,7 +302,33 @@ public class Controller implements Parcelable {
             int width = getWidthFromString(photoPath);
             Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
             writeBitmapOnMutable(mutableBitmap, bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation, height);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, height, "");
+            myWallpaperManager.setBitmap(mutableBitmap);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma){
+        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
+        if (photoPath == null) {
+            try {
+                myWallpaperManager.setResource(+R.drawable.default_image);
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
+            int height = getHeightFromString(photoPath);
+            int width = getWidthFromString(photoPath);
+            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
+            writeBitmapOnMutable(mutableBitmap, bitmap);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, height, totalKarma);
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         } catch (Exception e) {
@@ -298,14 +352,21 @@ public class Controller implements Parcelable {
      * Private helper method to place text on the wallpaper
      *
      * @param mutableBitmap the bitmap of the image to be the wallpaper
-     * @param text the text to be displayed
+     * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text, int height) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText, int height, String karmaText) {
+        String cutText = locationText;
+        if(cutText.length() > 30){
+            cutText = locationText.substring(0, 30);
+            cutText = cutText.concat("...");
+        }
+
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setTextSize(canvas.getHeight() / 50);
-        canvas.drawText(text, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
+        canvas.drawText(cutText, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
+        canvas.drawText(karmaText, (float)(0.95 * canvas.getWidth()), (float)(0.95 * canvas.getHeight()), paint);
     }
 
     /**
@@ -442,4 +503,61 @@ public class Controller implements Parcelable {
             }
         }
     }
+
+    /**
+     *      USER METHODS
+     *
+     *
+     * */
+    public ArrayList<String> checkForRequests(){
+        ArrayList<String> localFriends = user.getFriends();
+        final ArrayList<String> firebaseFriends = new ArrayList<>();
+        ArrayList<String> friended = new ArrayList<>();
+
+        DatabaseReference databaseReference = myFirebaseRef.child(user.getUsername());
+        Query query = databaseReference;
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot friendSnapShot: dataSnapshot.child("friends").getChildren()){
+                    String key = friendSnapShot.getKey();
+                    String val = friendSnapShot.getValue().toString();
+                    firebaseFriends.add(key);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(firebaseFriends.size() < localFriends.size()){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        for(int i = 0; i < firebaseFriends.size(); i++){
+            String friend = firebaseFriends.get(i);
+            if(!localFriends.contains(friend)){
+                friended.add(friend);
+            }
+        }
+        return friended;
+    }
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
+    public void sync(){
+        databaseMediator.downloadFriendPhotos(context);
+    }
+
 }

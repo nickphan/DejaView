@@ -28,11 +28,33 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import com.google.firebase.database.Query;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -54,6 +76,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_DEJA_6 = "DEJAPOINTS";
     public static final String COL_REL_7 = "RELEASED";
     public static final String COL_KARMA_8 = "KARMA";
+    public static final String COL_FILE_NAME_9 = "FILENAME";
+    public static final String COL_OWNER_10 = "OWNER";
+    public static final String COL_LOC_NAME_11="LOCATIONNAME";
+    public static final String COL_TOTAL_KARMA_12 = "TOTALKARMA";
+
+    //public static final String currentUserName = "Teehee@heeheecom";
+    //public static final String currentUserName = "yoohoohoo@heeheecom";
+    public static final String currentUserName = "physicalDevice@teesphonecom";
+
 
 
     public DatabaseHelper(Context context) {
@@ -84,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DATE_5 + " TEXT, " +
                 COL_DEJA_6 + " INTEGER, " +
                 COL_REL_7 + " INTEGER, " +
-                COL_KARMA_8 + " INTEGER)");
+                COL_KARMA_8 + " INTEGER , FILENAME TEXT, OWNER TEXT, LOCATIONNAME TEXT, TOTALKARMA INTEGER   )");
 
         Log.i(TAGDATABASE, "Table created");
     }
@@ -116,8 +147,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param isKarma       whether or not the photo is karma'd
      * @return true if insertion is successful, otherwise false
      */
-    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma) {
+    public boolean insertData(String phoneLocation, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
         SQLiteDatabase db = this.getWritableDatabase();
+
 
         // Put all data in a container
         ContentValues contentValues = new ContentValues();
@@ -128,6 +160,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_DEJA_6, dejapoints);
         contentValues.put(COL_REL_7, isReleased);
         contentValues.put(COL_KARMA_8, isKarma);
+        contentValues.put(COL_FILE_NAME_9, photoName);
+        contentValues.put(COL_OWNER_10,owner);
+        contentValues.put(COL_LOC_NAME_11,locationName);
+        contentValues.put(COL_TOTAL_KARMA_12, totalKarma);
+
 
         Log.i(TAGDATABASE, "Data inserted correctly");
         return db.insert(TABLE_NAME, null, contentValues) != -1;
@@ -160,12 +197,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param photoLocation location of the photo that has been karma'd
      */
-    public void updateKarma(String photoLocation) {
+    public void updateKarma(String photoLocation, int totalKarma) {
 
         int id = findIdByColumn(COL_PATH_2, photoLocation);
-
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
+        updateField(id, COL_TOTAL_KARMA_12, totalKarma+1);
+
 
         Log.i(TAGDATABASE, photoLocation + " set to karma'd");
     }
@@ -181,6 +219,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Delegate to updated field
         updateField(id, COL_REL_7, 1);
+
+        //TODO FIREBASE
+
+
+
+
 
         Log.i(TAGDATABASE, photoLocation + " set to released");
     }
@@ -213,9 +257,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Look through all the photo in the camera album and add any photos that are not in the database yet
      * to the database
      *
-     * @param context the context to of the activity
+     *  context the context to of the activity
      */
-    public void initialize(Context context) {
+    /*public void initialize(Context context) {
 
         // Ensure that app has permission to access the storage
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -248,12 +292,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Make sure it is in the camera album
                 if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
 
+                    // TODO Firebase
+
+
+
+
                     // Check if it already exist before inserting to avoid duplicated
                     try {
                         Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
+
                         if (res.getCount() == 0) {
-                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                            String photoName = Uri.fromFile(new File (absolutePath)).getLastPathSegment();
+                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
                             Log.i("Database insertion", absolutePath + " is now in the table");
+
                         }
 
                     } catch (Exception e) {
@@ -263,16 +315,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
+    }*/
+
+    public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Check if it already exist before inserting to avoid duplicated
+        try {
+            Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
+
+            if (res.getCount() == 0) {
+
+                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName, owner, locationName, totalKarma);
+                Log.i("Database insertion", absolutePath + " is now in the table");
+                //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
+                //insertFirebaseStorage(absolutePath);
+            }
+
+        } catch (Exception e) {
+            Log.d(TAGDATABASE, absolutePath + "Already");
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Gather all the information in the photo.
-     * This method was based on the website
-     * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
-     *
-     * @param context the context to of the activity
-     * @return cursor containing information of photo
-     */
+
+
+        /**
+         * Gather all the information in the photo.
+         * This method was based on the website
+         * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
+         *
+         * @param context the context to of the activity
+         * @return cursor containing information of photo
+         */
     public Cursor gatherPhotoInfo(Context context) {
         Uri uri;
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -320,6 +395,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else if (randomNumber >= 7) {
 
             // Select phonelocation from photo_table where Released = 0 order by date desc limit 5
+            // TODO
+            // Select phonelocation from photo_table where Released = 0 AND (emailSenderID=fID OR emailSenderID=myID) order by date desc limit 5
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7 + "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP5));
         } else {
             // Select phonelocation from photo_table where Released = 0 order by dejapoint desc limit 5
@@ -364,8 +441,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isReleased = res.getInt(6) > 0 ? true : false;
         boolean isKarma = res.getInt(7) > 0 ? true : false;
 
+        int totalKarma = res.getInt(11);
+
+        /*code to get total karma as int*/
+
         Log.i(TAGDATABASE, "Next photo object returned");
-        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma);
+        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma);
     }
 
     /**
@@ -433,7 +514,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         Log.d(TAGDATABASE, "Points updated");
     }
-
 }
 
 
