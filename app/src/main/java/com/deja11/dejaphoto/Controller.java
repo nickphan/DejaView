@@ -10,11 +10,15 @@ import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.util.Log;
+import android.widget.Toast;
 import android.util.Pair;
 
 import com.google.firebase.database.DataSnapshot;
@@ -38,8 +42,39 @@ import java.util.LinkedList;
 public class Controller implements Parcelable {
 
 
+    public static final int INTERVAL_OFFSET = 5; // offset for the interval
+    public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    public static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+
+    // request codes for each pending intent
+    public static final int LEFT_PENDING_INTENT_RC = 0;
+    public static final int RIGHT_PENDING_INTENT_RC = 1;
+    public static final int KARMA_PENDING_INTENT_RC = 2;
+    public static final int RELEASE_PENDING_INTENT_RC = 3;
+    public static final int ALARM_PENDING_INTENT_RC = 4;
+    public static final int NOTIFICATION_ID = 123;
+    public static final int PHOTO_PICKER_SINGLE_CODE = 5;
+    public static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
+
+    // codes for identifying which action the service has to execute
+    public static final String CODE_KEY = "Order";
+    public static final int CODE_NEXT_PHOTO = 1;
+    public static final int CODE_PREVIOUS_PHOTO = 2;
+    public static final int CODE_KARMA = 3;
+    public static final int CODE_RELEASE = 4;
+
+    // string paths of the dejaFolders
+    public static final String DEJAPHOTOPATH = Environment.getExternalStorageDirectory() + "/DejaPhoto";
+    public static final String DEJAPHOTOCOPIEDPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoCopied";
+    public static final String DEJAPHOTOFRIENDSPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoFriends";
+
+
+    private DatabaseHelper databaseHelper;
+
+
 
     private DatabaseMediator databaseMediator;
+
     private Context context;
     private Photo currPhoto;
     private LinkedList<Photo> cache;
@@ -446,6 +481,28 @@ public class Controller implements Parcelable {
         }
     }
 
+    public void copyPhotos(ArrayList<Uri> uriArrayList) {
+        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
+        Log.i("Folder Path", storagePath.getAbsolutePath());
+        if (!storagePath.exists()) {
+            boolean result = storagePath.mkdirs();
+            Log.i("Directory made", result + " ");
+        }
+
+        for (Uri u : uriArrayList) {
+            try {
+                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
+                File source = new File(AlbumUtils.getPath(context, id));
+                File destination = new File(storagePath, source.getName());
+                AlbumUtils.copyPhoto(source, destination);
+                Log.i("Photo Copy", "Successful");
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "Error copying a photo", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      *      USER METHODS
