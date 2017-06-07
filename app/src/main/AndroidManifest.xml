@@ -28,31 +28,31 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MainActivity$LeftReceiver" android:exported="false">
+        <receiver android:name=".LeftReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="left_button_receiver" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".MainActivity$RightReceiver" android:exported="false">
+        <receiver android:name=".RightReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="right_button_receiver" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".MainActivity$KarmaReceiver" android:exported="false">
+        <receiver android:name=".KarmaReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="karma_button_receiver" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".MainActivity$ReleaseReceiver" android:exported="false">
+        <receiver android:name=".ReleaseReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="release_button_receiver" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".MainActivity$AlarmReceiver">
+        <receiver android:name=".AlarmReceiver">
             <intent-filter>
                 <action android:name="alarm_receiver" />
             </intent-filter>
