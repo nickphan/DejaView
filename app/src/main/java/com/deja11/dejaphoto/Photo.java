@@ -15,6 +15,13 @@ public class Photo {
     private boolean mykarma;
     private int totalKarma;
 
+    // newly added field to accomodate for the updated column
+    private String dateString;
+    private String fileName;
+    private String owner;
+    private String locationName;
+
+
 
     public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
         this.phoneLocation = phoneLocation;
@@ -102,4 +109,36 @@ public class Photo {
         return this.phoneLocation.equals(photo.phoneLocation);
     }
 
+
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
 }
