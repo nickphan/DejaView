@@ -271,6 +271,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            File folderPath = new File(Controller.DEJAPHOTOPATH);
+            if (!folderPath.exists()) folderPath.mkdirs();
+
+            String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
+            File imageFile = new File(folderPath, "DejaPhoto" + timeStamp + ".jpg");
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+
             startActivity(cameraIntent);
         }
     }
