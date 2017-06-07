@@ -22,6 +22,7 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
 import static com.deja11.dejaphoto.DatabaseHelper.currentUserName;
@@ -41,6 +42,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -98,6 +100,7 @@ public class DatabaseMediator {
             String dateAdded = null;
             double latitude = 0.0;
             double longitude = 0.0;
+            String defaultLocation = "default";
 
             while (cursor.moveToNext()) {
                 absolutePath = cursor.getString(columnIndexPath); //path to the photo
@@ -108,28 +111,17 @@ public class DatabaseMediator {
                 // Make sure it is in the camera album
                 if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
-                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
+                    GeoLocation tempLoc = new GeoLocation(latitude,longitude);
+                    defaultLocation = tempLoc.getLocationName(context);
+                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, currentUserName, defaultLocation, 0);
 
-                    firebaseHelper.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                    firebaseHelper.insertFirebaseStorage(absolutePath);
+                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,currentUserName,defaultLocation, "0");
+
+
                 }
                 }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public void updatePoint(GeoLocation deviceLocation, Calendar deviceCalendar) {
@@ -140,12 +132,12 @@ public class DatabaseMediator {
         return databaseHelper.getNextPhoto();
     }
 
-    public void updateKarma(String photoLocation) {
-
-        databaseHelper.updateKarma(photoLocation);
+    public void updateKarma(String photoLocation, int totalKarma) {
+        databaseHelper.updateKarma(photoLocation, totalKarma);
         //TODO FIREBASE
-
         firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
+        int karma = totalKarma+1;
+        firebaseHelper.updateFirebase(currentUserName, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
     }
 
     public void updateRelease(String photoLocation) {
@@ -156,7 +148,7 @@ public class DatabaseMediator {
 
 
     public void downloadFriendPhotos(Context context) {
-        firebaseHelper.downloadFriendPhotos(context);
+        firebaseHelper.downloadFriendPhotos(context, "Teehee@heeheecom");
     }
 
     public void insertFirebase(String path, Objects object){
@@ -185,5 +177,33 @@ public class DatabaseMediator {
         Log.i(TAGDATABASE, "Successfully access storage");
         return context.getContentResolver().query(uri, projection, null, null, null);
 
+    }
+
+
+    public void addFriendFirebase(String user, String friend){
+        firebaseHelper.addFriend(user, friend);
+    }
+
+    /**
+     *      FIREBASE SETTERS
+     *
+     * */
+
+    public void setSharing(String user, boolean value){
+        firebaseHelper.setSharing(user, value);
+    }
+
+    /**
+     *      FIREBASE GETTERS
+     *
+     * */
+    public String getUsername(String username){
+        return  firebaseHelper.getUsername(username);
+    }
+    public boolean getSharing(String username){
+        return firebaseHelper.getSharing(username);
+    }
+    public ArrayList<Pair<String, String>> getFriends(String username){
+        return firebaseHelper.getFriends(username);
     }
 }

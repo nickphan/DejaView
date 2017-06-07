@@ -12,17 +12,33 @@ import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.DisplayMetrics;
+
+import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.Display;
-import android.view.WindowManager;
+
+import android.provider.DocumentsContract;
+import android.util.Log;
+import android.widget.Toast;
+import android.util.Pair;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -33,8 +49,39 @@ import java.util.LinkedList;
 public class Controller implements Parcelable {
 
 
+    public static final int INTERVAL_OFFSET = 5; // offset for the interval
+    public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    public static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+
+    // request codes for each pending intent
+    public static final int LEFT_PENDING_INTENT_RC = 0;
+    public static final int RIGHT_PENDING_INTENT_RC = 1;
+    public static final int KARMA_PENDING_INTENT_RC = 2;
+    public static final int RELEASE_PENDING_INTENT_RC = 3;
+    public static final int ALARM_PENDING_INTENT_RC = 4;
+    public static final int NOTIFICATION_ID = 123;
+    public static final int PHOTO_PICKER_SINGLE_CODE = 5;
+    public static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
+
+    // codes for identifying which action the service has to execute
+    public static final String CODE_KEY = "Order";
+    public static final int CODE_NEXT_PHOTO = 1;
+    public static final int CODE_PREVIOUS_PHOTO = 2;
+    public static final int CODE_KARMA = 3;
+    public static final int CODE_RELEASE = 4;
+
+    // string paths of the dejaFolders
+    public static final String DEJAPHOTOPATH = Environment.getExternalStorageDirectory() + "/DejaPhoto";
+    public static final String DEJAPHOTOCOPIEDPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoCopied";
+    public static final String DEJAPHOTOFRIENDSPATH = Environment.getExternalStorageDirectory() + "/DejaPhotoFriends";
+
+
+    private DatabaseHelper databaseHelper;
+
+
 
     private DatabaseMediator databaseMediator;
+
     private Context context;
     private Photo currPhoto;
     private LinkedList<Photo> cache;
@@ -42,20 +89,25 @@ public class Controller implements Parcelable {
     private int screenw;
     private int screenh;
 
+    private User user;
+    private FirebaseDatabase database;
+    private DatabaseReference myFirebaseRef;
     /**
      * Constructor with context to use for changing wallpaper
      */
     public Controller(Context context) {
-        Log.i("Initializing Controller", "New Controller");
         this.context = context;
 
         databaseMediator = new DatabaseMediator(context);
         //databaseMediator.init(this.context);
 
         cache = new LinkedList<Photo>();
-        initialize();
+        user = new User();
 
-        //TODO
+        database = FirebaseDatabase.getInstance();
+        myFirebaseRef = database.getReference();
+
+        initialize();
         databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
@@ -136,7 +188,8 @@ public class Controller implements Parcelable {
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
-            databaseMediator.updateKarma(photo.getPhotoLocation());
+            photo.incrementKarma();
+            databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");
@@ -191,7 +244,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), String.valueOf(photo.getTotalKarma()));
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -200,10 +253,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
             }
         }
     }
@@ -244,7 +297,7 @@ public class Controller implements Parcelable {
      * @param geoLocation the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
-    private boolean setWallpaper(String photoPath, String geoLocation) {
+    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma) {
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if (photoPath == null) {
             try {
@@ -266,7 +319,7 @@ public class Controller implements Parcelable {
             // inside the method, we need to adjust the photo size
             writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
 
-            writeTextOnWallpaper(mutableBitmap, geoLocation,0);
+            writeTextOnWallpaper(mutableBitmap, geoLocation,totalKarma);
 
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
@@ -282,11 +335,11 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the container where the drawing is done
      * @param bitmap the photo
      */
-    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photow, int photoh) {
+    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photoWidth, int photoHeight) {
 
         Canvas canvas = new Canvas(mutableBitmap);
         Matrix m = new Matrix();
-        m.setScale((float) mutableBitmap.getWidth() / photow, (float) mutableBitmap.getHeight() / photoh);
+        m.setScale((float) mutableBitmap.getWidth() / photoWidth, (float) mutableBitmap.getHeight() / photoHeight);
         canvas.drawBitmap(bitmap, m, new Paint());
     }
 
@@ -294,15 +347,22 @@ public class Controller implements Parcelable {
      * Private helper method to place text on the wallpaper
      *
      * @param mutableBitmap the bitmap of the image to be the wallpaper
-     * @param text the text to be displayed
+     * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String text,int karma) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText,String karma) {
+
+        String cutText = locationText;
+        if(cutText.length() > 30){
+            cutText = locationText.substring(0, 30);
+            cutText = cutText.concat("...");
+        }
+
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setTextSize(canvas.getHeight() / 40);
-        canvas.drawText(text, canvas.getHeight() / 40, (float)canvas.getHeight()-canvas.getHeight()/40, paint);
-        canvas.drawText(karma+"", canvas.getWidth()-3*canvas.getHeight()/40,canvas.getHeight()-canvas.getHeight()/40,paint);
+        canvas.drawText(cutText, canvas.getHeight() / 40, (float)canvas.getHeight()-canvas.getHeight()/40, paint);
+        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40,canvas.getHeight()-canvas.getHeight()/40,paint);
     }
 
     /**
@@ -415,4 +475,85 @@ public class Controller implements Parcelable {
 
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void copyPhotos(ArrayList<Uri> uriArrayList) {
+        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
+        Log.i("Folder Path", storagePath.getAbsolutePath());
+        if (!storagePath.exists()) {
+            boolean result = storagePath.mkdirs();
+            Log.i("Directory made", result + " ");
+        }
+
+        for (Uri u : uriArrayList) {
+            try {
+                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
+                File source = new File(AlbumUtils.getPath(context, id));
+                File destination = new File(storagePath, source.getName());
+                AlbumUtils.copyPhoto(source, destination);
+                Log.i("Photo Copy", "Successful");
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "Error copying a photo", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     *      USER METHODS
+     *
+     *
+     * */
+    public ArrayList<String> checkForRequests(){
+        ArrayList<String> localFriends = user.getFriends();
+        final ArrayList<String> firebaseFriends = new ArrayList<>();
+        ArrayList<String> friended = new ArrayList<>();
+
+        DatabaseReference databaseReference = myFirebaseRef.child(user.getUsername());
+        Query query = databaseReference;
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot friendSnapShot: dataSnapshot.child("friends").getChildren()){
+                    String key = friendSnapShot.getKey();
+                    String val = friendSnapShot.getValue().toString();
+                    firebaseFriends.add(key);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(firebaseFriends.size() < localFriends.size()){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        for(int i = 0; i < firebaseFriends.size(); i++){
+            String friend = firebaseFriends.get(i);
+            if(!localFriends.contains(friend)){
+                friended.add(friend);
+            }
+        }
+        return friended;
+    }
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
+    public void sync(){
+        databaseMediator.downloadFriendPhotos(context);
+    }
+
 }
