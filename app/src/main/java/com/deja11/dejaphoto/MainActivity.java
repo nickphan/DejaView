@@ -56,9 +56,33 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     Controller controller;
+
+    private static final int INTERVAL_OFFSET = 5; // offset for the interval
+    private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
+    private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+
+    // request codes for each pending intent
+    private static final int LEFT_PENDING_INTENT_RC = 0;
+    private static final int RIGHT_PENDING_INTENT_RC = 1;
+    private static final int KARMA_PENDING_INTENT_RC = 2;
+    private static final int RELEASE_PENDING_INTENT_RC = 3;
+    private static final int ALARM_PENDING_INTENT_RC = 4;
+    private static final int NOTIFICATION_ID = 123;
+    private static final int PHOTO_PICKER_SINGLE_CODE = 5;
+    private static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
+
+    // codes for identifying which action the service has to execute
+    private static final String CODE_KEY = "Order";
+    private static final int CODE_NEXT_PHOTO = 1;
+    private static final int CODE_PREVIOUS_PHOTO = 2;
+    private static final int CODE_KARMA = 3;
+    private static final int CODE_RELEASE = 4;
+    private static final int CODE_SYNC = 5;
+
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
+    Context myContext;
 
 
     // For testing purpose
@@ -77,6 +101,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
 
@@ -101,6 +126,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
 
+
+
+        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.test_photo_picker);
+        myContext = getApplicationContext();
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -224,8 +254,18 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         @Override
         public void run() {
             while(true){
+
                 try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
                 //downloadPhotos();
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
+                syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+
             }
         }
     }
@@ -365,37 +405,37 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      -Just get user's information from firebase
      *
      * */
-
     public boolean checkUserExists(String username){
-        final boolean[] check = new boolean[1];
         DatabaseReference databaseReference = myFirebaseRef.child("user");
+
+
         Query queryRef = databaseReference.orderByChild("username").equalTo(username);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     /*User doesn't exist*/
-                    check[0] = false;
                 }else{
                     /*User exists*/
-                    check[0] = true;
+                    //POINT 1
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-        return check[0];
+        //POINT 2
+
+
+        return false;
     }
+
+
 
     public void register(String username){
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.edit().putString("username", username).apply();
-
-        User firstUser = new User();
-        myFirebaseRef.child("user").setValue(firstUser);// ???maybe???
     }
 
 }

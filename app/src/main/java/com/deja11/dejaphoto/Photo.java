@@ -12,7 +12,8 @@ public class Photo {
     private GeoLocation geoLocation;
     private Date date;
     private boolean released;
-    private boolean karma;
+    private boolean mykarma;
+    private int totalKarma;
 
 
     public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
@@ -20,7 +21,17 @@ public class Photo {
         this.geoLocation = geoLocation;
         this.date = date;
         this.released = released;
-        this.karma = karma;
+        this.mykarma = karma;
+        this.totalKarma = 0;
+    }
+
+    public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma, int totalKarma){
+        this.phoneLocation = phoneLocation;
+        this.geoLocation = geoLocation;
+        this.date = date;
+        this.released = released;
+        this.mykarma = karma;
+        this.totalKarma = totalKarma;
     }
 
     /**
@@ -29,7 +40,7 @@ public class Photo {
      * @return true if the photo is karma-ed
      */
     public boolean isKarma() {
-        return karma;
+        return mykarma;
     }
 
     /**
@@ -38,9 +49,13 @@ public class Photo {
      * @param karma the condition whether the photo is about to be karma-ed
      */
     public void setKarma(boolean karma) {
-        this.karma = karma;
+        this.mykarma = karma;
     }
 
+
+    public int getTotalKarma(){return totalKarma;}
+
+    public void incrementKarma(){totalKarma++;}
     /**
      * Check if the photo has been released
      *
