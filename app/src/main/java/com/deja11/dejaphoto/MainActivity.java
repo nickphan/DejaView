@@ -62,6 +62,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private static final int INTERVAL_OFFSET = 5; // offset for the interval
     private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
     private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    private static final String USERNAME_KEY = "username"; // acquire the username
 
     // request codes for each pending intent
     private static final int LEFT_PENDING_INTENT_RC = 0;
@@ -100,7 +101,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     }
 
     //login email
-    private String email;
+    String email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -130,14 +131,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
 
-
-
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
         myContext = getApplicationContext();
 
         SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
-        email = mSharedPrefcheck.getString("name", "unknown");
+        email = mSharedPrefcheck.getString("username", "unknown");
         if(email.equals("unknown")){
             View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -146,11 +145,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     email = mEmail.getText().toString();
-                    Log.e("the input username: ", "email");
+                    Log.e("the input username: ", email);
                 }
             });
             //pop out the window
             builder.create().show();
+            Log.d("To SharedPreference: ", email);
+            mSharedPrefcheck.edit().putString("username",email).apply();
         }
 
         myFirebaseRef = database.getReference().child("name").child("123");
