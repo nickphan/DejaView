@@ -152,7 +152,10 @@ public class SettingPreference extends Activity {
     private void enableSlider( SeekBar seekBar){
         seekBar.setMax(MAX_TIME);
         intervalText = (TextView) findViewById(R.id.seekbarvalue);
-        currentInterval = getCurrentInterval();
+
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        currentInterval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
+
         seekBar.setProgress(currentInterval);
         currentPosition = getCurrentPosition();
         setText(seekBar, intervalText, currentInterval, currentPosition);
@@ -178,8 +181,6 @@ public class SettingPreference extends Activity {
         });
     }
 
-
-
     private void setText(SeekBar seekBar, TextView progressText, int interval, int val) {
         progressText.setText(String.valueOf(interval + TIME_OFFSET) + " min");
         progressText.setX(seekBar.getX() + val + seekBar.getThumbOffset() / 2);
@@ -202,15 +203,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    public int getCurrentInterval() {
-        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        try {
-            int interval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
-            return interval;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
+    public int getCurrentInterval(){return currentInterval;}
 
     public boolean ShowLocation(){return showLocation;}
 
