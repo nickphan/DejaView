@@ -37,10 +37,14 @@ public class SetWallpaperService extends IntentService {
 
         if(order == CODE_NEXT_PHOTO) {
             Photo nextPhoto = controller.getNextPhoto();
-            controller.setWallpaper(nextPhoto);
+            if(nextPhoto != null) {
+                controller.setWallpaper(nextPhoto);
+            }
         }else if(order == CODE_PREVIOUS_PHOTO){
             Photo prevPhoto = controller.getPreviousPhoto();
-            controller.setWallpaper(prevPhoto);
+            if(prevPhoto != null) {
+                controller.setWallpaper(prevPhoto);
+            }
         }else if(order == CODE_KARMA){
             controller.karmaPhoto();
         }else if(order == CODE_RELEASE){

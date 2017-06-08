@@ -105,18 +105,13 @@ public class Controller implements Parcelable {
         this.context = context;
 
         databaseMediator = new DatabaseMediator(context);
-        //databaseMediator.init(this.context);
-
         cache = new LinkedList<Photo>();
-
         user = new User();
-
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
         initialize();
-        //databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
         screenw = width;
@@ -554,7 +549,11 @@ public class Controller implements Parcelable {
     }
 
     public void addFriend(String friendName){
-        databaseMediator.addFriendFirebase(user.getUsername(), friendName);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        Log.i("AddFriendUser", username);
+        Log.i("AddFriendFriend", friendName);
+        databaseMediator.addFriendFirebase(username, friendName);
     }
 
     public void sync(){

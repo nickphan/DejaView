@@ -347,6 +347,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("FirebaseHelper", "LOOPER");
             }catch (Exception e){
                 e.printStackTrace();
             }
