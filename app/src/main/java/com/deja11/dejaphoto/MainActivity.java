@@ -413,7 +413,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         String newLocation = location.getText().toString();
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
-                        controller.updateLocationName(imageData,path);
+                        controller.updateLocationName(path,newLocation);
 
                     }
                 });

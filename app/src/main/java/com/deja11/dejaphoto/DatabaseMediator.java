@@ -214,8 +214,8 @@ public class DatabaseMediator {
     public ArrayList<String> testGetPhotoNamesFromFirebase(){
         return firebaseHelper.getPhotos();
     }
-    public void setLocationName(String locationName, String phoneLocation) {
-        databaseHelper.updateField(phoneLocation, DatabaseHelper.COL_LOC_NAME_11, locationName);
+    public void setLocationName(String photoPath, String locationName) {
+        databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
     }
 
     public void createUser(String username){
