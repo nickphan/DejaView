@@ -2,6 +2,7 @@ package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,6 +21,7 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -106,13 +108,18 @@ public class Controller implements Parcelable {
         //databaseMediator.init(this.context);
 
         cache = new LinkedList<Photo>();
+
         user = new User();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        user.setUsername(username);
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
         initialize();
-        databaseMediator.downloadFriendPhotos(context);
+        //databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
         screenw = width;
@@ -578,7 +585,22 @@ public class Controller implements Parcelable {
     }
 
     public void sync(){
-        databaseMediator.downloadFriendPhotos(context);
+        /*
+        if(SettingPreference.viewFriendPhoto){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String username = sharedPreferences.getString("username", "unknown");
+            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
+
+            for (Pair<String,String> currFriend : myFriends){
+                if(currFriend.second.equals("true")){
+                    databaseMediator.downloadFriendPhotos(context);
+                }
+                else{
+                    //delete
+                }
+            }
+
+        }*/
     }
     //sync should also look for karma, release, and name
 

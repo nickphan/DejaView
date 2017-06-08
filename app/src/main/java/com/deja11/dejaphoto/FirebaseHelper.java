@@ -112,6 +112,8 @@ public class FirebaseHelper {
     }
 
     public ArrayList<String> downloadFriendPhotos(final Context context, final String friendUserName){
+        Log.d("SYNC", "DOWNLOADING FROM " + friendUserName);
+        Toast.makeText(context,"Downloading from " + friendUserName,Toast.LENGTH_LONG).show();
 
 
         // Create a director if it doesn't exit
@@ -155,7 +157,7 @@ public class FirebaseHelper {
                     toBedl.setTotalKarma(totalKarma);
                     downloadAPhoto(friendUserName, photoName,context, toBedl);
                     //
-                    Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -261,11 +263,11 @@ public class FirebaseHelper {
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
-            Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
             storagePath.mkdirs();
         }
         else {
-            Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
 
         final File myFile = new File(storagePath,photoName);
@@ -280,13 +282,13 @@ public class FirebaseHelper {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
-                Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
+                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
 
             }
         });
