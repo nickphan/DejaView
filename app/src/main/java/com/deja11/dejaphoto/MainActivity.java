@@ -90,7 +90,6 @@ public class MainActivity extends Activity {
 
         // For Junit test
         setInstance(this);
-
         controller = new Controller(this);
 
         // request for permissions
@@ -123,7 +122,9 @@ public class MainActivity extends Activity {
                     Log.d("To SharedPreference: ", email);
                     int dot = email.indexOf('.');
                     String username = email.substring(0,dot) + email.substring(dot+1);
-                    mSharedPrefcheck.edit().putString("username",username).apply();
+
+                    mSharedPrefcheck.edit().putString("username",email).apply();
+                    controller.createUser();
                 }
             });
             //pop out the window

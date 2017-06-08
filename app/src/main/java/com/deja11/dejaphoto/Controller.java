@@ -111,10 +111,6 @@ public class Controller implements Parcelable {
 
         user = new User();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String username = sharedPreferences.getString("username", "unknown");
-        user.setUsername(username);
-
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
@@ -548,6 +544,13 @@ public class Controller implements Parcelable {
 
     public void updateLocationName(String photoPath, String locationName) {
         databaseMediator.setLocationName(photoPath, locationName);
+    }
+
+    public void createUser(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        user.setUsername(username);
+        databaseMediator.createUser(username);
     }
 
     public void sync(){
