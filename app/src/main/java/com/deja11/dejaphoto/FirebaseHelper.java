@@ -264,11 +264,33 @@ public class FirebaseHelper {
 
     }
 
+
+
+
+
+
+    /**
+     * Case 1: a is adding b. not friends
+     *      b's friend field gets a:false inserted
+     *      difference between local and firebase detected
+     *
+     * Case 2: a has already added b. not friends
+     *      b's friend field remains the same
+     *      local and firebase already the same
+     *
+     * Case 3: b is adding a. a has previously added b
+     *      a's friend field gets b:true
+     *      b's friend field is switched to a:true
+     *
+     *
+     * */
+
     public void addFriend(final String user, final String friend){
         final boolean[] check = new boolean[1];
         check[0] = false;
         DatabaseReference databaseReference = mdejaRef.child("users");
-        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        //Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        Query query = databaseReference.child(user).child("friends").child(friend);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -288,7 +310,7 @@ public class FirebaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.i("Error","Firebase addFriend failed");
             }
         });
         while(!check[0]){
@@ -299,6 +321,20 @@ public class FirebaseHelper {
             }
         }
     }
+
+    public void createUser(String username){
+        DatabaseReference databaseReference = mdejaRef.child("users");
+        databaseReference.child(username).child("sharing").setValue("false");
+        databaseReference.child(username).child("username").setValue(username);
+        databaseReference.child(username).child("friends").child("fake").setValue("false");
+    }
+
+
+
+
+
+
+    /*DO WE NEED THE METHODS UNDER HERE?*/
 
 
     public boolean getSharing(String username){

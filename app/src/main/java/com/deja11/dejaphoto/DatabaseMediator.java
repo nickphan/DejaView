@@ -218,6 +218,10 @@ public class DatabaseMediator {
         databaseHelper.updateField(phoneLocation, DatabaseHelper.COL_LOC_NAME_11, locationName);
     }
 
+    public void createUser(String username){
+        firebaseHelper.createUser(username);
+    }
+
 
 
     /**

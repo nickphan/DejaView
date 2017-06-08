@@ -107,12 +107,29 @@ public class UserTest {
     }
 
     DatabaseMediator databaseMediator;
-    FirebaseHelper firebaseHelper;
     @Test
     public void TestFirebase(){
         databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
         ArrayList<String> returnedStrings = databaseMediator.testGetPhotoNamesFromFirebase();
         assertEquals(returnedStrings.size(), 8);
+    }
+
+    @Test
+    public void TestCreateUser(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        databaseMediator.createUser("nick1@ucsdedu");
+        databaseMediator.createUser("nick2@ucsdedu");
+        databaseMediator.createUser("nick3@ucsdedu");
+        assertTrue(true);
+    }
+
+    @Test
+    public void TestAddFriends(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        //databaseMediator.addFriendFirebase("nick2@ucsdedu", "nick1@ucsdedu");
+        //databaseMediator.addFriendFirebase("nick1@ucsdedu", "nick2@ucsdedu");
+        databaseMediator.addFriendFirebase("nick3@ucsdedu", "nick2@ucsdedu");
+        assertTrue(true);
     }
 
 }

@@ -529,6 +529,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         Log.d(TAGDATABASE, "Points updated");
     }
+
+
 }
 
 
