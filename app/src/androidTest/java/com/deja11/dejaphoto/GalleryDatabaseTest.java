@@ -81,10 +81,8 @@ public class GalleryDatabaseTest {
 
 
         db.delete(TABLE_NAME, null, null);
-        testDb.initialize(mainActivity.getActivity());
-
-
-        testDb.initialize(mainActivity.getActivity());
+        //testDb.initialize(mainActivity.getActivity());
+        //testDb.initialize(mainActivity.getActivity());
     }
 
     @Test
@@ -136,7 +134,7 @@ public class GalleryDatabaseTest {
         db.delete(TABLE_NAME, null, null);
         //testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma);
 
-        testDb.updateKarma(testPath);
+        //testDb.updateKarma(testPath);
 
 
         // Check if updated properly, karma is now set to 1
@@ -186,7 +184,7 @@ public class GalleryDatabaseTest {
         //Create database
         testDb = new DatabaseHelper(mainActivity.getActivity());
 
-        testDb.initialize(mainActivity.getActivity());
+        //testDb.initialize(mainActivity.getActivity());
         SQLiteDatabase db = testDb.getWritableDatabase();
 
         String path1 = testDb.chooseNextPath();
