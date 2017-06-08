@@ -123,7 +123,8 @@ public class FirebaseHelper {
                 String photoName;
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                    downloadAPhoto(friendUserName, photoName);
+                    downloadAPhoto(friendUserName, photoName,context);
+                    Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
                 }
             }
             @Override
@@ -220,14 +221,17 @@ public class FirebaseHelper {
 
     }
 
-        public void downloadAPhoto(String userName, String photoName){
+        public void downloadAPhoto(String userName, String photoName, final Context context){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
-            //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
             storagePath.mkdirs();
+        }
+        else {
+            Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
 
         File myFile = new File(storagePath,photoName);
@@ -236,13 +240,13 @@ public class FirebaseHelper {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
-                //Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
 
             }
         });
