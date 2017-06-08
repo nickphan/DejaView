@@ -42,7 +42,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -261,8 +263,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
-                syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+
+                //Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
+                                //syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+                                        //myContext.startActivity(syncIntent);
 
             }
         }
@@ -303,6 +307,21 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void settingsClicked(View view) {
         Intent intent = new Intent(MainActivity.this, SettingPreference.class);
         startActivity(intent);
+    }
+
+    public void launchCamera(View view) {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            File folderPath = new File(Controller.DEJAPHOTOPATH);
+            if (!folderPath.exists()) folderPath.mkdirs();
+
+            String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
+            File imageFile = new File(folderPath, "DejaPhoto" + timeStamp + ".jpg");
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+
+            startActivity(cameraIntent);
+        }
     }
 
     /**
@@ -364,7 +383,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             Log.i("Image URI", uri.getPath());
                             Log.i("Image Authority", uri.getAuthority());
                             Log.i("Scheme", uri.getScheme());
-                            Log.i("Id", DocumentsContract.getDocumentId(uri));
+                            //Log.i("Id", DocumentsContract.getDocumentId(uri));
                         }
 
                         controller.copyPhotos(uriArrayList);
