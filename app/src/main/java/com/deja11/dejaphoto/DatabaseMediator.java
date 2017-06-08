@@ -149,7 +149,6 @@ public class DatabaseMediator {
     }
 
 
-
     public void downloadFriendPhotos(Context context) {
 
         firebaseHelper.downloadFriendPhotos(context, "physicalDevice@teesphonecom");
@@ -211,7 +210,9 @@ public class DatabaseMediator {
         return firebaseHelper.getFriends(username);
     }
 
-
+    public void setLocationName(String locationName, String phoneLocation) {
+        databaseHelper.updateField(phoneLocation, DatabaseHelper.COL_LOC_NAME_11, locationName);
+    }
 
 
 
