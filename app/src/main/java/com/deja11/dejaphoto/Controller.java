@@ -525,11 +525,18 @@ public class Controller implements Parcelable {
     public void sync(){
         databaseMediator.downloadFriendPhotos(context);
 
-
     }
     //sync should also look for karma, release, and name
 
 
+
+
+
+
+
+
+
+    /*delete this?*/
     /*public ArrayList<String> checkForRequests(){
         ArrayList<String> localFriends = user.getFriends();
         final ArrayList<String> firebaseFriends = new ArrayList<>();

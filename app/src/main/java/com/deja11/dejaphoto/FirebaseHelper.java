@@ -266,25 +266,6 @@ public class FirebaseHelper {
 
 
 
-
-
-
-    /**
-     * Case 1: a is adding b. not friends
-     *      b's friend field gets a:false inserted
-     *      difference between local and firebase detected
-     *
-     * Case 2: a has already added b. not friends
-     *      b's friend field remains the same
-     *      local and firebase already the same
-     *
-     * Case 3: b is adding a. a has previously added b
-     *      a's friend field gets b:true
-     *      b's friend field is switched to a:true
-     *
-     *
-     * */
-
     public void addFriend(final String user, final String friend){
         final boolean[] check = new boolean[1];
         check[0] = false;
@@ -335,13 +316,6 @@ public class FirebaseHelper {
     }
 
 
-
-
-
-
-    /*DO WE NEED THE METHODS UNDER HERE?*/
-
-
     public boolean getSharing(String username){
         final boolean[] sharing = new boolean[2];
         DatabaseReference databaseReference = mdejaRef.child("user").child(username);
@@ -377,6 +351,17 @@ public class FirebaseHelper {
         }
         return sharing[0];
     }
+
+    public void updateRelease(String username, String photoPath){
+        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        //COL_OWNER_10
+        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
+    }
+    /*DO WE NEED THE METHODS UNDER HERE?*/
+
 
     public ArrayList<Pair<String, String>> getFriends(String username){
         final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
@@ -442,18 +427,6 @@ public class FirebaseHelper {
             }
         }
         return name[0];
-    }
-
-
-
-
-    public void updateRelease(String username, String photoPath){
-        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
-        int period = photoName.indexOf('.');
-        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-
-        //COL_OWNER_10
-        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
     }
 
     public ArrayList<String> getPhotos(){
