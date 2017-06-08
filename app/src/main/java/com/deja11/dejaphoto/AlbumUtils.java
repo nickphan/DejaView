@@ -2,6 +2,7 @@ package com.deja11.dejaphoto;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -38,10 +39,12 @@ public class AlbumUtils {
     }
 
 
-    public static String getPath(Context context, String[] id) throws IllegalArgumentException {
+    public static String getPath(Context context, Uri uri, String selection, String[] selectionArgs)
+            throws IllegalArgumentException {
+
         String[] projection = {MediaStore.Images.Media.DATA };
         Cursor cursor = context.getContentResolver()
-                .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, "_id=?", id, null);
+                .query(uri, projection, selection, selectionArgs, null);
         if (cursor != null && cursor.moveToFirst()) {
             int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             return cursor.getString(index);

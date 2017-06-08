@@ -12,6 +12,7 @@ import android.widget.ToggleButton;
 
 public class SettingPreference extends Activity {
 
+
     final static int TIME_OFFSET = 5;
     final int MAX_TIME = 25;
     final String KEY_POSITION = "position";
