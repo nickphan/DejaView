@@ -212,7 +212,9 @@ public class DatabaseMediator {
     }
 
 
-
+    public ArrayList<String> testGetPhotoNamesFromFirebase(){
+        return firebaseHelper.getPhotos();
+    }
 
 
 

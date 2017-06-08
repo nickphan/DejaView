@@ -112,7 +112,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
 
-        controller = new Controller(this);
+        //controller = new Controller(this);
 
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionGranted = PackageManager.PERMISSION_GRANTED;

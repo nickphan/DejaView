@@ -419,4 +419,31 @@ public class FirebaseHelper {
         mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
     }
 
+    public ArrayList<String> getPhotos(){
+        final boolean[] check = new boolean[1];
+        final ArrayList<String> photoNames = new ArrayList<>();
+        final DatabaseReference databaseReference = mdejaRef.child("images").child("physicalDevice@teesphonecom");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot childrenSnapshot : dataSnapshot.getChildren()){
+                    photoNames.add(childrenSnapshot.getKey());
+                }
+                check[0] = true;
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                check[0] = true;
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+                Log.d("Testing", "Sleeping");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return photoNames;
+    }
 }
