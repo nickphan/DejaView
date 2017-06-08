@@ -551,6 +551,10 @@ public class Controller implements Parcelable {
         databaseMediator.createUser(username);
     }
 
+    public void addFriend(String friendName){
+        databaseMediator.addFriendFirebase(user.getUsername(), friendName);
+    }
+
     public void sync(){
         /*
         if(SettingPreference.viewFriendPhoto){
