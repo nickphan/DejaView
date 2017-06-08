@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -24,7 +25,9 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
@@ -34,6 +37,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
 
@@ -74,6 +78,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         MainActivity.instance = instance;
     }
 
+    //login email
+    String email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -94,7 +100,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
-        // creating folders for the app if they do not exist
+        // create folders for the app if they do not exist
         File dejaPhotoFolder = new File(Controller.DEJAPHOTOPATH);
         File dejaPhotoCopiedFolder = new File(Controller.DEJAPHOTOCOPIEDPATH);
         File dejaPhotoFriendsFolder = new File(Controller.DEJAPHOTOFRIENDSPATH);
@@ -103,6 +109,29 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
 
+        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.test_photo_picker);
+        myContext = getApplicationContext();
+
+        final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        email = mSharedPrefcheck.getString("username", "unknown");
+        if(email.equals("unknown")){
+            View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            final EditText mEmail = (EditText) v.findViewById(R.id.username);
+            builder.setView(v).setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    email = mEmail.getText().toString();
+                    Log.e("the input username: ", email);
+                    Log.d("To SharedPreference: ", email);
+                    mSharedPrefcheck.edit().putString("username",email).apply();
+                }
+            });
+            //pop out the window
+            builder.create().show();
+
+        }
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -232,7 +261,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         public void run() {
             while(true){
 
-                try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
                 //downloadPhotos();
 
                 try {
@@ -242,7 +270,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 }
                 Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
                 syncIntent.putExtra(Controller.CODE_KEY, Controller.CODE_SYNC);
-
+                Log.d("Sync", "Happening");
+                //Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
+                                //syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+                                        //myContext.startActivity(syncIntent);
             }
         }
     }
@@ -299,6 +330,31 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     }
 
+    public void addFriends(View view){
+        //final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.add_friend_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final EditText mEmail = (EditText) v.findViewById(R.id.username);
+        builder.setView(v).setPositiveButton("add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                email = mEmail.getText().toString();
+                /*
+                Log.e("the input username: ", email);
+                Log.d("To SharedPreference: ", email);
+                mSharedPrefcheck.edit().putString("friendEmail",email).apply();
+
+                //access to the firebase and then add the name
+                */
+                Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //pop out the window
+        builder.create().show();
+
+    }
+
     /**
      * Launches the gallery for a single photo
      * @param view, the view that calls it
@@ -334,17 +390,29 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      * @param resultCode the code for how things went
      * @param data the returned intent with the data we want
      * */
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void onActivityResult(int requestCode, int resultCode, final Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
-                Uri imageData = data.getData();
-                /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
+                View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.rename_location_dialog, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                final EditText location = (EditText) v.findViewById(R.id.locationname);
+                builder.setView(v).setPositiveButton("update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newLocation = location.getText().toString();
+                        Uri imageData = data.getData();
+                        String path = imageData.getPath();
+                        controller.updateLocationName(imageData,path);
+
+                    }
+                });
+
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
                 /* SINGLE RETURNED. SHOULD NEVER COME HERE */
                 if(data.getData() != null){
                     Uri imageData = data.getData();
-
                 }
                 /* MULTIPLE RETURNED. SHOULD ONLY EVER COME HERE */
                 else{
@@ -409,6 +477,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void register(String username){
         SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPref.edit().putString("username", username).apply();
+
+        //
+        //mSharedPref.getString("username", "none");
+    }
+
+
+    public void renameLocation(String location){
+
     }
 
 }

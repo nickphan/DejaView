@@ -114,7 +114,6 @@ public class FirebaseHelper {
 
         // Create a director if it doesn't exit
 
-
         Query queryRef = mdejaRef.child("images").child(friendUserName);
 
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -123,7 +122,8 @@ public class FirebaseHelper {
                 String photoName;
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                    downloadAPhoto(friendUserName, photoName);
+                    downloadAPhoto(friendUserName, photoName,context);
+                    Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
                 }
             }
             @Override
@@ -220,14 +220,17 @@ public class FirebaseHelper {
 
     }
 
-        public void downloadAPhoto(String userName, String photoName){
+        public void downloadAPhoto(String userName, String photoName, final Context context){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
-            //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
             storagePath.mkdirs();
+        }
+        else {
+            Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
 
         File myFile = new File(storagePath,photoName);
@@ -236,13 +239,13 @@ public class FirebaseHelper {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
-                //Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
 
             }
         });
@@ -347,7 +350,6 @@ public class FirebaseHelper {
                     for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
                         String key = friendSnapshot.getKey();
                         String val = friendSnapshot.getValue().toString();
-
                         Pair<String, String> pair = new Pair<String, String>(key, val);
                         friends.add(pair);
                     }
@@ -405,6 +407,16 @@ public class FirebaseHelper {
     public void setSharing(String name, boolean value){
         DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
         databaseReference.setValue(String.valueOf(value));
+    }
+
+
+    public void updateRelease(String username, String photoPath){
+        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        //COL_OWNER_10
+        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
     }
 
 }

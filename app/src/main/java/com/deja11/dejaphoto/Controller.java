@@ -4,6 +4,8 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +19,10 @@ import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import android.support.annotation.RequiresApi;
+import android.util.Log;
+
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -28,8 +34,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ThrowOnExtraProperties;
 import com.google.firebase.database.ValueEventListener;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,6 +90,8 @@ public class Controller implements Parcelable {
     private Photo currPhoto;
     private LinkedList<Photo> cache;
     private int mData = 0;
+    private int screenw;
+    private int screenh;
 
     private User user;
     private FirebaseDatabase database;
@@ -104,9 +112,12 @@ public class Controller implements Parcelable {
         myFirebaseRef = database.getReference();
 
         initialize();
+        databaseMediator.downloadFriendPhotos(context);
 
-        //TODO
-        //databaseMediator.downloadFriendPhotos(context);
+        int width= context.getResources().getDisplayMetrics().widthPixels;
+        screenw = width;
+        int height= context.getResources().getDisplayMetrics().heightPixels;
+        screenh = height;
     }
 
     /**
@@ -196,7 +207,7 @@ public class Controller implements Parcelable {
     void releasePhoto() {
         if (currPhoto != null) {
             currPhoto.setReleased(true);
-            databaseMediator.updateRelease(currPhoto.getPhotoLocation());
+            databaseMediator.updateRelease(currPhoto.getPhotoLocation(), currPhoto.getOwner());
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
                 currPhoto = cache.getLast();
@@ -246,10 +257,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context));
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
             }
         }
     }
@@ -290,7 +301,7 @@ public class Controller implements Parcelable {
      * @param geoLocation the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
-    private boolean setWallpaper(String photoPath, String geoLocation) {
+    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma) {
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if (photoPath == null) {
             try {
@@ -305,35 +316,15 @@ public class Controller implements Parcelable {
             Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
             int height = getHeightFromString(photoPath);
             int width = getWidthFromString(photoPath);
-            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
-            writeBitmapOnMutable(mutableBitmap, bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation, height, "");
-            myWallpaperManager.setBitmap(mutableBitmap);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma){
-        WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
-        if (photoPath == null) {
-            try {
-                myWallpaperManager.setResource(+R.drawable.default_image);
-                return false;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        try {
-            Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
-            int height = getHeightFromString(photoPath);
-            int width = getWidthFromString(photoPath);
-            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
-            writeBitmapOnMutable(mutableBitmap, bitmap);
-            writeTextOnWallpaper(mutableBitmap, geoLocation, height, totalKarma);
+            //create the bitmap that has the same size as the screen
+            Bitmap mutableBitmap = Bitmap.createBitmap(screenw, screenh, bitmap.getConfig());
+
+            // inside the method, we need to adjust the photo size
+            writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
+
+            writeTextOnWallpaper(mutableBitmap, geoLocation,totalKarma);
+
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
         } catch (Exception e) {
@@ -348,9 +339,12 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the container where the drawing is done
      * @param bitmap the photo
      */
-    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap) {
+    private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photoWidth, int photoHeight) {
+
         Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, null);
+        Matrix m = new Matrix();
+        m.setScale((float) mutableBitmap.getWidth() / photoWidth, (float) mutableBitmap.getHeight() / photoHeight);
+        canvas.drawBitmap(bitmap, m, new Paint());
     }
 
     /**
@@ -359,7 +353,8 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the bitmap of the image to be the wallpaper
      * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText, int height, String karmaText) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText,String karma) {
+
         String cutText = locationText;
         if(cutText.length() > 30){
             cutText = locationText.substring(0, 30);
@@ -368,10 +363,10 @@ public class Controller implements Parcelable {
 
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setTextSize(canvas.getHeight() / 50);
-        canvas.drawText(cutText, (float) (0.35 * canvas.getWidth()), (float) (0.95 * canvas.getHeight()), paint);
-        canvas.drawText(karmaText, (float)(0.95 * canvas.getWidth()), (float)(0.95 * canvas.getHeight()), paint);
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(canvas.getHeight() / 40);
+        canvas.drawText(cutText, canvas.getHeight() / 40, (float)canvas.getHeight()-canvas.getHeight()/40, paint);
+        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40,canvas.getHeight()-canvas.getHeight()/40,paint);
     }
 
     /**
@@ -463,6 +458,7 @@ public class Controller implements Parcelable {
 
     class ControllerLocationListener implements LocationListener {
         private Location lastLocation;
+
         private String locationProvider;
 
         public Location getLastLocation() {
@@ -473,9 +469,7 @@ public class Controller implements Parcelable {
             lastLocation = location;
         }
 
-        public void onProviderDisabled(String provider) {
-
-        }
+        public void onProviderDisabled(String provider) {   }
 
         public void onProviderEnabled(String provider) {
             locationProvider = provider;
@@ -486,6 +480,7 @@ public class Controller implements Parcelable {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void copyPhotos(ArrayList<Uri> uriArrayList) {
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoCopied");
         Log.i("Folder Path", storagePath.getAbsolutePath());
@@ -577,8 +572,14 @@ public class Controller implements Parcelable {
         }
     }
 
+    public void updateLocationName(Uri photoUri, String locationName) {
+        String directoryPath = photoUri.getPath();
+        databaseMediator.setLocationName(locationName, directoryPath);
+    }
+
     public void sync(){
         databaseMediator.downloadFriendPhotos(context);
     }
+    //sync should also look for karma, release, and name
 
 }
