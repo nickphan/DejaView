@@ -88,6 +88,7 @@ public class MainActivity extends Activity {
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
 
+
         /* controller = new Controller(this);
 
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -134,7 +135,6 @@ public class MainActivity extends Activity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
-
                 Toast.makeText(getBaseContext(), data.toString(), Toast.LENGTH_LONG).show();
 
             }
@@ -378,7 +378,7 @@ public class MainActivity extends Activity {
                         String newLocation = location.getText().toString();
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
-                        controller.updateLocationName(imageData,path);
+                        controller.updateLocationName(path,newLocation);
 
                     }
                 });
@@ -455,11 +455,6 @@ public class MainActivity extends Activity {
 
         //
         //mSharedPref.getString("username", "none");
-    }
-
-
-    public void renameLocation(String location){
-
     }
 
 }
