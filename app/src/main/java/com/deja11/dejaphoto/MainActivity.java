@@ -120,8 +120,10 @@ public class MainActivity extends Activity {
                     email = mEmail.getText().toString();
                     Log.e("the input username: ", email);
                     Log.d("To SharedPreference: ", email);
+                    int dot = email.indexOf('.');
+                    String username = email.substring(0,dot) + email.substring(dot+1);
 
-                    mSharedPrefcheck.edit().putString("username",email).apply();
+                    mSharedPrefcheck.edit().putString("username",username).apply();
                     controller.createUser();
                 }
             });
