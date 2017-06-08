@@ -162,7 +162,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
-
                 Toast.makeText(getBaseContext(), data.toString(), Toast.LENGTH_LONG).show();
 
             }
