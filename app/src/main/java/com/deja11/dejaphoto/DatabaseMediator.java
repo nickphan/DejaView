@@ -143,7 +143,8 @@ public class DatabaseMediator {
         databaseHelper.updateRelease(photoLocation);
         //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
         if(owner.equals(currentUserName)) {
-            firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+            //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+            firebaseHelper.updateRelease(currentUserName, photoLocation);
         }
     }
 
