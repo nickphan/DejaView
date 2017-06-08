@@ -384,7 +384,7 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the bitmap of the image to be the wallpaper
      * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText,String karma) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText, String karma) {
 
         String cutText = locationText;
         if(cutText.length() > 30){
