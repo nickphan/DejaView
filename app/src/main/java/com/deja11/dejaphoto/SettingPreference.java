@@ -12,11 +12,11 @@ import android.widget.ToggleButton;
 
 public class SettingPreference extends Activity {
 
-    final int TIME_OFFSET = 5;
+    final static int TIME_OFFSET = 5;
     final int MAX_TIME = 25;
     final String KEY_POSITION = "position";
     final String KEY_INTERVAL = "interval";
-    private int currentInterval = TIME_OFFSET;
+    public static int currentInterval = TIME_OFFSET;
     private static int currentPosition;
 
     //For testing purpose
@@ -29,23 +29,29 @@ public class SettingPreference extends Activity {
     /*For toggles*/
     Switch switchPhoto;
     TextView switchStatus;
-    private static boolean showSwitch = true;
+    public static boolean showSwitch = true;
+    private String KEY_SWITCH_PHOTO = "photoswtich";
 
     Switch switchLocation;
     TextView locationStatus;
-    private static boolean showLocation = true;
+    public static boolean showLocation = true;
+    private String KEY_LOCATION = "location";
 
     Switch switchMine;
     TextView myStatus;
-    private static boolean viewMyPhoto = true;
+    public static boolean viewMyPhoto = true;
+    private String KEY_VIEW_MY_PHOTOS = "viewMyPhotos";
 
     Switch switchFriends;
     TextView friendsStatus;
-    private static boolean viewFriendPhoto = true;
+    public static boolean viewFriendPhoto = true;
+    private String KEY_VIEW_FRIENDS_PHOTOS = "viewFriendsPhotos";
 
     Switch switchSharing;
     TextView sharingStatus;
-    private static boolean sharing = true;
+    public static boolean sharing = true;
+    private String KEY_SHARING = "sharing";
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -58,7 +64,7 @@ public class SettingPreference extends Activity {
         /* For all the toggles*/
         switchPhoto = (Switch) findViewById(R.id.switch1);
         switchStatus = (TextView) findViewById(R.id.set1);
-        showSwitch = getCurrentStatus("photoswitch");
+        showSwitch = getCurrentStatus(KEY_SWITCH_PHOTO);
         updateStatus(showSwitch, switchStatus, switchPhoto);
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         enableSlider(seekBar);
@@ -74,52 +80,52 @@ public class SettingPreference extends Activity {
                 else{
                     seekBar.setEnabled(false);
                 }
-                saveStatus("photoswitch", isChecked);
+                saveStatus(KEY_SWITCH_PHOTO, isChecked);
             }
         });
 
         /* For all the toggles*/
         switchLocation = (Switch) findViewById(R.id.switch2);
         locationStatus = (TextView) findViewById(R.id.set2);
-        showLocation = getCurrentStatus("location");
+        showLocation = getCurrentStatus(KEY_LOCATION);
         updateStatus(showLocation,locationStatus,switchLocation);
         switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, locationStatus, switchLocation);
-                saveStatus("location", isChecked);
+                saveStatus(KEY_LOCATION, isChecked);
             }
         });
 
         switchMine = (Switch) findViewById(R.id.switch3);
         myStatus = (TextView) findViewById(R.id.set3);
-        viewMyPhoto = getCurrentStatus("viewMyPhotos");
+        viewMyPhoto = getCurrentStatus(KEY_VIEW_MY_PHOTOS);
         updateStatus(viewMyPhoto,myStatus,switchMine);
         switchMine.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, myStatus, switchMine);
-                saveStatus("viewMyPhotos", isChecked);
+                saveStatus(KEY_VIEW_MY_PHOTOS, isChecked);
             }
         });
 
         switchFriends = (Switch) findViewById(R.id.switch4);
         friendsStatus = (TextView) findViewById(R.id.set4);
-        viewFriendPhoto = getCurrentStatus("viewFriendsPhotos");
+        viewFriendPhoto = getCurrentStatus(KEY_VIEW_FRIENDS_PHOTOS);
         updateStatus(viewFriendPhoto,friendsStatus,switchFriends);
         switchFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, friendsStatus, switchFriends);
-                saveStatus("viewFriendsPhotos", isChecked);
+                saveStatus(KEY_VIEW_FRIENDS_PHOTOS, isChecked);
             }
         });
 
         switchSharing = (Switch) findViewById(R.id.switch5);
         sharingStatus = (TextView) findViewById(R.id.set5);
-        sharing = getCurrentStatus("sharing");
+        sharing = getCurrentStatus(KEY_SHARING);
         updateStatus(sharing,sharingStatus,switchSharing);
         switchSharing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, sharingStatus, switchSharing);
-                saveStatus("sharing", isChecked);
+                saveStatus(KEY_SHARING, isChecked);
             }
         });
     }
@@ -202,16 +208,6 @@ public class SettingPreference extends Activity {
             return 0;
         }
     }
-
-    public int getCurrentInterval(){return currentInterval;}
-
-    public boolean ShowLocation(){return showLocation;}
-
-    public boolean ViewMyPhoto(){return viewMyPhoto;}
-
-    public boolean ViewFriendPhoto(){return viewFriendPhoto;}
-
-    public boolean PhotoSharing(){return sharing;}
 
     /**
      * For Testing purpose
