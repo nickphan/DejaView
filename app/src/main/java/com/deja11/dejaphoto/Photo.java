@@ -156,4 +156,24 @@ public class Photo {
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
+
+    public void setPhoneLocation(String phoneLocation) {
+        this.phoneLocation = phoneLocation;
+    }
+
+    public void setGeoLocation(GeoLocation geoLocation) {
+        this.geoLocation = geoLocation;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setMykarma(boolean mykarma) {
+        this.mykarma = mykarma;
+    }
+
+    public void setTotalKarma(int totalKarma) {
+        this.totalKarma = totalKarma;
+    }
 }

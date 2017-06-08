@@ -115,7 +115,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DATE_5 + " TEXT, " +
                 COL_DEJA_6 + " INTEGER, " +
                 COL_REL_7 + " INTEGER, " +
-                COL_KARMA_8 + " INTEGER , FILENAME TEXT, OWNER TEXT, LOCATIONNAME TEXT, TOTALKARMA INTEGER   )");
+                COL_KARMA_8 + " INTEGER , " +
+                COL_FILE_NAME_9 + " TEXT, " +
+                COL_OWNER_10 + " TEXT, " +
+                COL_LOC_NAME_11 + " TEXT, " +
+                COL_TOTAL_KARMA_12 + " INTEGER   )");
 
         Log.i(TAGDATABASE, "Table created");
     }
@@ -452,7 +456,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         boolean isReleased = res.getInt(6) > 0 ? true : false;
         boolean isKarma = res.getInt(7) > 0 ? true : false;
-
         int totalKarma = res.getInt(11);
 
         /*code to get total karma as int*/
@@ -526,6 +529,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         Log.d(TAGDATABASE, "Points updated");
     }
+
+
 }
 
 

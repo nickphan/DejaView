@@ -2,6 +2,7 @@ package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,6 +21,7 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -106,13 +108,19 @@ public class Controller implements Parcelable {
         //databaseMediator.init(this.context);
 
         cache = new LinkedList<Photo>();
+
         user = new User();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        user.setUsername(username);
+
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
         initialize();
-        databaseMediator.downloadFriendPhotos(context);
+        //databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
         screenw = width;
@@ -525,7 +533,51 @@ public class Controller implements Parcelable {
      *
      *
      * */
-    public ArrayList<String> checkForRequests(){
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
+    public void updateLocationName(String photoPath, String locationName) {
+        databaseMediator.setLocationName(photoPath, locationName);
+    }
+
+    public void sync(){
+        /*
+        if(SettingPreference.viewFriendPhoto){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String username = sharedPreferences.getString("username", "unknown");
+            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
+
+            for (Pair<String,String> currFriend : myFriends){
+                if(currFriend.second.equals("true")){
+                    databaseMediator.downloadFriendPhotos(context);
+                }
+                else{
+                    //delete
+                }
+            }
+
+        }*/
+    }
+    //sync should also look for karma, release, and name
+
+
+
+
+
+
+
+
+
+    /*delete this?*/
+    /*public ArrayList<String> checkForRequests(){
         ArrayList<String> localFriends = user.getFriends();
         final ArrayList<String> firebaseFriends = new ArrayList<>();
         ArrayList<String> friended = new ArrayList<>();
@@ -560,6 +612,7 @@ public class Controller implements Parcelable {
             }
         }
         return friended;
+
     }
     public void updateUser(){
         user.setSharing(databaseMediator.getSharing(user.getUsername()));
@@ -577,9 +630,8 @@ public class Controller implements Parcelable {
         databaseMediator.setLocationName(locationName, directoryPath);
     }
 
-    public void sync(){
-        databaseMediator.downloadFriendPhotos(context);
-    }
+    
     //sync should also look for karma, release, and name
+    }*/
 
 }

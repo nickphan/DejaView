@@ -47,6 +47,8 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
  */
 
 public class FirebaseHelper {
+
+
     public FirebaseHelper(Context context){
 
     }
@@ -109,7 +111,9 @@ public class FirebaseHelper {
         uploadTask = photoRef.putFile(file);
     }
 
-    public void downloadFriendPhotos(final Context context, final String friendUserName){
+    public ArrayList<String> downloadFriendPhotos(final Context context, final String friendUserName){
+        Log.d("SYNC", "DOWNLOADING FROM " + friendUserName);
+        Toast.makeText(context,"Downloading from " + friendUserName,Toast.LENGTH_LONG).show();
 
 
         // Create a director if it doesn't exit
@@ -119,15 +123,48 @@ public class FirebaseHelper {
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //TODO refactor this mess
+                String phoneLocation;
+                GeoLocation geoLocation;
+                int totalKarma;
+
+                // newly added field to accomodate for the updated column
+                String dateString;
+                String owner;
+                String locationName;
+
                 String photoName;
+
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+                    Photo toBedl = new Photo(null,null,null,0,false,false);
+
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
-                    downloadAPhoto(friendUserName, photoName,context);
-                    Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
+                    locationName = eventSnapshot.child(COL_LOC_NAME_11).getValue().toString();
+                    geoLocation = new GeoLocation(Double.valueOf(eventSnapshot.child(COL_LAT_3).getValue().toString()),Double.valueOf(eventSnapshot.child(COL_LONG_4).getValue().toString()));
+                    owner = eventSnapshot.child(COL_OWNER_10).getValue().toString();
+                    dateString= eventSnapshot.child(COL_DATE_5).getValue().toString();
+                    totalKarma = Integer.valueOf(eventSnapshot.child(COL_TOTAL_KARMA_12).getValue().toString());
+
+
+
+
+                    toBedl.setFileName(photoName);
+                    toBedl.setLocationName(locationName);
+                    toBedl.setGeoLocation(geoLocation);
+                    toBedl.setOwner(owner);
+                    toBedl.setDateString(dateString);
+                    toBedl.setTotalKarma(totalKarma);
+                    downloadAPhoto(friendUserName, photoName,context, toBedl);
+                    //
+                    //Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
+
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}});
+
+        return null;
 
 
 
@@ -220,36 +257,49 @@ public class FirebaseHelper {
 
     }
 
-        public void downloadAPhoto(String userName, String photoName, final Context context){
+        public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
-            Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
             storagePath.mkdirs();
         }
         else {
-            Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
 
-        File myFile = new File(storagePath,photoName);
+        final File myFile = new File(storagePath,photoName);
+
+
+
+
+
+
         StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
         riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
-                Toast.makeText(context, "file created",Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
+                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
 
             }
         });
         //Toast.makeText(context, listOfPhotosToDownload.get(i++), Toast.LENGTH_SHORT).show();
+
+
+
+            DatabaseHelper databaseHelper = new DatabaseHelper(context);
+            //tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
+
+                databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
 
 
     }
@@ -264,11 +314,14 @@ public class FirebaseHelper {
 
     }
 
+
+
     public void addFriend(final String user, final String friend){
         final boolean[] check = new boolean[1];
         check[0] = false;
         DatabaseReference databaseReference = mdejaRef.child("users");
-        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        //Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        Query query = databaseReference.child(user).child("friends").child(friend);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -288,7 +341,7 @@ public class FirebaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.i("Error","Firebase addFriend failed");
             }
         });
         while(!check[0]){
@@ -298,6 +351,18 @@ public class FirebaseHelper {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void createUser(String username){
+        DatabaseReference databaseReference = mdejaRef.child("users");
+        databaseReference.child(username).child("sharing").setValue("false");
+        databaseReference.child(username).child("username").setValue(username);
+        databaseReference.child(username).child("friends").child("fake").setValue("false");
+    }
+
+    public void setSharing(String name, boolean value){
+        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
+        databaseReference.setValue(String.valueOf(value));
     }
 
 
@@ -337,6 +402,17 @@ public class FirebaseHelper {
         return sharing[0];
     }
 
+    public void updateRelease(String username, String photoPath){
+        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        //COL_OWNER_10
+        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
+    }
+    /*DO WE NEED THE METHODS UNDER HERE?*/
+
+
     public ArrayList<Pair<String, String>> getFriends(String username){
         final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
         final boolean[] check = new boolean[1];
@@ -362,6 +438,9 @@ public class FirebaseHelper {
 
             }
         });
+        //Pair<String, String> pair = friends.get(0);
+        //pair.first;
+        //pair.second;
 
         while(!check[0]){
             try{
@@ -403,20 +482,31 @@ public class FirebaseHelper {
         return name[0];
     }
 
-
-    public void setSharing(String name, boolean value){
-        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
-        databaseReference.setValue(String.valueOf(value));
+    public ArrayList<String> getPhotos(){
+        final boolean[] check = new boolean[1];
+        final ArrayList<String> photoNames = new ArrayList<>();
+        final DatabaseReference databaseReference = mdejaRef.child("images").child("physicalDevice@teesphonecom");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot childrenSnapshot : dataSnapshot.getChildren()){
+                    photoNames.add(childrenSnapshot.getKey());
+                }
+                check[0] = true;
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                check[0] = true;
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+                Log.d("Testing", "Sleeping");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return photoNames;
     }
-
-
-    public void updateRelease(String username, String photoPath){
-        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
-        int period = photoName.indexOf('.');
-        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-
-        //COL_OWNER_10
-        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
-    }
-
 }
