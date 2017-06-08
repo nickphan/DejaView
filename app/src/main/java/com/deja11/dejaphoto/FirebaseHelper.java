@@ -1,8 +1,10 @@
 package com.deja11.dejaphoto;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -36,7 +38,6 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
-import static com.deja11.dejaphoto.DatabaseHelper.currentUserName;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_LAT_3;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_LONG_4;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_DATE_5;
@@ -47,9 +48,11 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
  */
 
 public class FirebaseHelper {
+    Context context;
 
 
     public FirebaseHelper(Context context){
+        this.context = context;
 
     }
 
@@ -104,10 +107,12 @@ public class FirebaseHelper {
 
 
     public void insertFirebaseStorage(String phoneLocation){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
         //insert into storage
         UploadTask uploadTask;
         Uri file = Uri.fromFile(new File(phoneLocation));
-        StorageReference photoRef = mdejaStorage.child("images/"+currentUserName+"/"+file.getLastPathSegment());
+        StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file.getLastPathSegment());
         uploadTask = photoRef.putFile(file);
     }
 
@@ -223,11 +228,12 @@ public class FirebaseHelper {
     public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName, final
                                     String userName, final String locationName, final String totalKarma) {
 
-
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
 
-        Query queryRef = mdejaRef.child("images").child(currentUserName).child(photoNameFix);
+        Query queryRef = mdejaRef.child("images").child(username).child(photoNameFix);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {

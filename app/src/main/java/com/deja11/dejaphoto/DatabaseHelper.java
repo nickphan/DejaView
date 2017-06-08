@@ -82,7 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_TOTAL_KARMA_12 = "TOTALKARMA";
 
     //public static final String currentUserName = "Teehee@heeheecom";
-    public static final String currentUserName = "yoohoohoo@heeheecom";
+    //public static final String currentUserName = "yoohoohoo@heeheecom";
     //public static final String currentUserName = "physicalDevice@teesphonecom";
 
 

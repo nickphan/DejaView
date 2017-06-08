@@ -86,7 +86,7 @@ public class Controller implements Parcelable {
 
 
 
-    private DatabaseMediator databaseMediator;
+    public DatabaseMediator databaseMediator;
 
     private Context context;
     private Photo currPhoto;
