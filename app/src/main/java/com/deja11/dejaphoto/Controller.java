@@ -11,12 +11,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 import android.util.Pair;
@@ -494,8 +496,24 @@ public class Controller implements Parcelable {
 
         for (Uri u : uriArrayList) {
             try {
-                String[] id = new String[] {DocumentsContract.getDocumentId(u).split(":")[1]};
-                File source = new File(AlbumUtils.getPath(context, id));
+
+                Uri uri;
+                String selection;
+                String[] id;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                    selection = "_id=?";
+                    id = new String[]{DocumentsContract.getDocumentId(u).split(":")[1]};
+                }
+
+                else {
+                    uri = u;
+                    selection = null;
+                    id = null;
+                }
+
+                File source = new File(AlbumUtils.getPath(context, uri, selection, id));
                 File destination = new File(storagePath, source.getName());
                 AlbumUtils.copyPhoto(source, destination);
                 Log.i("Photo Copy", "Successful");

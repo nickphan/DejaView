@@ -106,7 +106,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         setContentView(R.layout.test_photo_picker);
 
         controller = new Controller(this);
-
+/*
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionGranted = PackageManager.PERMISSION_GRANTED;
 
@@ -116,7 +116,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
-
+/*
         // creating folders for the app if they do not exist
         File dejaPhotoFolder = new File(Controller.DEJAPHOTOPATH);
         File dejaPhotoCopiedFolder = new File(Controller.DEJAPHOTOCOPIEDPATH);
@@ -126,11 +126,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
 
-
-
-        setContentView(R.layout.activity_main);
-        //setContentView(R.layout.test_photo_picker);
-        myContext = getApplicationContext();
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
