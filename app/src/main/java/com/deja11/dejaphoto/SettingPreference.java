@@ -24,7 +24,6 @@ public class SettingPreference extends Activity {
     public static SettingPreference getInstance() {
         if (instance == null) {setInstance(instance);}return instance;}
     public static void setInstance(SettingPreference instance) {SettingPreference.instance = instance;}
-    // For testing
     private TextView intervalText;
 
     /*For toggles*/
@@ -38,11 +37,11 @@ public class SettingPreference extends Activity {
 
     Switch switchMine;
     TextView myStatus;
-    private static boolean viewMyP = true;
+    private static boolean viewMyPhoto = true;
 
     Switch switchFriends;
     TextView friendsStatus;
-    private static boolean viewFrP = true;
+    private static boolean viewFriendPhoto = true;
 
     Switch switchSharing;
     TextView sharingStatus;
@@ -60,7 +59,7 @@ public class SettingPreference extends Activity {
         switchPhoto = (Switch) findViewById(R.id.switch1);
         switchStatus = (TextView) findViewById(R.id.set1);
         showSwitch = getCurrentStatus("photoswitch");
-        updateStatus(showSwitch,switchStatus,switchPhoto);
+        updateStatus(showSwitch, switchStatus, switchPhoto);
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         enableSlider(seekBar);
         if(!showSwitch){
@@ -93,8 +92,8 @@ public class SettingPreference extends Activity {
 
         switchMine = (Switch) findViewById(R.id.switch3);
         myStatus = (TextView) findViewById(R.id.set3);
-        viewMyP = getCurrentStatus("viewMyPhotos");
-        updateStatus(viewMyP,myStatus,switchMine);
+        viewMyPhoto = getCurrentStatus("viewMyPhotos");
+        updateStatus(viewMyPhoto,myStatus,switchMine);
         switchMine.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, myStatus, switchMine);
@@ -104,8 +103,8 @@ public class SettingPreference extends Activity {
 
         switchFriends = (Switch) findViewById(R.id.switch4);
         friendsStatus = (TextView) findViewById(R.id.set4);
-        viewFrP = getCurrentStatus("viewFriendsPhotos");
-        updateStatus(viewFrP,friendsStatus,switchFriends);
+        viewFriendPhoto = getCurrentStatus("viewFriendsPhotos");
+        updateStatus(viewFriendPhoto,friendsStatus,switchFriends);
         switchFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, friendsStatus, switchFriends);
@@ -125,12 +124,12 @@ public class SettingPreference extends Activity {
         });
     }
 
-    void saveStatus(String key, boolean status){
+    private void saveStatus(String key, boolean status){
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.edit().putBoolean(key, status).apply();
     }
 
-    boolean getCurrentStatus(String key){
+    private boolean getCurrentStatus(String key){
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             boolean status = mSharedPrefs.getBoolean(key, true);
@@ -140,7 +139,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    void updateStatus(boolean isChecked, TextView view, Switch switchButton){
+    private void updateStatus(boolean isChecked, TextView view, Switch switchButton){
         if (isChecked) {
             view.setText("on");
 
@@ -150,12 +149,12 @@ public class SettingPreference extends Activity {
         switchButton.setChecked(isChecked);
     }
 
-    void enableSlider( SeekBar seekBar){
+    private void enableSlider( SeekBar seekBar){
         seekBar.setMax(MAX_TIME);
         intervalText = (TextView) findViewById(R.id.seekbarvalue);
-        currentInterval = getCurrentProgress();
+        currentInterval = getCurrentInterval();
         seekBar.setProgress(currentInterval);
-        currentPosition = getCurrentInterval();
+        currentPosition = getCurrentPosition();
         setText(seekBar, intervalText, currentInterval, currentPosition);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -179,36 +178,7 @@ public class SettingPreference extends Activity {
         });
     }
 
-    boolean ShowLocation(){
-        return showLocation;
-    }
 
-    boolean ViewMyPhoto(){
-        return viewMyP;
-    }
-
-    boolean ViewFriendPhoto(){
-        return viewFrP;
-    }
-
-    boolean PhotoSharing(){
-        return sharing;
-    }
-
-
-    /**
-     * For Testing purpose
-     *
-     * @param seekBar  the seekbar object
-     * @param interval the current time interval
-     * @param fromUser true if the user updates the tme interval
-     */
-    public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
-        currentInterval = interval;
-        int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
-        currentPosition = val;
-        saveProgressAndLocation();
-    }
 
     private void setText(SeekBar seekBar, TextView progressText, int interval, int val) {
         progressText.setText(String.valueOf(interval + TIME_OFFSET) + " min");
@@ -222,7 +192,17 @@ public class SettingPreference extends Activity {
         mSharedPrefs.edit().putInt(KEY_POSITION, currentPosition).apply();
     }
 
-    public int getCurrentProgress() {
+    private int getCurrentPosition() {
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            int position = mSharedPrefs.getInt(KEY_POSITION, 0);
+            return position;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public int getCurrentInterval() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             int interval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
@@ -232,13 +212,26 @@ public class SettingPreference extends Activity {
         }
     }
 
-    private int getCurrentInterval() {
-        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        try {
-            int position = mSharedPrefs.getInt(KEY_POSITION, 0);
-            return position;
-        } catch (Exception e) {
-            return 0;
-        }
+    public boolean ShowLocation(){return showLocation;}
+
+    public boolean ViewMyPhoto(){return viewMyPhoto;}
+
+    public boolean ViewFriendPhoto(){return viewFriendPhoto;}
+
+    public boolean PhotoSharing(){return sharing;}
+
+    /**
+     * For Testing purpose
+     * @param seekBar  the seekbar object
+     * @param interval the current time interval
+     * @param fromUser true if the user updates the tme interval
+     */
+    public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
+        currentInterval = interval;
+        int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
+        currentPosition = val;
+        saveProgressAndLocation();
     }
+
+
 }
