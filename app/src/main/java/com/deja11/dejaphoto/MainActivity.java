@@ -27,6 +27,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
@@ -329,20 +330,40 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    /**
+     * This is the onClick function for the camera button.
+     * It launches the camera app to take a single photo and saves that photo into the DejaPhoto
+     * album.
+     *
+     * Code credits: https://developer.android.com/training/camera/photobasics.html
+     *
+     * @param view - the view that was clicked; required parameter for an onClick function
+     */
     public void launchCamera(View view) {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            // get the path to the DejaPhoto folder (or create it if it doesn't exist)
             File folderPath = new File(Controller.DEJAPHOTOPATH);
             if (!folderPath.exists()) folderPath.mkdirs();
 
-            String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
-            File imageFile = new File(folderPath, "DejaPhoto" + timeStamp + ".jpg");
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+            try {
+                String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
+                File imageFile = File.createTempFile("DejaPhoto" + timeStamp, ".jpg", folderPath);
+                Uri photoUri = FileProvider.getUriForFile(this, "com.DejaPhoto.fileprovider", imageFile);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
 
-            startActivity(cameraIntent);
+                Log.i("Camera", "Starting Camera Intent");
+                startActivity(cameraIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Camera", "Error Creating Photo");
+                Toast.makeText(this, "Cannot open camera", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
 
     /**
      *  -On first user, user registers a name
