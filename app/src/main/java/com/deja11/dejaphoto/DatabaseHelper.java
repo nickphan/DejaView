@@ -222,10 +222,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //TODO FIREBASE
 
-
-
-
-
         Log.i(TAGDATABASE, photoLocation + " set to released");
     }
 

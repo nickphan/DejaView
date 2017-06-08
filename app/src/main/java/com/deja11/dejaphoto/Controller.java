@@ -191,7 +191,7 @@ public class Controller implements Parcelable {
     void releasePhoto() {
         if (currPhoto != null) {
             currPhoto.setReleased(true);
-            databaseMediator.updateRelease(currPhoto.getPhotoLocation());
+            databaseMediator.updateRelease(currPhoto.getPhotoLocation(), currPhoto.getOwner());
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
                 currPhoto = cache.getLast();

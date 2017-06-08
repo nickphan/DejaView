@@ -139,9 +139,12 @@ public class DatabaseMediator {
         firebaseHelper.updateFirebase(currentUserName, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
     }
 
-    public void updateRelease(String photoLocation) {
+    public void updateRelease(String photoLocation, String owner) {
         databaseHelper.updateRelease(photoLocation);
-        firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        if(owner.equals(currentUserName)) {
+            firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        }
     }
 
 
@@ -206,4 +209,22 @@ public class DatabaseMediator {
     public ArrayList<Pair<String, String>> getFriends(String username){
         return firebaseHelper.getFriends(username);
     }
+
+
+
+
+
+
+    /**
+     *      Info that needs to get pulled from firebase for each photo
+     *          total karma
+     *          release value
+     *              if anyone releases a photo, reflect that change in sql
+     *              if an owner releases a photo, reflect that change in sql and firebase
+     *          location name
+     *              if anyone renames a photo, reflect that change in sql
+     *              if the owner of the photo renames it, reflect that change in sql and firebase
+     *
+     *
+     * */
 }
