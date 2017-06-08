@@ -57,7 +57,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends Activity {
 
     Controller controller;
     DatabaseHelper myDb;
@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
 
-    /*    controller = new Controller(this);
+        /* controller = new Controller(this);
 
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionGranted = PackageManager.PERMISSION_GRANTED;
@@ -108,10 +108,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoFolder.exists()) dejaPhotoFolder.mkdirs();
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
-
-        setContentView(R.layout.activity_main);
-        //setContentView(R.layout.test_photo_picker);
-        myContext = getApplicationContext();
 
         final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
         email = mSharedPrefcheck.getString("username", "unknown");
@@ -280,29 +276,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     @Override
     protected void onDestroy() {
-       /*
-        if(isBound){
-            unbindService(serviceConnection);
-            isBound = false;
-        }
-*/
+
        super.onDestroy();
-        // unregister the MainActivity as a listener for preference changes
-        SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPref.unregisterOnSharedPreferenceChangeListener(this);
-
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-        // the interval settings is changed
-        if (key.equals(Controller.INTERVAL_KEY)) {
-            int minutes = sharedPreferences.getInt(Controller.INTERVAL_KEY, Controller.INTERVAL_DEFAULT)
-                    + Controller.INTERVAL_OFFSET;
-            SetWallpaperService.updateInterval(minutes);
-            Log.d("Preference Changed", "Updated interval to " + minutes + " minutes");
-        }
     }
 
     /**
