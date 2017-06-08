@@ -21,8 +21,6 @@ public class Photo {
     private String owner;
     private String locationName;
 
-
-
     public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
         this.phoneLocation = phoneLocation;
         this.geoLocation = geoLocation;
