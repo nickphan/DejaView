@@ -261,8 +261,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
-                syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+
+                //Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
+                                //syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+                                        //myContext.startActivity(syncIntent);
 
             }
         }
@@ -364,7 +366,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             Log.i("Image URI", uri.getPath());
                             Log.i("Image Authority", uri.getAuthority());
                             Log.i("Scheme", uri.getScheme());
-                            Log.i("Id", DocumentsContract.getDocumentId(uri));
+                            //Log.i("Id", DocumentsContract.getDocumentId(uri));
                         }
 
                         controller.copyPhotos(uriArrayList);

@@ -41,6 +41,21 @@ public class Photo {
         this.totalKarma = totalKarma;
     }
 
+    public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma, int totalKarma, String dateString, String fileName, String owner, String locationName ){
+        this.phoneLocation = phoneLocation;
+        this.geoLocation = geoLocation;
+        this.date = date;
+        this.released = released;
+        this.mykarma = karma;
+        this.totalKarma = totalKarma;
+        this.dateString = dateString;
+        this.fileName = fileName;
+        this.owner = owner;
+        this.locationName = locationName;
+    }
+
+
+
     /**
      * Check if the photo is karma-ed
      *
