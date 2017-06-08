@@ -238,7 +238,7 @@ public class MainActivity extends Activity {
                 controller.addFriend(email);
                 Log.i("ADDFRIEND", "WHOA");
 
-                Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
             }
         });
         Log.i("ADDFRIEND", "END");
