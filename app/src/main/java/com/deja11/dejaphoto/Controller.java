@@ -329,6 +329,7 @@ public class Controller implements Parcelable {
 
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -345,8 +346,33 @@ public class Controller implements Parcelable {
 
         Canvas canvas = new Canvas(mutableBitmap);
         Matrix m = new Matrix();
-        m.setScale((float) mutableBitmap.getWidth() / photoWidth, (float) mutableBitmap.getHeight() / photoHeight);
-        canvas.drawBitmap(bitmap, m, new Paint());
+
+        int x_difference = photoWidth - mutableBitmap.getWidth() ;
+        int y_difference = photoHeight - mutableBitmap.getHeight() ;
+        int width_after_resize;
+        int height_after_resize;
+        if(x_difference <= 0 && y_difference <= 0){
+            m.setScale(1, 1);
+        }
+        else{
+            if(x_difference > 0 && y_difference > 0){
+                float ratio;
+                if(x_difference > y_difference){
+                    ratio = (float) mutableBitmap.getWidth() / photoWidth;
+                }
+                else{
+                    ratio = (float) mutableBitmap.getHeight() / photoHeight;
+                }
+                Log.d("current Ratio:", ratio+"");
+                width_after_resize = (int)ratio * photoWidth;
+                height_after_resize = (int)ratio* photoHeight;
+                bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize,
+                        height_after_resize, true);
+            }
+        }
+        int cx = (canvas.getWidth() - bitmap.getWidth()) >> 1;
+        int cy = (canvas.getHeight() - bitmap.getHeight()) >> 1;
+        canvas.drawBitmap(bitmap, cx,cy, new Paint());
     }
 
     /**
