@@ -457,9 +457,4 @@ public class MainActivity extends Activity {
         //mSharedPref.getString("username", "none");
     }
 
-
-    public void renameLocation(String location){
-
-    }
-
 }

@@ -388,6 +388,9 @@ public class FirebaseHelper {
 
             }
         });
+        //Pair<String, String> pair = friends.get(0);
+        //pair.first;
+        //pair.second;
 
         while(!check[0]){
             try{

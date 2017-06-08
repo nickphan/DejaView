@@ -110,6 +110,8 @@ public class Controller implements Parcelable {
         cache = new LinkedList<Photo>();
         user = new User();
 
+
+
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
