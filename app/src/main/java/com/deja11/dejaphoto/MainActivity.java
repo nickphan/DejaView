@@ -133,7 +133,10 @@ public class MainActivity extends Activity {
 
                 mSharedPrefcheck.edit().putString("username", username).apply();
                 //controller.createUser();
+              
+                
                 initApp();
+              
             }
         });
         //pop out the window
@@ -149,7 +152,8 @@ public class MainActivity extends Activity {
         initNotificationBar();
         initAlarms();
 
-        //controller = new Controller(this);
+        controller = new Controller(this);
+        //controller.databaseMediator.initDatabase(MainActivity.this);
     }
 
     /**
@@ -169,6 +173,7 @@ public class MainActivity extends Activity {
      * Creates the notification bar view and sets the listeners for the buttons in it
      */
     private void initNotificationBar() {
+
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
