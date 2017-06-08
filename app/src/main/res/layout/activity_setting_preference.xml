@@ -41,8 +41,11 @@
                 android:thumbTint="#46bdbf"/>
         </RelativeLayout>
         <TextView
+            android:id="@+id/set1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="on"
+            android:textSize="20dp"/>
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
@@ -61,7 +64,7 @@
     <RelativeLayout
         android:id="@+id/locationswitch"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="40dp"
         android:layout_below="@+id/seekbar_preference">
@@ -72,6 +75,7 @@
             android:text="Display Photo Location"
             android:textColor="#000000"
             android:textSize="20dp" />
+
         <Switch
             android:id="@+id/switch2"
             android:layout_width="wrap_content"
@@ -83,8 +87,15 @@
             android:scaleY="1.5"
             android:thumbTint="#46bdbf"
             />
-
     </RelativeLayout>
+    <TextView
+        android:id="@+id/set2"
+        android:layout_below="@id/locationswitch"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="on"
+        android:textSize="20dp"
+        />
 
     <RelativeLayout
         android:id="@+id/photoviewswitch"
@@ -111,7 +122,14 @@
             android:scaleY="1.5"
             android:thumbTint="#46bdbf" />
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/set3"
+        android:layout_below="@id/photoviewswitch"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="on"
+        android:textSize="20dp"
+        />
     <RelativeLayout
         android:id="@+id/friendsswitch"
         android:layout_width="wrap_content"
@@ -137,7 +155,14 @@
             android:scaleY="1.5"
             android:thumbTint="#46bdbf" />
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/set4"
+        android:layout_below="@id/friendsswitch"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="on"
+        android:textSize="20dp"
+        />
     <RelativeLayout
         android:id="@+id/shareswitch"
         android:layout_width="wrap_content"
@@ -164,5 +189,12 @@
             android:scaleY="1.5"
             android:thumbTint="#46bdbf" />
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/set5"
+        android:layout_below="@id/shareswitch"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="on"
+        android:textSize="20dp"
+        />
 </LinearLayout>
