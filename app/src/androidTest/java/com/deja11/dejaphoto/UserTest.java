@@ -13,6 +13,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -59,26 +61,30 @@ public class UserTest {
 
     @Test
     public void TestFirebaseIdeas(){
-
         final boolean[] check = new boolean[1];
-        final boolean[] sharing = new boolean[1];
-
-        check[0] = false;
-
-        final DatabaseReference databaseReference = myFirebaseRef.child("Test@gmailcom");
+        final ArrayList<String> photoNames = new ArrayList<>();
+        final ArrayList<String> date = new ArrayList<>();
+        final ArrayList<String> dejaPoints = new ArrayList<>();
+        final ArrayList<String> fileName = new ArrayList<>();
+        final ArrayList<String> geoLocationLat = new ArrayList<>();
+        final ArrayList<String> geoLocationLong = new ArrayList<>();
+        final ArrayList<String> karma = new ArrayList<>();
+        final ArrayList<String> locationName = new ArrayList<>();
+        final ArrayList<String> owner = new ArrayList<>();
+        final ArrayList<String> phoneLocation = new ArrayList<>();
+        final ArrayList<String> released = new ArrayList<>();
+        final ArrayList<String> totalKarma = new ArrayList<>();
+        final DatabaseReference databaseReference = myFirebaseRef.child("images").child("physicalDevice@teesphonecom");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String sharingString = dataSnapshot.child("sharing").getValue().toString();
-                if(sharingString.equals("true")){
-                    check[0] = true;
-                    sharing[0] = true;
-                }else{
-                    check[0] = true;
-                    sharing[0] = false;
-                }
-            }
+                for(DataSnapshot childrenSnapshot : dataSnapshot.getChildren()){
+                    photoNames.add(childrenSnapshot.getKey());
+                    date.add(childrenSnapshot.child("DATE").getValue().toString());
 
+                }
+                check[0] = true;
+            }
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -87,11 +93,13 @@ public class UserTest {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.d("Testing", "Sleeping");
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
-        assertFalse(sharing[0]);
+        assertEquals(photoNames.size(), 8);
+        assertEquals(date.size(), 8);
     }
 
 }

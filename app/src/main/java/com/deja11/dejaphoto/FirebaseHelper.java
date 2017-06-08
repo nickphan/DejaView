@@ -116,8 +116,6 @@ public class FirebaseHelper {
 
         // Create a director if it doesn't exit
 
-
-
         Query queryRef = mdejaRef.child("images").child(friendUserName);
 
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -400,7 +398,6 @@ public class FirebaseHelper {
                     for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
                         String key = friendSnapshot.getKey();
                         String val = friendSnapshot.getValue().toString();
-
                         Pair<String, String> pair = new Pair<String, String>(key, val);
                         friends.add(pair);
                     }
@@ -458,6 +455,16 @@ public class FirebaseHelper {
     public void setSharing(String name, boolean value){
         DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
         databaseReference.setValue(String.valueOf(value));
+    }
+
+
+    public void updateRelease(String username, String photoPath){
+        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        //COL_OWNER_10
+        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
     }
 
 }

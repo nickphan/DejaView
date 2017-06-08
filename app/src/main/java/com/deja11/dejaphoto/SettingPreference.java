@@ -12,11 +12,11 @@ import android.widget.ToggleButton;
 
 public class SettingPreference extends Activity {
 
-    final int TIME_OFFSET = 5;
+    final static int TIME_OFFSET = 5;
     final int MAX_TIME = 25;
     final String KEY_POSITION = "position";
     final String KEY_INTERVAL = "interval";
-    private int currentInterval = TIME_OFFSET;
+    public static int currentInterval = TIME_OFFSET;
     private static int currentPosition;
 
     //For testing purpose
@@ -24,29 +24,34 @@ public class SettingPreference extends Activity {
     public static SettingPreference getInstance() {
         if (instance == null) {setInstance(instance);}return instance;}
     public static void setInstance(SettingPreference instance) {SettingPreference.instance = instance;}
-    // For testing
     private TextView intervalText;
 
     /*For toggles*/
     Switch switchPhoto;
     TextView switchStatus;
-    private static boolean showSwitch = true;
+    public static boolean showSwitch = true;
+    private String KEY_SWITCH_PHOTO = "photoswtich";
 
     Switch switchLocation;
     TextView locationStatus;
-    private static boolean showLocation = true;
+    public static boolean showLocation = true;
+    private String KEY_LOCATION = "location";
 
     Switch switchMine;
     TextView myStatus;
-    private static boolean viewMyP = true;
+    public static boolean viewMyPhoto = true;
+    private String KEY_VIEW_MY_PHOTOS = "viewMyPhotos";
 
     Switch switchFriends;
     TextView friendsStatus;
-    private static boolean viewFrP = true;
+    public static boolean viewFriendPhoto = true;
+    private String KEY_VIEW_FRIENDS_PHOTOS = "viewFriendsPhotos";
 
     Switch switchSharing;
     TextView sharingStatus;
-    private static boolean sharing = true;
+    public static boolean sharing = true;
+    private String KEY_SHARING = "sharing";
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -59,8 +64,8 @@ public class SettingPreference extends Activity {
         /* For all the toggles*/
         switchPhoto = (Switch) findViewById(R.id.switch1);
         switchStatus = (TextView) findViewById(R.id.set1);
-        showSwitch = getCurrentStatus("photoswitch");
-        updateStatus(showSwitch,switchStatus,switchPhoto);
+        showSwitch = getCurrentStatus(KEY_SWITCH_PHOTO);
+        updateStatus(showSwitch, switchStatus, switchPhoto);
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         enableSlider(seekBar);
         if(!showSwitch){
@@ -75,63 +80,62 @@ public class SettingPreference extends Activity {
                 else{
                     seekBar.setEnabled(false);
                 }
-                saveStatus("photoswitch", isChecked);
+                saveStatus(KEY_SWITCH_PHOTO, isChecked);
             }
         });
 
         /* For all the toggles*/
         switchLocation = (Switch) findViewById(R.id.switch2);
         locationStatus = (TextView) findViewById(R.id.set2);
-        showLocation = getCurrentStatus("location");
+        showLocation = getCurrentStatus(KEY_LOCATION);
         updateStatus(showLocation,locationStatus,switchLocation);
         switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, locationStatus, switchLocation);
-                saveStatus("location", isChecked);
+                saveStatus(KEY_LOCATION, isChecked);
             }
         });
 
         switchMine = (Switch) findViewById(R.id.switch3);
         myStatus = (TextView) findViewById(R.id.set3);
-        viewMyP = getCurrentStatus("viewMyPhotos");
-        updateStatus(viewMyP,myStatus,switchMine);
+        viewMyPhoto = getCurrentStatus(KEY_VIEW_MY_PHOTOS);
+        updateStatus(viewMyPhoto,myStatus,switchMine);
         switchMine.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, myStatus, switchMine);
-                saveStatus("viewMyPhotos", isChecked);
+                saveStatus(KEY_VIEW_MY_PHOTOS, isChecked);
             }
         });
 
         switchFriends = (Switch) findViewById(R.id.switch4);
         friendsStatus = (TextView) findViewById(R.id.set4);
-        viewFrP = getCurrentStatus("viewFriendsPhotos");
-        updateStatus(viewFrP,friendsStatus,switchFriends);
+        viewFriendPhoto = getCurrentStatus(KEY_VIEW_FRIENDS_PHOTOS);
+        updateStatus(viewFriendPhoto,friendsStatus,switchFriends);
         switchFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, friendsStatus, switchFriends);
-                saveStatus("viewFriendsPhotos", isChecked);
+                saveStatus(KEY_VIEW_FRIENDS_PHOTOS, isChecked);
             }
         });
 
         switchSharing = (Switch) findViewById(R.id.switch5);
         sharingStatus = (TextView) findViewById(R.id.set5);
-        sharing = getCurrentStatus("sharing");
+        sharing = getCurrentStatus(KEY_SHARING);
         updateStatus(sharing,sharingStatus,switchSharing);
         switchSharing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStatus(isChecked, sharingStatus, switchSharing);
-                saveStatus("sharing", isChecked);
+                saveStatus(KEY_SHARING, isChecked);
             }
         });
     }
 
-
-    void saveStatus(String key, boolean status){
+    private void saveStatus(String key, boolean status){
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.edit().putBoolean(key, status).apply();
     }
 
-    boolean getCurrentStatus(String key){
+    private boolean getCurrentStatus(String key){
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             boolean status = mSharedPrefs.getBoolean(key, true);
@@ -141,7 +145,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    void updateStatus(boolean isChecked, TextView view, Switch switchButton){
+    private void updateStatus(boolean isChecked, TextView view, Switch switchButton){
         if (isChecked) {
             view.setText("on");
 
@@ -151,12 +155,15 @@ public class SettingPreference extends Activity {
         switchButton.setChecked(isChecked);
     }
 
-    void enableSlider( SeekBar seekBar){
+    private void enableSlider( SeekBar seekBar){
         seekBar.setMax(MAX_TIME);
         intervalText = (TextView) findViewById(R.id.seekbarvalue);
-        currentInterval = getCurrentProgress();
+
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        currentInterval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
+
         seekBar.setProgress(currentInterval);
-        currentPosition = getCurrentLocation();
+        currentPosition = getCurrentPosition();
         setText(seekBar, intervalText, currentInterval, currentPosition);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -178,38 +185,6 @@ public class SettingPreference extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
-    }
-
-    boolean getShowLocation(){
-        return showLocation;
-    }
-
-    boolean getMyP(){
-        return viewMyP;
-    }
-
-    boolean getFrP(){
-        return viewFrP;
-    }
-
-    boolean getSharing(){
-        return sharing;
-    }
-
-
-    /**
-     * For Testing purpose
-     *
-     * @param seekBar  the seekbar object
-     * @param interval the current time interval
-     * @param fromUser true if the user updates the tme interval
-     */
-    public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
-        currentInterval = interval;
-        int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
-        currentPosition = val;
-        saveProgressAndLocation();
     }
 
     private void setText(SeekBar seekBar, TextView progressText, int interval, int val) {
@@ -224,17 +199,7 @@ public class SettingPreference extends Activity {
         mSharedPrefs.edit().putInt(KEY_POSITION, currentPosition).apply();
     }
 
-    private int getCurrentProgress() {
-        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        try {
-            int interval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
-            return interval;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private int getCurrentLocation() {
+    private int getCurrentPosition() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             int position = mSharedPrefs.getInt(KEY_POSITION, 0);
@@ -243,4 +208,19 @@ public class SettingPreference extends Activity {
             return 0;
         }
     }
+
+    /**
+     * For Testing purpose
+     * @param seekBar  the seekbar object
+     * @param interval the current time interval
+     * @param fromUser true if the user updates the tme interval
+     */
+    public void onProgressChanged(SeekBar seekBar, int interval, boolean fromUser) {
+        currentInterval = interval;
+        int val = (interval * (seekBar.getWidth() - 2 * seekBar.getThumbOffset())) / seekBar.getMax();
+        currentPosition = val;
+        saveProgressAndLocation();
+    }
+
+
 }
