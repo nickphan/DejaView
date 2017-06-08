@@ -117,9 +117,9 @@ public class UserTest {
     @Test
     public void TestCreateUser(){
         databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
-        databaseMediator.createUser("nick1@ucsdedu");
-        databaseMediator.createUser("nick2@ucsdedu");
-        databaseMediator.createUser("nick3@ucsdedu");
+        //databaseMediator.createUser("nick1@ucsdedu");
+        //databaseMediator.createUser("nick2@ucsdedu");
+        //databaseMediator.createUser("nick3@ucsdedu");
         assertTrue(true);
     }
 
@@ -129,6 +129,13 @@ public class UserTest {
         //databaseMediator.addFriendFirebase("nick2@ucsdedu", "nick1@ucsdedu");
         //databaseMediator.addFriendFirebase("nick1@ucsdedu", "nick2@ucsdedu");
         databaseMediator.addFriendFirebase("nick3@ucsdedu", "nick2@ucsdedu");
+        assertTrue(true);
+    }
+
+    @Test
+    public void TestSetSharing(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        databaseMediator.setSharing("nick1@ucsdedu", false);
         assertTrue(true);
     }
 

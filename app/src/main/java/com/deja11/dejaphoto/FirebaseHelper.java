@@ -329,6 +329,11 @@ public class FirebaseHelper {
         databaseReference.child(username).child("friends").child("fake").setValue("false");
     }
 
+    public void setSharing(String name, boolean value){
+        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
+        databaseReference.setValue(String.valueOf(value));
+    }
+
 
 
 
@@ -440,10 +445,6 @@ public class FirebaseHelper {
     }
 
 
-    public void setSharing(String name, boolean value){
-        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
-        databaseReference.setValue(String.valueOf(value));
-    }
 
 
     public void updateRelease(String username, String photoPath){
