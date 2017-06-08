@@ -10,14 +10,16 @@ import android.util.Log;
 
 /**
  * Created by Carl on 6/4/2017.
+ *
+ * This class is a receiver for the left button (previous photo) in the notification bar.
  */
 public class LeftReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("Button Clicked", "Left Button / Previous Photo Button");
+        Log.d("Receiver", "Left Button (Previous Photo)");
 
-        // reset the alarm by cancelling then rescheduling
+        // reset the alarm by cancelling it and then rescheduling
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
                 Controller.ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -25,6 +27,7 @@ public class LeftReceiver extends BroadcastReceiver {
 
         mAlarmManager.cancel(alarmPIntent);
 
+        // reschedule the alarm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);

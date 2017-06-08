@@ -10,6 +10,9 @@ import android.util.Log;
 
 /**
  * Created by Carl on 6/7/2017.
+ *
+ * This class is a receiver that waits for the sync alarm to fire.
+ * The alarm is for syncing the local database with the cloud.
  */
 
 public class SyncReceiver extends BroadcastReceiver {

@@ -56,29 +56,6 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     Controller controller;
-
-    private static final int INTERVAL_OFFSET = 5; // offset for the interval
-    private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
-    private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
-
-    // request codes for each pending intent
-    private static final int LEFT_PENDING_INTENT_RC = 0;
-    private static final int RIGHT_PENDING_INTENT_RC = 1;
-    private static final int KARMA_PENDING_INTENT_RC = 2;
-    private static final int RELEASE_PENDING_INTENT_RC = 3;
-    private static final int ALARM_PENDING_INTENT_RC = 4;
-    private static final int NOTIFICATION_ID = 123;
-    private static final int PHOTO_PICKER_SINGLE_CODE = 5;
-    private static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
-
-    // codes for identifying which action the service has to execute
-    private static final String CODE_KEY = "Order";
-    private static final int CODE_NEXT_PHOTO = 1;
-    private static final int CODE_PREVIOUS_PHOTO = 2;
-    private static final int CODE_KARMA = 3;
-    private static final int CODE_RELEASE = 4;
-    private static final int CODE_SYNC = 5;
-
     DatabaseHelper myDb;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
@@ -105,8 +82,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.test_photo_picker);
 
-        controller = new Controller(this);
-/*
+    /*    controller = new Controller(this);
+
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionGranted = PackageManager.PERMISSION_GRANTED;
 
@@ -116,7 +93,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
-/*
+
         // creating folders for the app if they do not exist
         File dejaPhotoFolder = new File(Controller.DEJAPHOTOPATH);
         File dejaPhotoCopiedFolder = new File(Controller.DEJAPHOTOCOPIEDPATH);
@@ -142,7 +119,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
             }
         });
-/*
+
         // For Junit test
         setInstance(this);
 
@@ -150,38 +127,32 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
 
-        // initialize the value of the interval using shared preferences, if applicable
-        SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        SetWallpaperService.updateInterval(mSharedPref.getInt(INTERVAL_KEY, INTERVAL_DEFAULT)
-                + INTERVAL_OFFSET);
-
-        // register the mainActivity to detect any changes in preferences
-        mSharedPref.registerOnSharedPreferenceChangeListener(this);
-
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
 
+        // register the intents to each of the buttons in the notification bar
         Intent leftButtonIntent = new Intent("left_button_receiver");
         PendingIntent leftButtonPIntent = PendingIntent.getBroadcast(this,
-                LEFT_PENDING_INTENT_RC, leftButtonIntent, 0);
+                Controller.LEFT_PENDING_INTENT_RC, leftButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.previous, leftButtonPIntent);
 
         Intent rightButtonIntent = new Intent("right_button_receiver");
         PendingIntent rightButtonPIntent = PendingIntent.getBroadcast(this,
-                RIGHT_PENDING_INTENT_RC, rightButtonIntent, 0);
+                Controller.RIGHT_PENDING_INTENT_RC, rightButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.next, rightButtonPIntent);
 
         Intent karmaButtonIntent = new Intent("karma_button_receiver");
         PendingIntent karmaButtonPIntent = PendingIntent.getBroadcast(this,
-                KARMA_PENDING_INTENT_RC, karmaButtonIntent, 0);
+                Controller.KARMA_PENDING_INTENT_RC, karmaButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.karma, karmaButtonPIntent);
 
         Intent releaseButtonIntent = new Intent("release_button_receiver");
         PendingIntent releaseButtonPIntent = PendingIntent.getBroadcast(this,
-                RELEASE_PENDING_INTENT_RC, releaseButtonIntent, 0);
+                Controller.RELEASE_PENDING_INTENT_RC, releaseButtonIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.release, releaseButtonPIntent);
-        //set the icon and time and build the notification of deja photo
+
+        // set the icon and time and build the notification of deja photo
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_wallpaper)
                 .setWhen(System.currentTimeMillis())
@@ -191,9 +162,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         // call the notification manager to show the notification in the status bar
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotificationManager.notify(NOTIFICATION_ID, notification);
+        mNotificationManager.notify(Controller.NOTIFICATION_ID, notification);
 
-        // Setting up the alarm
+
         int timer;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         try {
@@ -203,31 +174,27 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             timer = 300000;
         }
         Log.i("TIMER", Integer.toString(timer));
+
+
+        // setting up the alarms for changing wallpaper and syncing the database
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this,
-                ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-
-            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis(), alarmPIntent);
-        } else {
-            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
-        }
-
+                Controller.ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent syncIntent = new Intent("sync_receiver");
         PendingIntent syncPIntent = PendingIntent.getBroadcast(this,
                 Controller.SYNC_PENDING_INTENT_RC, syncIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-
+            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis(), alarmPIntent);
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), syncPIntent);
         } else {
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
         }
@@ -274,7 +241,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                     e.printStackTrace();
                 }
                 Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
-                syncIntent.putExtra(CODE_KEY, CODE_SYNC);
+                syncIntent.putExtra(Controller.CODE_KEY, Controller.CODE_SYNC);
 
             }
         }
@@ -388,10 +355,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                             ClipData.Item item = clipData.getItemAt(i);
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
-                            Log.i("Image URI", uri.getPath());
-                            Log.i("Image Authority", uri.getAuthority());
-                            Log.i("Scheme", uri.getScheme());
-                            Log.i("Id", DocumentsContract.getDocumentId(uri));
                         }
 
                         controller.copyPhotos(uriArrayList);

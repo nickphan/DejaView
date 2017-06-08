@@ -43,10 +43,10 @@ import java.util.LinkedList;
 
 public class Controller implements Parcelable {
 
-
     public static final int INTERVAL_OFFSET = 5; // offset for the interval
     public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
     public static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+
     public static final int SYNC_INTERVAL = 10000;
 
     // request codes for each pending intent
