@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
+import static com.deja11.dejaphoto.R.id.username;
+
 /**
  * Created by shuai9532 on 5/6/17.
  */
@@ -87,7 +89,7 @@ public class Controller implements Parcelable {
 
 
 
-    private DatabaseMediator databaseMediator;
+    public DatabaseMediator databaseMediator;
 
     private Context context;
     private Photo currPhoto;
@@ -131,11 +133,8 @@ public class Controller implements Parcelable {
         databaseMediator.updatePoint(getUserCurrentLocation(), getUserCalendar());
         Photo photo = databaseMediator.getNextPhoto();
         if (currPhoto == null) {
-            if (photo.isReleased()) {
-                return getNextPhoto();
-            } else {
-                return photo;
-            }
+            return photo;
+
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -191,11 +190,13 @@ public class Controller implements Parcelable {
      * Set current photo karma field to true
      */
     public boolean karmaPhoto() {
+        Log.d("Karma", "Karma button clicked");
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
             photo.incrementKarma();
             databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
+            Log.d("Karma", "controller username to be karma "+username+ " // " +photo.getPhotoLocation());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");
@@ -329,6 +330,7 @@ public class Controller implements Parcelable {
 
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -345,8 +347,11 @@ public class Controller implements Parcelable {
 
         Canvas canvas = new Canvas(mutableBitmap);
         Matrix m = new Matrix();
+
         int x_difference = photoWidth - mutableBitmap.getWidth() ;
         int y_difference = photoHeight - mutableBitmap.getHeight() ;
+        int width_after_resize;
+        int height_after_resize;
         if(x_difference <= 0 && y_difference <= 0){
             m.setScale(1, 1);
         }
@@ -360,10 +365,15 @@ public class Controller implements Parcelable {
                     ratio = (float) mutableBitmap.getHeight() / photoHeight;
                 }
                 Log.d("current Ratio:", ratio+"");
-                m.setScale(ratio, ratio);
+                width_after_resize = (int)ratio * photoWidth;
+                height_after_resize = (int)ratio* photoHeight;
+                bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize,
+                        height_after_resize, true);
             }
         }
-        canvas.drawBitmap(bitmap, m, new Paint());
+        int cx = (canvas.getWidth() - bitmap.getWidth()) >> 1;
+        int cy = (canvas.getHeight() - bitmap.getHeight()) >> 1;
+        canvas.drawBitmap(bitmap, cx,cy, new Paint());
     }
 
     /**

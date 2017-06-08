@@ -2,10 +2,12 @@ package com.deja11.dejaphoto;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -25,7 +27,6 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
 import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
-import static com.deja11.dejaphoto.DatabaseHelper.currentUserName;
 
 import android.Manifest;
 import android.app.Activity;
@@ -74,11 +75,13 @@ import java.util.Random;
 public class DatabaseMediator {
     private DatabaseHelper databaseHelper;
     private FirebaseHelper firebaseHelper;
+    private Context context;
 
     public DatabaseMediator(Context context){
         databaseHelper = new DatabaseHelper(context);
         firebaseHelper = new FirebaseHelper(context);
         this.initDatabase(context);
+        this.context = context;
         //databaseHelper.initialize(context);
     }
 
@@ -87,6 +90,17 @@ public class DatabaseMediator {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }else{
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String username = sharedPreferences.getString("username", "unknown");
+
+
+            if(username.equals("unknown")){
+                return;
+            }
+
+
+
             // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
             Cursor cursor = gatherPhotoInfo(context);
 
@@ -113,9 +127,9 @@ public class DatabaseMediator {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);
-                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, currentUserName, defaultLocation, 0);
+                    databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, username, defaultLocation, 0);
 
-                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,currentUserName,defaultLocation, "0");
+                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,username,defaultLocation, "0");
 
                 }
                 }
@@ -132,19 +146,26 @@ public class DatabaseMediator {
     }
 
     public void updateKarma(String photoLocation, int totalKarma) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+
+
         databaseHelper.updateKarma(photoLocation, totalKarma);
         //TODO FIREBASE
-        firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_KARMA_8,"1");
+        firebaseHelper.updateFirebase(username, photoLocation ,COL_KARMA_8,"1");
         int karma = totalKarma+1;
-        firebaseHelper.updateFirebase(currentUserName, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
+        firebaseHelper.updateFirebase(username, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
+        Log.d("Karma", "database mediator username to be karma "+username+ " // " +photoLocation);
     }
 
     public void updateRelease(String photoLocation, String owner) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
         databaseHelper.updateRelease(photoLocation);
         //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
-        if(owner.equals(currentUserName)) {
+        if(owner.equals(username)) {
             //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
-            firebaseHelper.updateRelease(currentUserName, photoLocation);
+            firebaseHelper.updateRelease(username, photoLocation);
         }
     }
 
