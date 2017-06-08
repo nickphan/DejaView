@@ -222,6 +222,21 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                     System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
         }
 
+
+        Intent syncIntent = new Intent("sync_receiver");
+        PendingIntent syncPIntent = PendingIntent.getBroadcast(this,
+                Controller.SYNC_PENDING_INTENT_RC, syncIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis(), syncPIntent);
+        } else {
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
+        }
+
         // add a listener for the settings button
         ImageButton setting = (ImageButton) findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {

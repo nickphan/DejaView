@@ -45,6 +45,7 @@ public class Controller implements Parcelable {
     public static final int INTERVAL_OFFSET = 5; // offset for the interval
     public static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
     public static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    public static final int SYNC_INTERVAL = 10000;
 
     // request codes for each pending intent
     public static final int LEFT_PENDING_INTENT_RC = 0;
@@ -52,6 +53,7 @@ public class Controller implements Parcelable {
     public static final int KARMA_PENDING_INTENT_RC = 2;
     public static final int RELEASE_PENDING_INTENT_RC = 3;
     public static final int ALARM_PENDING_INTENT_RC = 4;
+    public static final int SYNC_PENDING_INTENT_RC = 5;
     public static final int NOTIFICATION_ID = 123;
     public static final int PHOTO_PICKER_SINGLE_CODE = 5;
     public static final int PHOTO_PICKER_MULTIPLE_CODE = 6;
@@ -62,6 +64,7 @@ public class Controller implements Parcelable {
     public static final int CODE_PREVIOUS_PHOTO = 2;
     public static final int CODE_KARMA = 3;
     public static final int CODE_RELEASE = 4;
+    public static final int CODE_SYNC = 5;
 
     // string paths of the dejaFolders
     public static final String DEJAPHOTOPATH = Environment.getExternalStorageDirectory() + "/DejaPhoto";
