@@ -192,6 +192,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public void updateField(String photoLocation, String column, String newValue){
+        int id = findIdByColumn(COL_PATH_2, photoLocation);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Put data id and new data in a container
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_ID_1, id);
+        contentValues.put(column, newValue);
+
+        Log.i(TAGDATABASE, "Data updated correctly");
+        db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)});
+
+
+    }
+
     /**
      * Update the value of the karma to 1
      *

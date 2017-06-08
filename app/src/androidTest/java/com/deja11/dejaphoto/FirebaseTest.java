@@ -16,8 +16,8 @@ public class FirebaseTest {
 
     @Test
     public void TestCreateDatabase() {
-        //Create database
-        //testDb = new DatabaseHelper(mainActivity.getActivity());
-        //assertTrue("Database created", true);
+
+
+
     }
 }
