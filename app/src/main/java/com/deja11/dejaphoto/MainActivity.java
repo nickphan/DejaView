@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -24,7 +25,9 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
@@ -34,6 +37,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
 
@@ -60,6 +64,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private static final int INTERVAL_OFFSET = 5; // offset for the interval
     private static final String INTERVAL_KEY = "progress"; // the key for the interval in the shared preferences
     private static final int INTERVAL_DEFAULT = 0; // default value for the interval in the shared preferences
+    private static final String USERNAME_KEY = "username"; // acquire the username
 
     // request codes for each pending intent
     private static final int LEFT_PENDING_INTENT_RC = 0;
@@ -97,6 +102,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         MainActivity.instance = instance;
     }
 
+    //login email
+    String email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -126,11 +133,29 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
 
-
-
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
         myContext = getApplicationContext();
+
+        final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        email = mSharedPrefcheck.getString("username", "unknown");
+        if(email.equals("unknown")){
+            View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            final EditText mEmail = (EditText) v.findViewById(R.id.username);
+            builder.setView(v).setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    email = mEmail.getText().toString();
+                    Log.e("the input username: ", email);
+                    Log.d("To SharedPreference: ", email);
+                    mSharedPrefcheck.edit().putString("username",email).apply();
+                }
+            });
+            //pop out the window
+            builder.create().show();
+
+        }
 
         myFirebaseRef = database.getReference().child("name").child("123");
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -256,18 +281,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             while(true){
 
                 try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
-                //downloadPhotos();
-
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                Log.d("Sync", "Happening");
                 //Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
                                 //syncIntent.putExtra(CODE_KEY, CODE_SYNC);
                                         //myContext.startActivity(syncIntent);
-
             }
         }
     }
@@ -359,6 +376,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      * @param resultCode the code for how things went
      * @param data the returned intent with the data we want
      * */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
