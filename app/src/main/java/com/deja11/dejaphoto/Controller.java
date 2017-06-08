@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
+import static com.deja11.dejaphoto.R.id.username;
+
 /**
  * Created by shuai9532 on 5/6/17.
  */
@@ -105,18 +107,13 @@ public class Controller implements Parcelable {
         this.context = context;
 
         databaseMediator = new DatabaseMediator(context);
-        //databaseMediator.init(this.context);
-
         cache = new LinkedList<Photo>();
-
         user = new User();
-
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
         initialize();
-        //databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
         screenw = width;
@@ -135,11 +132,8 @@ public class Controller implements Parcelable {
         databaseMediator.updatePoint(getUserCurrentLocation(), getUserCalendar());
         Photo photo = databaseMediator.getNextPhoto();
         if (currPhoto == null) {
-            if (photo.isReleased()) {
-                return getNextPhoto();
-            } else {
-                return photo;
-            }
+            return photo;
+
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -195,11 +189,13 @@ public class Controller implements Parcelable {
      * Set current photo karma field to true
      */
     public boolean karmaPhoto() {
+        Log.d("Karma", "Karma button clicked");
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
             photo.incrementKarma();
             databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
+            Log.d("Karma", "controller username to be karma "+username+ " // " +photo.getPhotoLocation());
             return true;
         } else {
             Log.i("karmaPhoto", "photo karma is true");
@@ -554,7 +550,11 @@ public class Controller implements Parcelable {
     }
 
     public void addFriend(String friendName){
-        databaseMediator.addFriendFirebase(user.getUsername(), friendName);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        Log.i("AddFriendUser", username);
+        Log.i("AddFriendFriend", friendName);
+        databaseMediator.addFriendFirebase(username, friendName);
     }
 
     public void sync(){

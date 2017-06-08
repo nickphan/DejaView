@@ -122,10 +122,10 @@ public class MainActivity extends Activity {
                     Log.d("To SharedPreference: ", email);
                     //int dot = email.indexOf('.');
                     //String username = email.substring(0,dot) + email.substring(dot+1);
-
                     mSharedPrefcheck.edit().putString("username",email).apply();
+
                     controller.createUser();
-                    //controller.databaseMediator.initDatabase(MainActivity.this);
+                    controller.databaseMediator.initDatabase(MainActivity.this);
                 }
             });
             //pop out the window

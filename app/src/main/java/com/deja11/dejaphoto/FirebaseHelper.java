@@ -316,6 +316,7 @@ public class FirebaseHelper {
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
         mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue("1");
+        Log.d("Karma", "images/"+userName+"/"+photoNameFix+"/"+column+"/"+newValue);
         //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
 
     }
@@ -353,6 +354,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("FirebaseHelper", "LOOPER");
             }catch (Exception e){
                 e.printStackTrace();
             }

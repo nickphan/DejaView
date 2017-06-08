@@ -149,11 +149,13 @@ public class DatabaseMediator {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
 
+
         databaseHelper.updateKarma(photoLocation, totalKarma);
         //TODO FIREBASE
         firebaseHelper.updateFirebase(username, photoLocation ,COL_KARMA_8,"1");
         int karma = totalKarma+1;
         firebaseHelper.updateFirebase(username, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
+        Log.d("Karma", "database mediator username to be karma "+username+ " // " +photoLocation);
     }
 
     public void updateRelease(String photoLocation, String owner) {
