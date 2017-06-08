@@ -123,13 +123,12 @@ public class MainActivity extends Activity {
                     int dot = email.indexOf('.');
                     String username = email.substring(0,dot) + email.substring(dot+1);
 
-                    mSharedPrefcheck.edit().putString("username",email).apply();
+                    mSharedPrefcheck.edit().putString("username",username).apply();
                     controller.createUser();
                 }
             });
             //pop out the window
             builder.create().show();
-
         }
 
         myFirebaseRef = database.getReference().child("name").child("123");
@@ -224,6 +223,7 @@ public class MainActivity extends Activity {
 
     public void addFriends(View view){
         //final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        Log.i("ADDFRIEND", "START");
         View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.add_friend_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         final EditText mEmail = (EditText) v.findViewById(R.id.username);
@@ -238,10 +238,13 @@ public class MainActivity extends Activity {
 
                 //access to the firebase and then add the name
                 */
+                controller.addFriend(email);
+                Log.i("ADDFRIEND", "WHOA");
+
                 Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
             }
         });
-
+        Log.i("ADDFRIEND", "END");
         //pop out the window
         builder.create().show();
 
