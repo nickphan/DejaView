@@ -349,7 +349,24 @@ public class Controller implements Parcelable {
 
         Canvas canvas = new Canvas(mutableBitmap);
         Matrix m = new Matrix();
-        m.setScale((float) mutableBitmap.getWidth() / photoWidth, (float) mutableBitmap.getHeight() / photoHeight);
+        int x_difference = photoWidth - mutableBitmap.getWidth() ;
+        int y_difference = photoHeight - mutableBitmap.getHeight() ;
+        if(x_difference <= 0 && y_difference <= 0){
+            m.setScale(1, 1);
+        }
+        else{
+            if(x_difference > 0 && y_difference > 0){
+                float ratio;
+                if(x_difference > y_difference){
+                    ratio = (float) mutableBitmap.getWidth() / photoWidth;
+                }
+                else{
+                    ratio = (float) mutableBitmap.getHeight() / photoHeight;
+                }
+                Log.d("current Ratio:", ratio+"");
+                m.setScale(ratio, ratio);
+            }
+        }
         canvas.drawBitmap(bitmap, m, new Paint());
     }
 

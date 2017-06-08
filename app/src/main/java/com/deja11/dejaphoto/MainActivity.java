@@ -120,10 +120,11 @@ public class MainActivity extends Activity {
                     email = mEmail.getText().toString();
                     Log.e("the input username: ", email);
                     Log.d("To SharedPreference: ", email);
+                    /*
                     int dot = email.indexOf('.');
                     String username = email.substring(0,dot) + email.substring(dot+1);
-
-                    mSharedPrefcheck.edit().putString("username",username).apply();
+*/
+                    mSharedPrefcheck.edit().putString("username",email).apply();
                     controller.createUser();
                 }
             });
@@ -358,7 +359,6 @@ public class MainActivity extends Activity {
      * */
     public boolean checkUserExists(String username){
         DatabaseReference databaseReference = myFirebaseRef.child("user");
-
 
         Query queryRef = databaseReference.orderByChild("username").equalTo(username);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
