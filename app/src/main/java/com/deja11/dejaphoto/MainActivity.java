@@ -232,7 +232,9 @@ public class MainActivity extends Activity {
                     System.currentTimeMillis(), syncPIntent);
         } else {
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
+                    System.currentTimeMillis(),
+                    (SettingPreference.currentInterval + Controller.INTERVAL_OFFSET) * Controller.MIN_TO_MS,
+                    alarmPIntent);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
         }
@@ -290,20 +292,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Launches the gallery for a single photo
-     * @param view, the view that calls it
-     */
-    public void getSingleImageFromGallery(View view){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String pictureDirectoryPath = pictureDirectory.getPath();
-        Uri data = Uri.parse(pictureDirectoryPath);
-        photoPickerIntent.setDataAndType(data, "image/*");
-        startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
-    }
-
-    /**
-     * OnClick function for the Import Photos button
+     * OnClick function for the Import Photos button.
      * Launches the gallery and lets the user select photos.
      *
      * @param view, the view that calls this method
@@ -319,6 +308,21 @@ public class MainActivity extends Activity {
         Uri data = Uri.parse(pictureDirectoryPath);
         photoPickerIntent.setDataAndType(data, "image/*");
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), Controller.PHOTO_PICKER_MULTIPLE_CODE);
+    }
+
+    /**
+     *
+     * OnClick function for the Rename Location button.
+     * Launches the gallery for a single photo
+     * @param view, the view that calls it
+     */
+    public void getSingleImageFromGallery(View view){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        Uri data = Uri.parse(pictureDirectoryPath);
+        photoPickerIntent.setDataAndType(data, "image/*");
+        startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
     }
 
     /**
@@ -341,7 +345,6 @@ public class MainActivity extends Activity {
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
                         controller.updateLocationName(path,newLocation);
-
                     }
                 });
 
