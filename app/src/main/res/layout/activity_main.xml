@@ -82,7 +82,8 @@
             android:layout_height="wrap_content"
             android:text="import photos"
             android:layout_row="1"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:onClick="getMultipleImagesFromGallery"/>
         <Button
             android:id="@+id/renamelocation"
             android:layout_width="wrap_content"

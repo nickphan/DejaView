@@ -6,18 +6,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
  * Created by Carl on 6/4/2017.
+ *
+ * This class is a receiver for the release button in the notification bar.
  */
 public class ReleaseReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("Receiver", "Release Button");
         Toast.makeText(context, "Photo released", Toast.LENGTH_SHORT).show();
 
-        // reset the alarm by cancelling then rescheduling
+        // reset the alarm by cancelling it and then rescheduling
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(context,
                 Controller.ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -25,6 +29,7 @@ public class ReleaseReceiver extends BroadcastReceiver {
 
         mAlarmManager.cancel(alarmPIntent);
 
+        // reschedule the alarm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis() + SetWallpaperService.interval, alarmPIntent);
