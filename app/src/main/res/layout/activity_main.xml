@@ -96,7 +96,7 @@
         android:id="@+id/camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="settingsClicked"
+        android:onClick="launchCamera"
         android:src="@drawable/ic_photo_camera_black_24dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
