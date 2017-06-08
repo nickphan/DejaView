@@ -95,6 +95,9 @@ public class DatabaseMediator {
             String username = sharedPreferences.getString("username", "unknown");
 
 
+            if(username.equals("unknown")){
+                return;
+            }
 
 
 

@@ -420,6 +420,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         }
 
+        if(res.getCount() == 0){
+
+            Log.d("CHOOSING PHOTO","database is empty");
+            return "empty";
+        }
+
         // Choose randomly among those top 5 or random data
         randomPosition = rand.nextInt(res.getCount());
         res.moveToPosition(randomPosition);
@@ -440,9 +446,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Photo getNextPhoto() {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        String nextphotoLocation = chooseNextPath();
+
+        if(nextphotoLocation.equals("empty")){
+
+            Log.d("CHOOSING PHOTO","next photo returned is also empty");
+            return null;
+        }
+
+
         // get a random photo an then get all their information
         // Select * from photo_table where phonelocation = chooseNextPath()
-        Cursor res = db.query(true, TABLE_NAME, null, COL_PATH_2 + "='" + chooseNextPath() + "'", null, null, null, null, null);
+
+
+        Cursor res = db.query(true, TABLE_NAME, null, COL_PATH_2 + "='" + nextphotoLocation + "'", null, null, null, null, null);
 
         res.moveToNext();
 
