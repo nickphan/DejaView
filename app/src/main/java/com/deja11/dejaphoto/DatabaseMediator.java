@@ -143,10 +143,10 @@ public class DatabaseMediator {
         databaseHelper.updateRelease(photoLocation);
         //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
         if(owner.equals(currentUserName)) {
-            firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+            //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+            firebaseHelper.updateRelease(currentUserName, photoLocation);
         }
     }
-
 
 
     public void downloadFriendPhotos(Context context) {
@@ -210,7 +210,9 @@ public class DatabaseMediator {
         return firebaseHelper.getFriends(username);
     }
 
-
+    public void setLocationName(String locationName, String phoneLocation) {
+        databaseHelper.updateField(phoneLocation, DatabaseHelper.COL_LOC_NAME_11, locationName);
+    }
 
 
 

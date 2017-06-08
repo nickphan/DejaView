@@ -405,7 +405,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void onActivityResult(int requestCode, int resultCode, final Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
-
                 View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.rename_location_dialog, null);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 final EditText location = (EditText) v.findViewById(R.id.locationname);
@@ -415,11 +414,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         String newLocation = location.getText().toString();
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
-                        // TODO: 6/7/17 waiting for chris
+                        controller.updateLocationName(imageData,path);
 
                     }
                 });
-                /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
+
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
                 /* SINGLE RETURNED. SHOULD NEVER COME HERE */
@@ -496,6 +495,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         //
         //mSharedPref.getString("username", "none");
+    }
+
+
+    public void renameLocation(String location){
+
     }
 
 }

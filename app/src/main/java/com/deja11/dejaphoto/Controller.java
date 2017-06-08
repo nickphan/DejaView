@@ -552,8 +552,14 @@ public class Controller implements Parcelable {
         }
     }
 
+    public void updateLocationName(Uri photoUri, String locationName) {
+        String directoryPath = photoUri.getPath();
+        databaseMediator.setLocationName(locationName, directoryPath);
+    }
+
     public void sync(){
         databaseMediator.downloadFriendPhotos(context);
     }
+    //sync should also look for karma, release, and name
 
 }
