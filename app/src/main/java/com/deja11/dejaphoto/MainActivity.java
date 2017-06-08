@@ -85,20 +85,19 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        //setContentView(R.layout.activity_main);
-        setContentView(R.layout.test_photo_picker);
+        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.test_photo_picker);
 
+        // For Junit test
+        setInstance(this);
 
-        /* controller = new Controller(this);
+        controller = new Controller(this);
 
-        int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permissionGranted = PackageManager.PERMISSION_GRANTED;
-
-        Log.i("Has Permission", hasPermission + "");
-        Log.i("Permission Granted", permissionGranted + "");
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        // request for permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
         // create folders for the app if they do not exist
@@ -138,21 +137,12 @@ public class MainActivity extends Activity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
                 Toast.makeText(getBaseContext(), data.toString(), Toast.LENGTH_LONG).show();
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
-
-        // For Junit test
-        setInstance(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
 
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
@@ -191,18 +181,6 @@ public class MainActivity extends Activity {
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(Controller.NOTIFICATION_ID, notification);
 
-
-        int timer;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        try {
-            timer = 300000 + sharedPreferences.getInt("Progress", 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            timer = 300000;
-        }
-        Log.i("TIMER", Integer.toString(timer));
-
-
         // setting up the alarms for changing wallpaper and syncing the database
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this,
@@ -225,55 +203,6 @@ public class MainActivity extends Activity {
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
         }
-
-        // add a listener for the settings button
-        ImageButton setting = (ImageButton) findViewById(R.id.setting);
-        setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SettingPreference.class));
-            }
-        });
-
-        // create a new thread for syncing
-       /* interacting with front end
-        new Thread(){
-            public void run(){
-                while(true){
-                    try {Thread.sleep(5000);} catch (InterruptedException e) {e.printStackTrace();}
-                    runOnUiThread (new Runnable() {
-                        @Override
-                        public void run() {
-                            sync();
-                            Toast.makeText(MainActivity.this, "thread running", Toast.LENGTH_SHORT).show();}
-                    });
-
-                }
-            }
-        }.start();
-        */
-        //new Thread(new Sync()).start();
-    }
-    class Sync implements Runnable{
-        @Override
-        public void run() {
-            while(true){
-
-                //downloadPhotos();
-
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
-                syncIntent.putExtra(Controller.CODE_KEY, Controller.CODE_SYNC);
-                Log.d("Sync", "Happening");
-                //Intent syncIntent = new Intent(myContext, SetWallpaperService.class);
-                                //syncIntent.putExtra(CODE_KEY, CODE_SYNC);
-                                        //myContext.startActivity(syncIntent);
-            }
-        }
     }
 
     @Override
@@ -290,21 +219,6 @@ public class MainActivity extends Activity {
     public void settingsClicked(View view) {
         Intent intent = new Intent(MainActivity.this, SettingPreference.class);
         startActivity(intent);
-    }
-
-    public void launchCamera(View view) {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            File folderPath = new File(Controller.DEJAPHOTOPATH);
-            if (!folderPath.exists()) folderPath.mkdirs();
-
-            String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
-            File imageFile = new File(folderPath, "DejaPhoto" + timeStamp + ".jpg");
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
-
-            startActivity(cameraIntent);
-        }
     }
 
     public void addFriends(View view){
@@ -409,6 +323,21 @@ public class MainActivity extends Activity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void launchCamera(View view) {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            File folderPath = new File(Controller.DEJAPHOTOPATH);
+            if (!folderPath.exists()) folderPath.mkdirs();
+
+            String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
+            File imageFile = new File(folderPath, "DejaPhoto" + timeStamp + ".jpg");
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+
+            startActivity(cameraIntent);
+        }
     }
 
     /**
