@@ -125,7 +125,6 @@ public class SettingPreference extends Activity {
         });
     }
 
-
     void saveStatus(String key, boolean status){
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.edit().putBoolean(key, status).apply();
@@ -156,7 +155,7 @@ public class SettingPreference extends Activity {
         intervalText = (TextView) findViewById(R.id.seekbarvalue);
         currentInterval = getCurrentProgress();
         seekBar.setProgress(currentInterval);
-        currentPosition = getCurrentLocation();
+        currentPosition = getCurrentInterval();
         setText(seekBar, intervalText, currentInterval, currentPosition);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -178,22 +177,21 @@ public class SettingPreference extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
     }
 
-    boolean getShowLocation(){
+    boolean ShowLocation(){
         return showLocation;
     }
 
-    boolean getMyP(){
+    boolean ViewMyPhoto(){
         return viewMyP;
     }
 
-    boolean getFrP(){
+    boolean ViewFriendPhoto(){
         return viewFrP;
     }
 
-    boolean getSharing(){
+    boolean PhotoSharing(){
         return sharing;
     }
 
@@ -224,7 +222,7 @@ public class SettingPreference extends Activity {
         mSharedPrefs.edit().putInt(KEY_POSITION, currentPosition).apply();
     }
 
-    private int getCurrentProgress() {
+    public int getCurrentProgress() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             int interval = mSharedPrefs.getInt(KEY_INTERVAL, 0);
@@ -234,7 +232,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    private int getCurrentLocation() {
+    private int getCurrentInterval() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             int position = mSharedPrefs.getInt(KEY_POSITION, 0);

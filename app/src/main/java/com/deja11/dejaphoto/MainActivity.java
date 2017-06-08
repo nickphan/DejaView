@@ -341,6 +341,31 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     }
 
+    public void addFriends(View view){
+        //final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.add_friend_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final EditText mEmail = (EditText) v.findViewById(R.id.username);
+        builder.setView(v).setPositiveButton("add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                email = mEmail.getText().toString();
+                /*
+                Log.e("the input username: ", email);
+                Log.d("To SharedPreference: ", email);
+                mSharedPrefcheck.edit().putString("friendEmail",email).apply();
+
+                //access to the firebase and then add the name
+                */
+                Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //pop out the window
+        builder.create().show();
+
+    }
+
     /**
      * Launches the gallery for a single photo
      * @param view, the view that calls it
@@ -377,17 +402,29 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
      * @param data the returned intent with the data we want
      * */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, final Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
-                Uri imageData = data.getData();
+
+                View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.rename_location_dialog, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                final EditText location = (EditText) v.findViewById(R.id.locationname);
+                builder.setView(v).setPositiveButton("update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newLocation = location.getText().toString();
+                        Uri imageData = data.getData();
+                        String path = imageData.getPath();
+                        // TODO: 6/7/17 waiting for chris
+
+                    }
+                });
                 /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
                 /* SINGLE RETURNED. SHOULD NEVER COME HERE */
                 if(data.getData() != null){
                     Uri imageData = data.getData();
-
                 }
                 /* MULTIPLE RETURNED. SHOULD ONLY EVER COME HERE */
                 else{
