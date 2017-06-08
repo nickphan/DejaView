@@ -61,46 +61,101 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends Activity {
 
     Controller controller;
-    DatabaseHelper myDb;
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myFirebaseRef = database.getReference();
     Context myContext;
-
+    String username;
 
     // For testing purpose
     private static MainActivity instance;
-    public static MainActivity getInstance() {
-        if (instance == null) {
-            setInstance(instance);
-        }
-        return instance;
-    }
-    public static void setInstance(MainActivity instance) {
-        MainActivity.instance = instance;
-    }
 
-    //login email
-    String email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         //setContentView(R.layout.test_photo_picker);
 
         // For Junit test
-        setInstance(this);
-        controller = new Controller(this);
+        initTesting();
 
         // request for permissions
+        requestPermissions();
+
+        // get the username from shared preferences and prompt the user to log in (if needed)
+        SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
+        username = mSharedPrefcheck.getString("username", "unknown");
+
+        if(username.equals("unknown")){
+            promptUserLogin(mSharedPrefcheck);
+        }
+
+        else {
+            initApp();
+        }
+    }
+
+
+    /***********************************************************************************************
+     *                            FUNCTIONS FOR INITIALIZING APP                                   *
+     **********************************************************************************************/
+
+    /**
+     * Requests permission from the user
+     */
+    private void requestPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
-        // create folders for the app if they do not exist
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA}, 2);
+        }
+    }
+
+    /**
+     * Creates a pop-up dialog that prompts the user to log in
+     */
+    private void promptUserLogin(final SharedPreferences mSharedPrefcheck) {
+        View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final EditText mEmail = (EditText) v.findViewById(R.id.username);
+        builder.setView(v).setPositiveButton("Login", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                username = mEmail.getText().toString();
+                Log.e("the input username: ", username);
+                Log.d("To SharedPreference: ", username);
+                //int dot = email.indexOf('.');
+                //String username = email.substring(0,dot) + email.substring(dot+1);
+
+                mSharedPrefcheck.edit().putString("username", username).apply();
+                //controller.createUser();
+                initApp();
+            }
+        });
+        //pop out the window
+        builder.create().show();
+    }
+
+    /**
+     * This is the main function that initializes the app.
+     * It calls several smaller functions that initializes different parts of the app.
+     */
+    private void initApp() {
+        createFolders();
+        initNotificationBar();
+        initAlarms();
+
+        //controller = new Controller(this);
+    }
+
+    /**
+     * Creates folders for the app if they do not exist
+     */
+    private void createFolders() {
         File dejaPhotoFolder = new File(Controller.DEJAPHOTOPATH);
         File dejaPhotoCopiedFolder = new File(Controller.DEJAPHOTOCOPIEDPATH);
         File dejaPhotoFriendsFolder = new File(Controller.DEJAPHOTOFRIENDSPATH);
@@ -108,43 +163,12 @@ public class MainActivity extends Activity {
         if (!dejaPhotoFolder.exists()) dejaPhotoFolder.mkdirs();
         if (!dejaPhotoCopiedFolder.exists()) dejaPhotoCopiedFolder.mkdirs();
         if (!dejaPhotoFriendsFolder.exists()) dejaPhotoFriendsFolder.mkdirs();
+    }
 
-        final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
-        email = mSharedPrefcheck.getString("username", "unknown");
-        if(email.equals("unknown")){
-            View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.user_input_dialog, null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            final EditText mEmail = (EditText) v.findViewById(R.id.username);
-            builder.setView(v).setPositiveButton("Login", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    email = mEmail.getText().toString();
-                    Log.e("the input username: ", email);
-                    Log.d("To SharedPreference: ", email);
-                    //int dot = email.indexOf('.');
-                    //String username = email.substring(0,dot) + email.substring(dot+1);
-
-                    mSharedPrefcheck.edit().putString("username", email).apply();
-                    controller.createUser();
-                }
-            });
-            //pop out the window
-            builder.create().show();
-        }
-
-        myFirebaseRef = database.getReference().child("name").child("123");
-        myFirebaseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                Toast.makeText(getBaseContext(), data.toString(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
+    /**
+     * Creates the notification bar view and sets the listeners for the buttons in it
+     */
+    private void initNotificationBar() {
         // create the view for the notification
         RemoteViews notificationView = new RemoteViews(getBaseContext().getPackageName(),
                 R.layout.notification);
@@ -181,8 +205,15 @@ public class MainActivity extends Activity {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(Controller.NOTIFICATION_ID, notification);
+    }
 
-        // setting up the alarms for changing wallpaper and syncing the database
+    /**
+     * Sets the alarms for:
+     *   1. changing the wallpaper
+     *   2. syncing with the online database
+     */
+    private void initAlarms() {
+        // create intents for the alarms
         Intent alarmIntent = new Intent("alarm_receiver");
         PendingIntent alarmPIntent = PendingIntent.getBroadcast(this,
                 Controller.ALARM_PENDING_INTENT_RC, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -193,6 +224,7 @@ public class MainActivity extends Activity {
 
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
+        // schedule the alarms
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), alarmPIntent);
@@ -206,14 +238,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
 
-       super.onDestroy();
-    }
+    /***********************************************************************************************
+     *                               BUTTON ONCLICK FUNCTIONS                                      *
+     **********************************************************************************************/
 
     /**
-     * For testing purpose
+     * OnClick function for the Settings button.
+     * Launches the settings activity.
      *
      * @param view
      */
@@ -222,6 +254,12 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    /**
+     * OnClick function for the Add Friends button.
+     * Displays a pop-up that prompts the user to enter the username of the friend.
+     *
+     * @param view
+     */
     public void addFriends(View view){
         //final SharedPreferences mSharedPrefcheck = PreferenceManager.getDefaultSharedPreferences(this);
         Log.i("ADDFRIEND", "START");
@@ -231,7 +269,7 @@ public class MainActivity extends Activity {
         builder.setView(v).setPositiveButton("add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                email = mEmail.getText().toString();
+                String email = mEmail.getText().toString();
                 /*
                 Log.e("the input username: ", email);
                 Log.d("To SharedPreference: ", email);
@@ -254,7 +292,7 @@ public class MainActivity extends Activity {
     /**
      * Launches the gallery for a single photo
      * @param view, the view that calls it
-     * */
+     */
     public void getSingleImageFromGallery(View view){
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -263,8 +301,11 @@ public class MainActivity extends Activity {
         photoPickerIntent.setDataAndType(data, "image/*");
         startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
     }
+
     /**
-     * Launches the gallery and lets you select photos
+     * OnClick function for the Import Photos button
+     * Launches the gallery and lets the user select photos.
+     *
      * @param view, the view that calls this method
      * */
     public void getMultipleImagesFromGallery(View view){
@@ -321,7 +362,7 @@ public class MainActivity extends Activity {
                             uriArrayList.add(uri);
                         }
 
-                        controller.copyPhotos(uriArrayList);
+                        //controller.copyPhotos(uriArrayList);
 
                     }
                 }
@@ -330,11 +371,9 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
     /**
-     * This is the onClick function for the camera button.
-     * It launches the camera app to take a single photo and saves that photo into the DejaPhoto
-     * album.
+     * OnClick function for the Camera button.
+     * Launches the camera app to take a single photo and saves that photo into the DejaPhoto album.
      *
      * Code credits: https://developer.android.com/training/camera/photobasics.html
      *
@@ -343,12 +382,14 @@ public class MainActivity extends Activity {
     public void launchCamera(View view) {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+        // try to launch the camera if there is an app in the phone that can take a picture
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             // get the path to the DejaPhoto folder (or create it if it doesn't exist)
             File folderPath = new File(Controller.DEJAPHOTOPATH);
             if (!folderPath.exists()) folderPath.mkdirs();
 
             try {
+                // create a file with a unique name (via date and time)
                 String timeStamp = new SimpleDateFormat("ddMMMyyyy_hh:mm:ss").format(new Date());
                 File imageFile = File.createTempFile("DejaPhoto" + timeStamp, ".jpg", folderPath);
                 Uri photoUri = FileProvider.getUriForFile(this, "com.DejaPhoto.fileprovider", imageFile);
@@ -365,52 +406,21 @@ public class MainActivity extends Activity {
     }
 
 
-    /**
-     *  -On first user, user registers a name
-        -From then on, that name is in the Firebase and is linked to that device
-            -sharing
-            -username
-            -friendsList with true/false
+    /***********************************************************************************************
+     *                                    TESTING FUNCTIONS                                        *
+     **********************************************************************************************/
 
-     -No password is necessary
-     -No user class is necessary
-     -Just get user's information from firebase
-     *
-     * */
-    public boolean checkUserExists(String username){
-        DatabaseReference databaseReference = myFirebaseRef.child("user");
-
-
-        Query queryRef = databaseReference.orderByChild("username").equalTo(username);
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot == null || dataSnapshot.getValue() == null){
-                    /*User doesn't exist*/
-                }else{
-                    /*User exists*/
-                    //POINT 1
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        //POINT 2
-
-
-        return false;
+    public static MainActivity getInstance() {
+        if (instance == null) {
+            setInstance(instance);
+        }
+        return instance;
+    }
+    public static void setInstance(MainActivity instance) {
+        MainActivity.instance = instance;
     }
 
-
-
-    public void register(String username){
-        SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPref.edit().putString("username", username).apply();
-
-        //
-        //mSharedPref.getString("username", "none");
+    public void initTesting() {
+        setInstance(this);
     }
-
 }
