@@ -12,11 +12,11 @@ import android.widget.ToggleButton;
 
 public class SettingPreference extends Activity {
 
-    final int TIME_OFFSET = 5;
+    static final int TIME_OFFSET = 5;
     final int MAX_TIME = 25;
     final String KEY_POSITION = "position";
     final String KEY_INTERVAL = "interval";
-    private int currentInterval = TIME_OFFSET;
+    private static int currentInterval = TIME_OFFSET;
     private static int currentPosition;
 
     //For testing purpose
@@ -203,7 +203,7 @@ public class SettingPreference extends Activity {
         }
     }
 
-    public int getCurrentInterval(){return currentInterval;}
+    public static int getCurrentInterval(){return currentInterval;}
 
     public boolean ShowLocation(){return showLocation;}
 
