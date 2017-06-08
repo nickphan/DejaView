@@ -140,9 +140,12 @@ public class DatabaseMediator {
         firebaseHelper.updateFirebase(currentUserName, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
     }
 
-    public void updateRelease(String photoLocation) {
+    public void updateRelease(String photoLocation, String owner) {
         databaseHelper.updateRelease(photoLocation);
-        firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        if(owner.equals(currentUserName)) {
+            firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+        }
     }
 
 
