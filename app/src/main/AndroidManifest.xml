@@ -58,6 +58,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".SyncReceiver">
+            <intent-filter>
+                <action android:name="sync_receiver" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".SetWallpaperService"
             android:exported="false" />
