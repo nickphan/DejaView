@@ -363,7 +363,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
                 Uri imageData = data.getData();
-                /* IDK DO SOMETHING WITH THE SINGLE PHOTO */
+                String photoPath = imageData.getPath();
+
+                /*this is where we pop up to ask new name*/
+
+
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
                 /* SINGLE RETURNED. SHOULD NEVER COME HERE */
@@ -441,6 +445,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         //
         //mSharedPref.getString("username", "none");
+    }
+
+
+    public void renameLocation(String location){
+
     }
 
 }
