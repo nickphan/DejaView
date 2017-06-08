@@ -108,15 +108,19 @@ public class Controller implements Parcelable {
         //databaseMediator.init(this.context);
 
         cache = new LinkedList<Photo>();
+
         user = new User();
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        user.setUsername(username);
 
 
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
         initialize();
-        databaseMediator.downloadFriendPhotos(context);
+        //databaseMediator.downloadFriendPhotos(context);
 
         int width= context.getResources().getDisplayMetrics().widthPixels;
         screenw = width;
@@ -545,8 +549,22 @@ public class Controller implements Parcelable {
     }
 
     public void sync(){
-        databaseMediator.downloadFriendPhotos(context);
+        /*
+        if(SettingPreference.viewFriendPhoto){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String username = sharedPreferences.getString("username", "unknown");
+            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
 
+            for (Pair<String,String> currFriend : myFriends){
+                if(currFriend.second.equals("true")){
+                    databaseMediator.downloadFriendPhotos(context);
+                }
+                else{
+                    //delete
+                }
+            }
+
+        }*/
     }
     //sync should also look for karma, release, and name
 
@@ -594,5 +612,26 @@ public class Controller implements Parcelable {
             }
         }
         return friended;
+
+    }
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
+    public void updateLocationName(Uri photoUri, String locationName) {
+        String directoryPath = photoUri.getPath();
+        databaseMediator.setLocationName(locationName, directoryPath);
+    }
+
+    
+    //sync should also look for karma, release, and name
     }*/
+
 }
