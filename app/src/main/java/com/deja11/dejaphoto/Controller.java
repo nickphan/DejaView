@@ -319,6 +319,8 @@ public class Controller implements Parcelable {
             int width = getWidthFromString(photoPath);
 
             //create the bitmap that has the same size as the screen
+            Log.i("SCREENW", String.valueOf(screenw));
+            Log.i("SCREENH", String.valueOf(screenh));
             Bitmap mutableBitmap = Bitmap.createBitmap(screenw, screenh, bitmap.getConfig());
 
             // inside the method, we need to adjust the photo size

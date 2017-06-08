@@ -48,18 +48,22 @@ import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
 
 public class FirebaseHelper {
 
+    FirebaseDatabase dejabase;
+    DatabaseReference mdejaRef;
+    FirebaseStorage dejaStorage;
+    StorageReference mdejaStorage;
 
     public FirebaseHelper(Context context){
+        dejabase = FirebaseDatabase.getInstance();
+        mdejaRef = dejabase.getReference();
 
+        dejaStorage = FirebaseStorage.getInstance();
+        mdejaStorage = dejaStorage.getReference();
     }
 
     //TODO Firebase stuff
     // TODO remove
-    FirebaseDatabase dejabase = FirebaseDatabase.getInstance();
-    DatabaseReference mdejaRef = dejabase.getReference();
 
-    FirebaseStorage dejaStorage = FirebaseStorage.getInstance();
-    StorageReference mdejaStorage = dejaStorage.getReference();
     /**
      * Insert a new photo into the database
      *
@@ -317,41 +321,47 @@ public class FirebaseHelper {
 
 
     public void addFriend(final String user, final String friend){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference dbR = firebaseDatabase.getReference();
         final boolean[] check = new boolean[1];
         check[0] = false;
-        DatabaseReference databaseReference = mdejaRef.child("users");
+        DatabaseReference databaseReference = dbR.child("users");
         //Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
         Query query = databaseReference.child(user).child("friends").child(friend);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.i("FirebaseHelper", "Pre add listener");
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i("FirebaseHelper","have dataSnapshot");
                 if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     //he hasn't added you yet
                     mdejaRef.child("users").child(friend).child("friends").child(user).setValue("false");
-                    check[0] = true;
+                    //check[0] = true;
                 }else{
                     if(dataSnapshot.getValue().toString().equals("false")){
                         mdejaRef.child("users").child(user).child("friends").child(friend).setValue("true");
                         mdejaRef.child("users").child(friend).child("friends").child(user).setValue("true");
-                        check[0] = true;
+                        //check[0] = true;
                     }
-                    check[0] = true;
+                    //check[0] = true;
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.i("Error","Firebase addFriend failed");
+                check[0] = true;
             }
         });
-        while(!check[0]){
+        Log.i("FirebaseHelper", "Post Add Listener");
+        /*while(!check[0]){
             try{
                 Thread.sleep(500);
-                Log.i("FirebaseHelper", "LOOPER");
+
             }catch (Exception e){
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     public void createUser(String username){
