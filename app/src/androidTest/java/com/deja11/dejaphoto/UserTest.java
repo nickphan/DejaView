@@ -1,6 +1,7 @@
 package com.deja11.dejaphoto;
 
 import android.provider.ContactsContract;
+import android.support.test.rule.ActivityTestRule;
 import android.util.Log;
 
 import org.junit.Rule;
@@ -27,6 +28,9 @@ public class UserTest {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myFirebaseRef = database.getReference();
+
+    @Rule
+    public ActivityTestRule<MainActivity> mainActivityActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class);
 
 
     @Test
@@ -100,6 +104,39 @@ public class UserTest {
         }
         assertEquals(photoNames.size(), 8);
         assertEquals(date.size(), 8);
+    }
+
+    DatabaseMediator databaseMediator;
+    @Test
+    public void TestFirebase(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        ArrayList<String> returnedStrings = databaseMediator.testGetPhotoNamesFromFirebase();
+        assertEquals(returnedStrings.size(), 8);
+    }
+
+    @Test
+    public void TestCreateUser(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        //databaseMediator.createUser("nick1@ucsdedu");
+        //databaseMediator.createUser("nick2@ucsdedu");
+        //databaseMediator.createUser("nick3@ucsdedu");
+        assertTrue(true);
+    }
+
+    @Test
+    public void TestAddFriends(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        //databaseMediator.addFriendFirebase("nick2@ucsdedu", "nick1@ucsdedu");
+        //databaseMediator.addFriendFirebase("nick1@ucsdedu", "nick2@ucsdedu");
+        databaseMediator.addFriendFirebase("nick3@ucsdedu", "nick2@ucsdedu");
+        assertTrue(true);
+    }
+
+    @Test
+    public void TestSetSharing(){
+        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
+        databaseMediator.setSharing("nick1@ucsdedu", false);
+        assertTrue(true);
     }
 
 }

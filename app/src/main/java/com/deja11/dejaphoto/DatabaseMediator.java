@@ -154,9 +154,6 @@ public class DatabaseMediator {
         firebaseHelper.downloadFriendPhotos(context, "physicalDevice@teesphonecom");
     }
 
-    public void insertFirebase(String path, Objects object){
-
-    }
 
     /**
      * Gather all the information in the photo.
@@ -187,6 +184,10 @@ public class DatabaseMediator {
         firebaseHelper.addFriend(user, friend);
     }
 
+
+    public void createUser(String username){
+        firebaseHelper.createUser(username);
+    }
     /**
      *      FIREBASE SETTERS
      *
@@ -200,19 +201,26 @@ public class DatabaseMediator {
      *      FIREBASE GETTERS
      *
      * */
-    public String getUsername(String username){
-        return  firebaseHelper.getUsername(username);
-    }
+
+
     public boolean getSharing(String username){
         return firebaseHelper.getSharing(username);
     }
+
+
     public ArrayList<Pair<String, String>> getFriends(String username){
         return firebaseHelper.getFriends(username);
     }
-
-    public void setLocationName(String locationName, String phoneLocation) {
-        databaseHelper.updateField(phoneLocation, DatabaseHelper.COL_LOC_NAME_11, locationName);
+    public String getUsername(String username){
+        return  firebaseHelper.getUsername(username);
     }
+    public ArrayList<String> testGetPhotoNamesFromFirebase(){
+        return firebaseHelper.getPhotos();
+    }
+    public void setLocationName(String photoPath, String locationName) {
+        databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
+    }
+
 
 
 

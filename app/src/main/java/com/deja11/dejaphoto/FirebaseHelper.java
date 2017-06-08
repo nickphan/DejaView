@@ -314,11 +314,14 @@ public class FirebaseHelper {
 
     }
 
+
+
     public void addFriend(final String user, final String friend){
         final boolean[] check = new boolean[1];
         check[0] = false;
         DatabaseReference databaseReference = mdejaRef.child("users");
-        Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        //Query query = databaseReference.child(user).orderByChild("friends").equalTo(friend);
+        Query query = databaseReference.child(user).child("friends").child(friend);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -338,7 +341,7 @@ public class FirebaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.i("Error","Firebase addFriend failed");
             }
         });
         while(!check[0]){
@@ -348,6 +351,18 @@ public class FirebaseHelper {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void createUser(String username){
+        DatabaseReference databaseReference = mdejaRef.child("users");
+        databaseReference.child(username).child("sharing").setValue("false");
+        databaseReference.child(username).child("username").setValue(username);
+        databaseReference.child(username).child("friends").child("fake").setValue("false");
+    }
+
+    public void setSharing(String name, boolean value){
+        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
+        databaseReference.setValue(String.valueOf(value));
     }
 
 
@@ -387,6 +402,17 @@ public class FirebaseHelper {
         return sharing[0];
     }
 
+    public void updateRelease(String username, String photoPath){
+        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
+        int period = photoName.indexOf('.');
+        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
+
+        //COL_OWNER_10
+        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
+    }
+    /*DO WE NEED THE METHODS UNDER HERE?*/
+
+
     public ArrayList<Pair<String, String>> getFriends(String username){
         final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
         final boolean[] check = new boolean[1];
@@ -412,6 +438,9 @@ public class FirebaseHelper {
 
             }
         });
+        //Pair<String, String> pair = friends.get(0);
+        //pair.first;
+        //pair.second;
 
         while(!check[0]){
             try{
@@ -453,20 +482,31 @@ public class FirebaseHelper {
         return name[0];
     }
 
-
-    public void setSharing(String name, boolean value){
-        DatabaseReference databaseReference = mdejaRef.child("users").child(name).child("sharing");
-        databaseReference.setValue(String.valueOf(value));
+    public ArrayList<String> getPhotos(){
+        final boolean[] check = new boolean[1];
+        final ArrayList<String> photoNames = new ArrayList<>();
+        final DatabaseReference databaseReference = mdejaRef.child("images").child("physicalDevice@teesphonecom");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot childrenSnapshot : dataSnapshot.getChildren()){
+                    photoNames.add(childrenSnapshot.getKey());
+                }
+                check[0] = true;
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                check[0] = true;
+            }
+        });
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+                Log.d("Testing", "Sleeping");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return photoNames;
     }
-
-
-    public void updateRelease(String username, String photoPath){
-        String photoName = Uri.fromFile(new File (photoPath)).getLastPathSegment();
-        int period = photoName.indexOf('.');
-        String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-
-        //COL_OWNER_10
-        mdejaRef.child("images").child(username).child(photoNameFix).child(COL_REL_7).setValue("1");
-    }
-
 }

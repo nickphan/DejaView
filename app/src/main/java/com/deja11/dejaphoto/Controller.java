@@ -115,6 +115,7 @@ public class Controller implements Parcelable {
         String username = sharedPreferences.getString("username", "unknown");
         user.setUsername(username);
 
+
         database = FirebaseDatabase.getInstance();
         myFirebaseRef = database.getReference();
 
@@ -532,7 +533,51 @@ public class Controller implements Parcelable {
      *
      *
      * */
-    public ArrayList<String> checkForRequests(){
+    public void updateUser(){
+        user.setSharing(databaseMediator.getSharing(user.getUsername()));
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        for(int i = 0; i < friendsList.size(); i++){
+            Pair<String, String> friend = friendsList.get(i);
+            String name = friend.first;
+            String val = friend.second;
+            user.setFriend(name, val);
+        }
+    }
+
+    public void updateLocationName(String photoPath, String locationName) {
+        databaseMediator.setLocationName(photoPath, locationName);
+    }
+
+    public void sync(){
+        /*
+        if(SettingPreference.viewFriendPhoto){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String username = sharedPreferences.getString("username", "unknown");
+            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
+
+            for (Pair<String,String> currFriend : myFriends){
+                if(currFriend.second.equals("true")){
+                    databaseMediator.downloadFriendPhotos(context);
+                }
+                else{
+                    //delete
+                }
+            }
+
+        }*/
+    }
+    //sync should also look for karma, release, and name
+
+
+
+
+
+
+
+
+
+    /*delete this?*/
+    /*public ArrayList<String> checkForRequests(){
         ArrayList<String> localFriends = user.getFriends();
         final ArrayList<String> firebaseFriends = new ArrayList<>();
         ArrayList<String> friended = new ArrayList<>();
@@ -567,6 +612,7 @@ public class Controller implements Parcelable {
             }
         }
         return friended;
+
     }
     public void updateUser(){
         user.setSharing(databaseMediator.getSharing(user.getUsername()));
@@ -584,24 +630,8 @@ public class Controller implements Parcelable {
         databaseMediator.setLocationName(locationName, directoryPath);
     }
 
-    public void sync(){
-        /*
-        if(SettingPreference.viewFriendPhoto){
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String username = sharedPreferences.getString("username", "unknown");
-            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
-
-            for (Pair<String,String> currFriend : myFriends){
-                if(currFriend.second.equals("true")){
-                    databaseMediator.downloadFriendPhotos(context);
-                }
-                else{
-                    //delete
-                }
-            }
-
-        }*/
-    }
+    
     //sync should also look for karma, release, and name
+    }*/
 
 }
