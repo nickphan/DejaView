@@ -118,12 +118,15 @@ public class Controller implements Parcelable {
         myFirebaseRef = database.getReference();
 
         initialize();
-
-        int width= context.getResources().getDisplayMetrics().widthPixels;
+/*
+        int width= context.getResources().getSystem().getDisplayMetrics().widthPixels;
         screenw = width;
-        int height= context.getResources().getDisplayMetrics().heightPixels;
-        screenh = height;
 
+        int height= context.getResources().getSystem().getDisplayMetrics().heightPixels;
+        screenh = height;
+        Log.i("SCREENW", String.valueOf(screenw));
+        Log.i("SCREENH", String.valueOf(screenh));
+*/
         //databaseMediator.createUser(user.getUsername());
     }
 
@@ -323,15 +326,18 @@ public class Controller implements Parcelable {
             int height = getHeightFromString(photoPath);
             int width = getWidthFromString(photoPath);
 
-            //create the bitmap that has the same size as the screen
-            Log.i("SCREENW", String.valueOf(screenw));
-            Log.i("SCREENH", String.valueOf(screenh));
+            int screenWidth= context.getResources().getSystem().getDisplayMetrics().widthPixels;
+            int screenHeight= context.getResources().getSystem().getDisplayMetrics().heightPixels;
+            Log.i("SCREENW", String.valueOf(screenWidth));
+            Log.i("SCREENH", String.valueOf(screenHeight));
 
-            //
-            Bitmap mutableBitmap = Bitmap.createBitmap(width, screenh, bitmap.getConfig());
+
+            Bitmap mutableBitmap = Bitmap.createBitmap(screenWidth, screenHeight, bitmap.getConfig());
 
             // inside the method, we need to adjust the photo size
             writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
+            Log.i("Photosize width: ", bitmap.getWidth()+"");
+            Log.i("Photosize height: ", bitmap.getHeight()+"");
 
             writeTextOnWallpaper(mutableBitmap, geoLocation,totalKarma);
 
@@ -353,34 +359,42 @@ public class Controller implements Parcelable {
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photoWidth, int photoHeight) {
 
         Canvas canvas = new Canvas(mutableBitmap);
-        Matrix m = new Matrix();
 
         int x_difference = photoWidth - mutableBitmap.getWidth() ;
         int y_difference = photoHeight - mutableBitmap.getHeight() ;
         int width_after_resize;
         int height_after_resize;
-       /* if(x_difference <= 0 && y_difference <= 0){
-            m.setScale(1, 1);
+
+        float ratio;
+        float adjust_ratio = 1;
+
+        if(x_difference > y_difference){
+            ratio = (float) mutableBitmap.getWidth() / photoWidth;
         }
         else{
-            if(x_difference > 0 && y_difference > 0){*/
-                float ratio;
-                if(x_difference > y_difference){
-                    ratio = (float) mutableBitmap.getWidth() / photoWidth;
-                }
-                else{
-                    ratio = (float) mutableBitmap.getHeight() / photoHeight;
-                }
-                Log.d("current Ratio:", ratio+"");
-                width_after_resize = (int)ratio * photoWidth;
-                height_after_resize = (int)ratio* photoHeight;
-                bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize,
-                        height_after_resize, true);
-            //}
-        //}
-        int cx = (canvas.getWidth() - bitmap.getWidth()) >> 1;
+            ratio = (float) mutableBitmap.getHeight() / photoHeight;
+        }
+        Log.d("current Ratio:", ratio+"");
+        width_after_resize = (int)(ratio * photoWidth);
+        height_after_resize = (int)(ratio* photoHeight);
+
+
+        if(width_after_resize == mutableBitmap.getWidth() && height_after_resize > mutableBitmap.getHeight()){
+            adjust_ratio = (float) mutableBitmap.getHeight() / height_after_resize;
+        }
+        else if(height_after_resize == mutableBitmap.getHeight() && width_after_resize > mutableBitmap.getWidth()) {
+            adjust_ratio = (float) mutableBitmap.getWidth() / width_after_resize;
+        }
+        Log.d("current adjust_Ratio:", adjust_ratio +"");
+        width_after_resize = (int)(adjust_ratio * width_after_resize );
+        height_after_resize = (int)(adjust_ratio* height_after_resize);
+
+        bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize, height_after_resize, true);
+        Log.i("photo width", bitmap.getWidth()+"");
+        Log.i("photo height", bitmap.getHeight()+"");
+
         int cy = (canvas.getHeight() - bitmap.getHeight()) >> 1;
-        canvas.drawBitmap(bitmap, cx,cy, new Paint());
+        canvas.drawBitmap(bitmap, 0,cy, new Paint());
     }
 
     /**
@@ -401,8 +415,9 @@ public class Controller implements Parcelable {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setTextSize(canvas.getHeight() / 40);
-        canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.95 * screenh), paint);
-        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.95 * screenh),paint);
+        canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.9 * mutableBitmap.getHeight()), paint);
+        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.9 * mutableBitmap.getHeight()),paint);
+
     }
 
     /**
