@@ -279,6 +279,8 @@ public class FirebaseHelper {
     public int getTotalKarma(String ownerName, String photoName){
         final boolean[] check = new boolean[1];
         final int[] karma = new int[1];
+        Log.i("getTotalKarma", ownerName);
+        Log.i("getTotalKarma", photoName);
         DatabaseReference databaseReference = mdejaRef.child("images").child(ownerName).child(photoName).child("TOTALKARMA");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -297,6 +299,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("waiting", "getTotalKarma");
             }catch (Exception e){
                 e.printStackTrace();;
             }
@@ -335,7 +338,6 @@ public class FirebaseHelper {
             databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
         }catch (Exception e){
             Log.e("Exception RejecTED", "file not found");
-
         }
 
 

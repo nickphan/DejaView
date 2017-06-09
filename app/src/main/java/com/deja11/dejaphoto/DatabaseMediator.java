@@ -227,6 +227,12 @@ public class DatabaseMediator {
      * */
 
     public int getTotalKarma(String ownerName, String photoName){
+        int dot = photoName.indexOf('.');
+        String name;
+        if(dot != -1){
+            name = photoName.substring(0,dot) + photoName.substring(dot+1);
+            return firebaseHelper.getTotalKarma(ownerName, name);
+        }
         return  firebaseHelper.getTotalKarma(ownerName, photoName);
     }
 
