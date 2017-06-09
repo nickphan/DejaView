@@ -62,23 +62,40 @@ public class AlbumUtils {
     }
 
     /**
-     * Deletes all friends' photos (in DejaPhotoFriend).
+     * Deletes all the photos of a specific friend.
+     *
+     * @param friendName
      */
-    public static void deleteAllFriendsPhoto() {
-        File dejaPhotoFriendFolder = new File(Controller.DEJAPHOTOFRIENDSPATH);
+    public static void deleteAllPhotosOfFriend(String friendName) {
+        File friendFolder = new File(Controller.DEJAPHOTOFRIENDSPATH, friendName);
 
-        if (dejaPhotoFriendFolder.exists()) {
-            String[] photos = dejaPhotoFriendFolder.list();
+        if (friendFolder.exists()) {
+            String[] photos = friendFolder.list();
 
             // loop through each of the photos in the folder and try to delete them
             for (String photo : photos) {
                 try {
-                    new File(dejaPhotoFriendFolder, photo).delete();
+                    new File(friendFolder, photo).delete();
                     Log.i("File Change", "Deleted " + photo);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.i("File Change", "Delete Unsuccessful for " + photo);
                 }
+            }
+        }
+    }
+
+    /**
+     * Deletes all the photos in the DejaPhotoFriend album.
+     */
+    public static void deleteAllFriendPhotos() {
+        File dejaPhotoFriendFolder = new File(Controller.DEJAPHOTOFRIENDSPATH);
+
+        if (dejaPhotoFriendFolder.exists()) {
+            String[] friends = dejaPhotoFriendFolder.list();
+
+            for(String friend : friends) {
+                deleteAllPhotosOfFriend(friend);
             }
         }
     }
