@@ -258,7 +258,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), String.valueOf(photo.getTotalKarma()));
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), databaseMediator.getTotalKarma(photo.getOwner(), photo.getFileName()));
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -267,10 +267,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), databaseMediator.getTotalKarma(photo.getOwner(), photo.getFileName()));
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), databaseMediator.getTotalKarma(photo.getOwner(), photo.getFileName()));
             }
         }
     }
@@ -311,7 +311,7 @@ public class Controller implements Parcelable {
      * @param geoLocation the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
-    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma) {
+    private boolean setWallpaper(String photoPath, String geoLocation, int totalKarma) {
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if (photoPath == null) {
             try {
@@ -340,7 +340,7 @@ public class Controller implements Parcelable {
             Log.i("Photosize width: ", bitmap.getWidth()+"");
             Log.i("Photosize height: ", bitmap.getHeight()+"");
 
-            writeTextOnWallpaper(mutableBitmap, geoLocation,totalKarma);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, Integer.toString(totalKarma));
 
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;

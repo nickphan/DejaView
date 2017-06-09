@@ -276,6 +276,35 @@ public class FirebaseHelper {
 
     }
 
+    public int getTotalKarma(String ownerName, String photoName){
+        final boolean[] check = new boolean[1];
+        final int[] karma = new int[1];
+        DatabaseReference databaseReference = mdejaRef.child("images").child(ownerName).child(photoName).child("TOTALKARMA");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String karmaString = dataSnapshot.getValue().toString();
+                karma[0] = Integer.valueOf(karmaString);
+                check[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                check[0] = true;
+            }
+        });
+
+        while(!check[0]){
+            try{
+                Thread.sleep(500);
+            }catch (Exception e){
+                e.printStackTrace();;
+            }
+        }
+        return karma[0];
+
+    }
+
     public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");

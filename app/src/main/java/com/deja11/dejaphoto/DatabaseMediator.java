@@ -226,6 +226,9 @@ public class DatabaseMediator {
      *
      * */
 
+    public int getTotalKarma(String ownerName, String photoName){
+        return  firebaseHelper.getTotalKarma(ownerName, photoName);
+    }
 
     public boolean getSharing(String username){
         return firebaseHelper.getSharing(username);
