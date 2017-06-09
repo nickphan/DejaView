@@ -593,6 +593,8 @@ public class Controller implements Parcelable {
 
     public void sync(){
 
+
+
         // adds all the photos in the folder into the gallery (so the database can scan it)
         for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
             File[] files = new File(folderPath).listFiles();
@@ -621,6 +623,7 @@ public class Controller implements Parcelable {
             for (Pair<String,String> currFriend : myFriends){
 
                 Log.d("SHOWING FRIEND ", currFriend.first);
+                //databaseMediator.deleteFriendPhotos("nick1");
                 if(currFriend.second.equals("true")){
                     databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }

@@ -238,10 +238,10 @@ public class FirebaseHelper {
     }
 
     public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName, final
-                                    String userName, final String locationName, final String totalKarma) {
+                                    String photouserName, final String locationName, final String totalKarma) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String username = sharedPreferences.getString("username", "unknown");
+        final String username = sharedPreferences.getString("username", "unknown");
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
 
@@ -253,8 +253,11 @@ public class FirebaseHelper {
 
                 if (snapshot == null || snapshot.getValue() == null) {
                     //Toast.makeText(MainActivity.this, "No record found", Toast.LENGTH_SHORT).show();
-                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, userName,locationName, totalKarma);
-                    insertFirebaseStorage(absolutePath);
+
+
+                        insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, username,locationName, totalKarma);
+                        insertFirebaseStorage(absolutePath);
+
 
                 }
                 else {
