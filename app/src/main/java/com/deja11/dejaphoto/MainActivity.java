@@ -237,7 +237,9 @@ public class MainActivity extends Activity {
                     System.currentTimeMillis(), syncPIntent);
         } else {
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
+                    System.currentTimeMillis(),
+                    (SettingPreference.currentInterval + Controller.INTERVAL_OFFSET) * Controller.MIN_TO_MS,
+                    alarmPIntent);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
         }
@@ -328,6 +330,8 @@ public class MainActivity extends Activity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), Controller.PHOTO_PICKER_MULTIPLE_CODE);
     }
 
+
+
     /**
      * Handler for whenever an activity is returned
      * @param requestCode, the code for whatever activity was started
@@ -348,7 +352,6 @@ public class MainActivity extends Activity {
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
                         controller.updateLocationName(path,newLocation);
-
                     }
                 });
 
