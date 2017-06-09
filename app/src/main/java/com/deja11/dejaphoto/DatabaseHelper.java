@@ -57,6 +57,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
+import static android.R.attr.value;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -209,6 +211,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.i(TAGDATABASE, "Data updated correctly");
         db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)});
 
+
+    }
+
+    public void deleteAPhoto(String photoLocation, String owner){
+        SQLiteDatabase db = this.getWritableDatabase();
+        /*
+
+        // Select id from photo_table where column = value
+        Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, column + "='" + value + "'", null, null, null, null, null);
+
+        if (res.getCount() >= 0) {
+            res.moveToNext();
+            Log.i(TAGDATABASE, value + " is found at id = " + res.getInt(0));
+            return res.getInt(0);
+        } else {
+            Log.d(TAGDATABASE, value + " is not found");
+            return -1;
+        }*/
 
     }
 
