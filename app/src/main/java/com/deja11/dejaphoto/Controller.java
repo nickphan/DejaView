@@ -598,8 +598,10 @@ public class Controller implements Parcelable {
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
 
             for (Pair<String,String> currFriend : myFriends){
+
+                Log.d("SHOWING FRIEND ", currFriend.first);
                 if(currFriend.second.equals("true")){
-                    databaseMediator.downloadFriendPhotos(context);
+                    databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
                 else{
                     //delete

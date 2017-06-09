@@ -174,9 +174,9 @@ public class DatabaseMediator {
     }
 
 
-    public void downloadFriendPhotos(Context context) {
+    public void downloadFriendPhotos(Context context, String username) {
 
-        firebaseHelper.downloadFriendPhotos(context, "physicalDevice@teesphonecom");
+        firebaseHelper.downloadFriendPhotos(context, username);
     }
 
 
