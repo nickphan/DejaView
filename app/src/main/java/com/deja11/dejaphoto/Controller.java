@@ -591,7 +591,7 @@ public class Controller implements Parcelable {
     public void sync(){
 
         databaseMediator.initDatabase(context);
-        /*
+
         if(SettingPreference.viewFriendPhoto){
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             String username = sharedPreferences.getString("username", "unknown");
@@ -606,7 +606,7 @@ public class Controller implements Parcelable {
                 }
             }
 
-        }*/
+        }
     }
     //sync should also look for karma, release, and name
 

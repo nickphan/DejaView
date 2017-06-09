@@ -372,9 +372,7 @@ public class MainActivity extends Activity {
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
                         }
-
-                        //controller.copyPhotos(uriArrayList);
-
+                        controller.copyPhotos(uriArrayList);
                     }
                 }
             }
