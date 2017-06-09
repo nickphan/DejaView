@@ -441,8 +441,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
-        boolean viewMyPhoto = sharedPreferences.getBoolean("viewMyPhotos",true);
-        boolean viewFriendPhoto = sharedPreferences.getBoolean("viewFriendsPhotos",true);
+        boolean viewMyPhoto = SettingPreference.viewMyPhoto;
+        boolean viewFriendPhoto = SettingPreference.viewFriendPhoto;
 
         selection = COL_REL_7 +"= 0";
 
