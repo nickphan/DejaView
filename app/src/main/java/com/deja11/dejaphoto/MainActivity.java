@@ -237,7 +237,9 @@ public class MainActivity extends Activity {
                     System.currentTimeMillis(), syncPIntent);
         } else {
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis(), SetWallpaperService.interval, alarmPIntent);
+                    System.currentTimeMillis(),
+                    (SettingPreference.currentInterval + Controller.INTERVAL_OFFSET) * Controller.MIN_TO_MS,
+                    alarmPIntent);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis(), Controller.SYNC_INTERVAL, syncPIntent);
         }
@@ -285,7 +287,7 @@ public class MainActivity extends Activity {
                 controller.addFriend(email);
                 Log.i("ADDFRIEND", "WHOA");
 
-                Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
             }
         });
         Log.i("ADDFRIEND", "END");
@@ -300,7 +302,9 @@ public class MainActivity extends Activity {
      */
     public void getSingleImageFromGallery(View view){
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
         String pictureDirectoryPath = pictureDirectory.getPath();
         Uri data = Uri.parse(pictureDirectoryPath);
         photoPickerIntent.setDataAndType(data, "image/*");
@@ -326,6 +330,8 @@ public class MainActivity extends Activity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), Controller.PHOTO_PICKER_MULTIPLE_CODE);
     }
 
+
+
     /**
      * Handler for whenever an activity is returned
      * @param requestCode, the code for whatever activity was started
@@ -346,7 +352,6 @@ public class MainActivity extends Activity {
                         Uri imageData = data.getData();
                         String path = imageData.getPath();
                         controller.updateLocationName(path,newLocation);
-
                     }
                 });
 

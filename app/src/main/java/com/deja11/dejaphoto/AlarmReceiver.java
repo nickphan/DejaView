@@ -28,7 +28,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis() + SettingPreference.currentInterval, alarmPIntent);
+                    System.currentTimeMillis() + (SettingPreference.currentInterval +
+                            Controller.INTERVAL_OFFSET) * Controller.MIN_TO_MS, alarmPIntent);
         }
 
         // create an intent to call the SetWallpaperServices with the appropriate code
