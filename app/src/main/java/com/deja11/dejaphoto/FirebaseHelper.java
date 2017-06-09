@@ -277,7 +277,6 @@ public class FirebaseHelper {
     }
 
     public int getTotalKarma(String ownerName, String photoName){
-        final boolean[] check = new boolean[1];
         final int[] karma = new int[1];
         Log.i("getTotalKarma", ownerName);
         Log.i("getTotalKarma", photoName);
@@ -287,23 +286,13 @@ public class FirebaseHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String karmaString = dataSnapshot.getValue().toString();
                 karma[0] = Integer.valueOf(karmaString);
-                check[0] = true;
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                check[0] = true;
             }
         });
 
-        while(!check[0]){
-            try{
-                Thread.sleep(500);
-                Log.i("waiting", "getTotalKarma");
-            }catch (Exception e){
-                e.printStackTrace();;
-            }
-        }
         return karma[0];
 
     }

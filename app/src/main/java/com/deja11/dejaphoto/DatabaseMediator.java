@@ -251,6 +251,7 @@ public class DatabaseMediator {
         return firebaseHelper.getPhotos();
     }
     public void setLocationName(String photoPath, String locationName) {
+        Log.i("location", "mediator updating location name");
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
     }
 
