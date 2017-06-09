@@ -129,6 +129,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_TOTAL_KARMA_12 + " INTEGER   )");
 
         Log.i(TAGDATABASE, "Table created");
+
     }
 
     /**
@@ -178,7 +179,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         Log.i(TAGDATABASE, "Data inserted correctly");
-        return db.insert(TABLE_NAME, null, contentValues) != -1;
+        boolean status = db.insert(TABLE_NAME, null, contentValues) != -1;
+
+        return status;
     }
 
     /**
@@ -199,7 +202,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(column, newValue);
 
         Log.i(TAGDATABASE, "Data updated correctly");
-        return db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)}) > 0;
+
+        boolean status = db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)}) > 0;
+
+        return  status;
 
     }
 
@@ -217,10 +223,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)});
 
 
+
     }
 
-    public void deleteAPhoto(String photoLocation, String owner){
+    public void deleteAPhoto(String owner){
         SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NAME,COL_OWNER_10 +"="+ owner,null );
+
+        Log.d("DELETING FROM SQL", "delete owner" + owner);
         /*
 
         // Select id from photo_table where column = value
@@ -436,13 +447,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         selection = COL_REL_7 +"= 0";
 
         if(viewMyPhoto && !viewFriendPhoto){
-            //selection += " AND ";
-            //selection += COL_OWNER_10 + " == '"+ username +"'";
+            selection += " AND ";
+            selection += COL_OWNER_10 + " == '"+ username +"'";
             Log.d("View Status", "OWN is On, Friend is OFF");
         }
         else if(!viewMyPhoto && viewFriendPhoto){
-            //selection += " AND ";
-            //selection += COL_OWNER_10 + " != '"+ username +"'";
+            selection += " AND ";
+            selection += COL_OWNER_10 + " != '"+ username +"'";
 
             Log.d("View Status", "OWN is OFF, Friend is ON");
 

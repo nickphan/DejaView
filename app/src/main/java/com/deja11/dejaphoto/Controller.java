@@ -240,6 +240,7 @@ public class Controller implements Parcelable {
      * @return true if the wallpaper was set. false otherwise
      */
     public boolean setWallpaper(Photo photo) {
+        Log.i("setWallpaper", "so far so good");
         if (photo == null) {
             return false;
         }
@@ -328,7 +329,7 @@ public class Controller implements Parcelable {
             Log.i("SCREENH", String.valueOf(screenh));
 
             //
-            Bitmap mutableBitmap = Bitmap.createBitmap(width, screenh, bitmap.getConfig());
+            Bitmap mutableBitmap = Bitmap.createBitmap(width, height, bitmap.getConfig());
 
             // inside the method, we need to adjust the photo size
             writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
