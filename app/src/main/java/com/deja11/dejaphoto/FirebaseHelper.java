@@ -115,8 +115,6 @@ public class FirebaseHelper {
 
     public void insertFirebaseStorage(String phoneLocation){
 
-        Uri compressed = compress(phoneLocation);
-
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
@@ -128,13 +126,13 @@ public class FirebaseHelper {
         Uri file = compress(phoneLocation);
         Log.d("FIREBASE STORAGE",file2.getLastPathSegment() +" will be uploaded" );
         StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file2.getLastPathSegment());
+
         uploadTask = photoRef.putFile(file);
     }
 
     public ArrayList<String> downloadFriendPhotos(final Context context, final String friendUserName){
         Log.d("SYNC", "DOWNLOADING FROM " + friendUserName);
         Toast.makeText(context,"Downloading from " + friendUserName,Toast.LENGTH_LONG).show();
-
 
         // Create a director if it doesn't exit
 
@@ -153,11 +151,12 @@ public class FirebaseHelper {
                 String dateString;
                 String owner;
                 String locationName;
-
                 String photoName;
+                boolean released;
+                boolean karma;
 
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                    Photo toBedl = new Photo(null,null,null,0,false,false);
+
 
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
                     locationName = eventSnapshot.child(COL_LOC_NAME_11).getValue().toString();
@@ -165,16 +164,19 @@ public class FirebaseHelper {
                     owner = eventSnapshot.child(COL_OWNER_10).getValue().toString();
                     dateString= eventSnapshot.child(COL_DATE_5).getValue().toString();
                     totalKarma = Integer.valueOf(eventSnapshot.child(COL_TOTAL_KARMA_12).getValue().toString());
+                    released = Boolean.valueOf(eventSnapshot.child(COL_KARMA_8).getValue().toString());
 
 
 
 
-                    toBedl.setFileName(photoName);
-                    toBedl.setLocationName(locationName);
-                    toBedl.setGeoLocation(geoLocation);
-                    toBedl.setOwner(owner);
-                    toBedl.setDateString(dateString);
-                    toBedl.setTotalKarma(totalKarma);
+                    Photo toBedl = new Photo(null, geoLocation, null, 0, released, false, totalKarma, dateString, photoName, owner, locationName);
+
+                    //toBedl.setFileName(photoName);
+                    //toBedl.setLocationName(locationName);
+                    //toBedl.setGeoLocation(geoLocation);
+                    //toBedl.setOwner(owner);
+                    //toBedl.setDateString(dateString);
+                    //toBedl.setTotalKarma(totalKarma);
                     downloadAPhoto(friendUserName, photoName,context, toBedl);
                     //
                     //Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
@@ -281,7 +283,28 @@ public class FirebaseHelper {
 
     }
 
-        public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
+    public int getTotalKarma(String ownerName, String photoName){
+        final int[] karma = new int[1];
+        Log.i("getTotalKarma", ownerName);
+        Log.i("getTotalKarma", photoName);
+        DatabaseReference databaseReference = mdejaRef.child("images").child(ownerName).child(photoName).child("TOTALKARMA");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String karmaString = dataSnapshot.getValue().toString();
+                karma[0] = Integer.valueOf(karmaString);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        return karma[0];
+
+    }
+
+    public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
         File storagePath = new File(Controller.DEJAPHOTOFRIENDSPATH, photo.getOwner());
 
@@ -289,43 +312,29 @@ public class FirebaseHelper {
         if(!storagePath.exists()) {
             //Toast.makeText(context, "storage created",Toast.LENGTH_LONG).show();
             storagePath.mkdirs();
-        }
-        else {
+        } else {
             //Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
-try {
-    final File myFile = new File(storagePath, photoName);
+        try {
 
-
-    StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
-    riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-        @Override
-        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-            // Local temp file has been created
-            //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
+            final File myFile = new File(storagePath,photoName);
+            StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
+            riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // Local temp file has been created
+                    //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                }
+            });
+            DatabaseHelper databaseHelper = new DatabaseHelper(context);
+            databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
+        }catch (Exception e){
+            Log.e("Exception RejecTED", "file not found");
         }
-    }).addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception exception) {
-            // Handle any errors
-            //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
-
-        }
-    });
-    //Toast.makeText(context, listOfPhotosToDownload.get(i++), Toast.LENGTH_SHORT).show();
-
-
-
-    DatabaseHelper databaseHelper = new DatabaseHelper(context);
-    //tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
-
-    databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
-
-}
-catch (Exception e){
-    Log.e("Exception RejecTED", "file not found");
-
-}
 
 
 
@@ -482,6 +491,7 @@ catch (Exception e){
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("waiting", "getFriends");
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -512,6 +522,7 @@ catch (Exception e){
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("waiting", "getusername");
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -539,7 +550,7 @@ catch (Exception e){
         while(!check[0]){
             try{
                 Thread.sleep(500);
-                Log.d("Testing", "Sleeping");
+                Log.d("waiting", "getPhotos");
             }catch (Exception e){
                 e.printStackTrace();
             }

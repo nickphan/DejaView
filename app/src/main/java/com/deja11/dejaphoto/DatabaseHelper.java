@@ -383,7 +383,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
 
             if (res.getCount() == 0) {
-
                 this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName, owner, locationName, totalKarma);
                 Log.i("Database insertion", absolutePath + " is now in the table");
                 //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
@@ -566,7 +565,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         /*code to get total karma as int*/
 
-        Log.i(TAGDATABASE, "Next photo object returned");
+        Log.i("CHOOSING PHOTO", "Next photo object returned");
         return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma, dateString, fileName, owner, locName);
     }
 
