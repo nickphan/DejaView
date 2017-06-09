@@ -537,10 +537,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isKarma = res.getInt(7) > 0 ? true : false;
         int totalKarma = res.getInt(11);
 
+        //this.dateString = dateString;
+        //this.fileName = fileName;
+        //this.owner = owner;
+        //this.locationName = locationName;
+
+        String dateString = res.getString(4);
+        String fileName = res.getString(8);
+        String owner = res.getString(9);
+        String locName = res.getString(10);
+
         /*code to get total karma as int*/
 
         Log.i(TAGDATABASE, "Next photo object returned");
-        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma);
+        return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma, dateString, fileName, owner, locName);
     }
 
     /**
