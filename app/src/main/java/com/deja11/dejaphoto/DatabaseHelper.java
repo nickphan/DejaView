@@ -549,7 +549,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         /*code to get total karma as int*/
 
-        Log.i(TAGDATABASE, "Next photo object returned");
+        Log.i("CHOOSING PHOTO", "Next photo object returned");
         return new Photo(photoLocation, geoLocation, date, dejapoint, isReleased, isKarma, totalKarma, dateString, fileName, owner, locName);
     }
 

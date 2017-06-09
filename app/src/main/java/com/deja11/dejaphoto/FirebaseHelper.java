@@ -122,8 +122,8 @@ public class FirebaseHelper {
         String username = sharedPreferences.getString("username", "unknown");
         //insert into storage
         UploadTask uploadTask;
-        //Uri file = Uri.fromFile(new File(phoneLocation));
-        Uri file = compress(phoneLocation);
+        Uri file = Uri.fromFile(new File(phoneLocation));
+        //Uri file = compress(phoneLocation);
         StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file.getLastPathSegment());
         uploadTask = photoRef.putFile(file);
     }
@@ -131,7 +131,6 @@ public class FirebaseHelper {
     public ArrayList<String> downloadFriendPhotos(final Context context, final String friendUserName){
         Log.d("SYNC", "DOWNLOADING FROM " + friendUserName);
         Toast.makeText(context,"Downloading from " + friendUserName,Toast.LENGTH_LONG).show();
-
 
         // Create a director if it doesn't exit
 
@@ -275,7 +274,7 @@ public class FirebaseHelper {
 
     }
 
-        public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
+    public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
         File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");
 
@@ -289,12 +288,6 @@ public class FirebaseHelper {
         }
 
         final File myFile = new File(storagePath,photoName);
-
-
-
-
-
-
         StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
         riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
