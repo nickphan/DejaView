@@ -226,6 +226,15 @@ public class DatabaseMediator {
      *
      * */
 
+    public int getTotalKarma(String ownerName, String photoName){
+        int dot = photoName.indexOf('.');
+        String name;
+        if(dot != -1){
+            name = photoName.substring(0,dot) + photoName.substring(dot+1);
+            return firebaseHelper.getTotalKarma(ownerName, name);
+        }
+        return  firebaseHelper.getTotalKarma(ownerName, photoName);
+    }
 
     public boolean getSharing(String username){
         return firebaseHelper.getSharing(username);
@@ -242,6 +251,7 @@ public class DatabaseMediator {
         return firebaseHelper.getPhotos();
     }
     public void setLocationName(String photoPath, String locationName) {
+        Log.i("location", "mediator updating location name");
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
     }
 
