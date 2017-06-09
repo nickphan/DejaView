@@ -129,7 +129,6 @@ public class DatabaseMediator {
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);
                     databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, username, defaultLocation, 0);
-
                     firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,username,defaultLocation, "0");
 
                 }
