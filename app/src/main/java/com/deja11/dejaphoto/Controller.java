@@ -589,6 +589,8 @@ public class Controller implements Parcelable {
     }
 
     public void sync(){
+
+        databaseMediator.initDatabase(context);
         /*
         if(SettingPreference.viewFriendPhoto){
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

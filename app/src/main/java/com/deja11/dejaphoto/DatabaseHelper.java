@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "deja.db";
     public static final String TABLE_NAME = "photo_table";
-    public static final String ALBUMPREFIX = "DCIM";
+    public static final String ALBUMPREFIX = "Deja";
 
     public static final String COL_ID_1 = "ID";
     public static final String COL_PATH_2 = "PHONELOCATION";
