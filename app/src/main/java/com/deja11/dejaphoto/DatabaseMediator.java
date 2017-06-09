@@ -164,6 +164,9 @@ public class DatabaseMediator {
         String username = sharedPreferences.getString("username", "unknown");
         databaseHelper.updateRelease(photoLocation);
         //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+
+        Log.i("Release", "databaseHelper not the problem");
+
         if(owner.equals(username)) {
             //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
             firebaseHelper.updateRelease(username, photoLocation);
