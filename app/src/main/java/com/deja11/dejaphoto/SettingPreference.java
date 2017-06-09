@@ -74,6 +74,7 @@ public class SettingPreference extends Activity {
         }
         switchPhoto.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showSwitch = isChecked;
                 updateStatus(isChecked, switchStatus, switchPhoto);
                 if(isChecked){
                     seekBar.setEnabled(true);
@@ -92,6 +93,7 @@ public class SettingPreference extends Activity {
         updateStatus(showLocation,locationStatus,switchLocation);
         switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showLocation = isChecked;
                 updateStatus(isChecked, locationStatus, switchLocation);
                 saveStatus(KEY_LOCATION, isChecked);
             }
@@ -103,6 +105,7 @@ public class SettingPreference extends Activity {
         updateStatus(viewMyPhoto,myStatus,switchMine);
         switchMine.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                viewMyPhoto = isChecked;
                 updateStatus(isChecked, myStatus, switchMine);
                 saveStatus(KEY_VIEW_MY_PHOTOS, isChecked);
             }
@@ -114,6 +117,7 @@ public class SettingPreference extends Activity {
         updateStatus(viewFriendPhoto,friendsStatus,switchFriends);
         switchFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                viewFriendPhoto = isChecked;
                 updateStatus(isChecked, friendsStatus, switchFriends);
                 saveStatus(KEY_VIEW_FRIENDS_PHOTOS, isChecked);
             }
@@ -125,6 +129,7 @@ public class SettingPreference extends Activity {
         updateStatus(sharing,sharingStatus,switchSharing);
         switchSharing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sharing = isChecked;
                 updateStatus(isChecked, sharingStatus, switchSharing);
                 saveStatus(KEY_SHARING, isChecked);
             }
