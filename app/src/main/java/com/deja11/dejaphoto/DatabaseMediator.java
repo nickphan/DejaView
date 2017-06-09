@@ -122,8 +122,9 @@ public class DatabaseMediator {
                 latitude = cursor.getDouble(columnIndexLat); // latitude
                 longitude = cursor.getDouble(columnIndexLong); // longtitude
 
+                String test = "deja";
                 // Make sure it is in the camera album
-                if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
+                if (absolutePath.toLowerCase().contains(test.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);

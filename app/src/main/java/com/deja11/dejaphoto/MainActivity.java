@@ -132,11 +132,9 @@ public class MainActivity extends Activity {
                 //String username = email.substring(0,dot) + email.substring(dot+1);
 
                 mSharedPrefcheck.edit().putString("username", username).apply();
-                //controller.createUser();
-              
-                
+
                 initApp();
-              
+
             }
         });
         //pop out the window
@@ -151,8 +149,11 @@ public class MainActivity extends Activity {
         createFolders();
         initNotificationBar();
         initAlarms();
-
         controller = new Controller(this);
+
+        controller.createUser();
+
+
         //controller.databaseMediator.initDatabase(MainActivity.this);
     }
 
