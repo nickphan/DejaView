@@ -61,7 +61,6 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends Activity {
 
     Controller controller;
-    Context myContext;
     String username;
 
     // For testing purpose
@@ -102,16 +101,21 @@ public class MainActivity extends Activity {
      * Requests permission from the user
      */
     private void requestPermissions() {
+        ArrayList<String> permissions = new ArrayList<String>(2);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+
+        if (permissions.size() > 0) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 2);
+                    permissions.toArray(new String[0]), 1);
         }
     }
 
