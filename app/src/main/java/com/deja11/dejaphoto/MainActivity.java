@@ -362,24 +362,26 @@ public class MainActivity extends Activity {
 
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
-                /* SINGLE RETURNED. SHOULD NEVER COME HERE */
+                /* SINGLE RETURNED. */
+                ArrayList<Uri> uriArrayList = new ArrayList<Uri>();
+
                 if(data.getData() != null){
-                    Uri imageData = data.getData();
+                    uriArrayList.add(data.getData());
+
                 }
-                /* MULTIPLE RETURNED. SHOULD ONLY EVER COME HERE */
+                /* MULTIPLE RETURNED. */
                 else{
                     if(data.getClipData() != null){
                         ClipData clipData = data.getClipData();
-                        ArrayList<Uri> uriArrayList = new ArrayList<Uri>();
                         for(int i = 0; i < clipData.getItemCount(); i++){
                             ClipData.Item item = clipData.getItemAt(i);
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
                         }
-
-                        controller.copyPhotos(uriArrayList);
                     }
                 }
+
+                controller.copyPhotos(uriArrayList);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
