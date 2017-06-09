@@ -373,7 +373,7 @@ public class MainActivity extends Activity {
                             uriArrayList.add(uri);
                         }
 
-                        //controller.copyPhotos(uriArrayList);
+                        controller.copyPhotos(uriArrayList);
 
                     }
                 }
