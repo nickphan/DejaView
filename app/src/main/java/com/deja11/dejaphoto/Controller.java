@@ -121,7 +121,7 @@ public class Controller implements Parcelable {
         int height= context.getResources().getDisplayMetrics().heightPixels;
         screenh = height;
 
-        databaseMediator.createUser(user.getUsername());
+        //databaseMediator.createUser(user.getUsername());
     }
 
     /**
@@ -321,7 +321,11 @@ public class Controller implements Parcelable {
             int width = getWidthFromString(photoPath);
 
             //create the bitmap that has the same size as the screen
-            Bitmap mutableBitmap = Bitmap.createBitmap(screenw, screenh, bitmap.getConfig());
+            Log.i("SCREENW", String.valueOf(screenw));
+            Log.i("SCREENH", String.valueOf(screenh));
+
+            //
+            Bitmap mutableBitmap = Bitmap.createBitmap(width, screenh, bitmap.getConfig());
 
             // inside the method, we need to adjust the photo size
             writeBitmapOnMutable(mutableBitmap, bitmap, width, height );
@@ -352,11 +356,11 @@ public class Controller implements Parcelable {
         int y_difference = photoHeight - mutableBitmap.getHeight() ;
         int width_after_resize;
         int height_after_resize;
-        if(x_difference <= 0 && y_difference <= 0){
+       /* if(x_difference <= 0 && y_difference <= 0){
             m.setScale(1, 1);
         }
         else{
-            if(x_difference > 0 && y_difference > 0){
+            if(x_difference > 0 && y_difference > 0){*/
                 float ratio;
                 if(x_difference > y_difference){
                     ratio = (float) mutableBitmap.getWidth() / photoWidth;
@@ -369,8 +373,8 @@ public class Controller implements Parcelable {
                 height_after_resize = (int)ratio* photoHeight;
                 bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize,
                         height_after_resize, true);
-            }
-        }
+            //}
+        //}
         int cx = (canvas.getWidth() - bitmap.getWidth()) >> 1;
         int cy = (canvas.getHeight() - bitmap.getHeight()) >> 1;
         canvas.drawBitmap(bitmap, cx,cy, new Paint());
@@ -382,7 +386,7 @@ public class Controller implements Parcelable {
      * @param mutableBitmap the bitmap of the image to be the wallpaper
      * @param locationText the text to be displayed
      */
-    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText,String karma) {
+    private void writeTextOnWallpaper(Bitmap mutableBitmap, String locationText, String karma) {
 
         String cutText = locationText;
         if(cutText.length() > 30){
@@ -394,8 +398,8 @@ public class Controller implements Parcelable {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setTextSize(canvas.getHeight() / 40);
-        canvas.drawText(cutText, canvas.getHeight() / 40, (float)canvas.getHeight()-canvas.getHeight()/40, paint);
-        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40,canvas.getHeight()-canvas.getHeight()/40,paint);
+        canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.9 * screenh), paint);
+        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.9 * screenh),paint);
     }
 
     /**

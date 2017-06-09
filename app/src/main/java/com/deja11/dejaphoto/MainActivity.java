@@ -287,7 +287,7 @@ public class MainActivity extends Activity {
                 controller.addFriend(email);
                 Log.i("ADDFRIEND", "WHOA");
 
-                Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(myContext, "request has been sent to "+email, Toast.LENGTH_SHORT).show();
             }
         });
         Log.i("ADDFRIEND", "END");
@@ -297,7 +297,22 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * OnClick function for the Import Photos button.
+     * Launches the gallery for a single photo
+     * @param view, the view that calls it
+     */
+    public void getSingleImageFromGallery(View view){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        Uri data = Uri.parse(pictureDirectoryPath);
+        photoPickerIntent.setDataAndType(data, "image/*");
+        startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
+    }
+
+    /**
+     * OnClick function for the Import Photos button
      * Launches the gallery and lets the user select photos.
      *
      * @param view, the view that calls this method
@@ -315,20 +330,7 @@ public class MainActivity extends Activity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), Controller.PHOTO_PICKER_MULTIPLE_CODE);
     }
 
-    /**
-     *
-     * OnClick function for the Rename Location button.
-     * Launches the gallery for a single photo
-     * @param view, the view that calls it
-     */
-    public void getSingleImageFromGallery(View view){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String pictureDirectoryPath = pictureDirectory.getPath();
-        Uri data = Uri.parse(pictureDirectoryPath);
-        photoPickerIntent.setDataAndType(data, "image/*");
-        startActivityForResult(photoPickerIntent, Controller.PHOTO_PICKER_SINGLE_CODE);
-    }
+
 
     /**
      * Handler for whenever an activity is returned
