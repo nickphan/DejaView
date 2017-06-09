@@ -306,7 +306,7 @@ public class MainActivity extends Activity {
      * @param view, the view that calls it
      */
     public void getSingleImageFromGallery(View view){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
 
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
