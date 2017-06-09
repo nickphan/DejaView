@@ -591,22 +591,24 @@ public class Controller implements Parcelable {
     public void sync(){
 
         databaseMediator.initDatabase(context);
-        /*
+
         if(SettingPreference.viewFriendPhoto){
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             String username = sharedPreferences.getString("username", "unknown");
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
 
             for (Pair<String,String> currFriend : myFriends){
+
+                Log.d("SHOWING FRIEND ", currFriend.first);
                 if(currFriend.second.equals("true")){
-                    databaseMediator.downloadFriendPhotos(context);
+                    databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
                 else{
                     //delete
                 }
             }
 
-        }*/
+        }
     }
     //sync should also look for karma, release, and name
 

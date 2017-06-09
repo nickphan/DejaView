@@ -23,12 +23,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -58,6 +60,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import static android.R.attr.value;
+import static com.deja11.dejaphoto.R.id.username;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -87,11 +90,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //public static final String currentUserName = "yoohoohoo@heeheecom";
     //public static final String currentUserName = "physicalDevice@teesphonecom";
 
+    Context context;
 
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
         Log.i(TAGDATABASE, "Database constructor called");
+        this.context = context;
     }
 
 
@@ -418,6 +423,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String pathToPhoto = null;
         Random rand = new Random();
 
+        String selection;
+
+
+
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        boolean viewMyPhoto = sharedPreferences.getBoolean("viewMyPhotos",true);
+        boolean viewFriendPhoto = sharedPreferences.getBoolean("viewFriendsPhotos",true);
+
+        selection = COL_REL_7 +"= 0";
+
+        if(viewMyPhoto && !viewFriendPhoto){
+            //selection += " AND ";
+            //selection += COL_OWNER_10 + " == '"+ username +"'";
+            Log.d("View Status", "OWN is On, Friend is OFF");
+        }
+        else if(!viewMyPhoto && viewFriendPhoto){
+            //selection += " AND ";
+            //selection += COL_OWNER_10 + " != '"+ username +"'";
+
+            Log.d("View Status", "OWN is OFF, Friend is ON");
+
+        }
+        else if(!viewMyPhoto && !viewFriendPhoto){
+
+            Log.d("View Status", "OWN is OFF, Friend is OFF");
+            //return "empty";
+        }
+        else{
+
+            Log.d("View Status", "OWN is ON, Friend is ON");
+        }
+
+
+
+
         // Generate a random number
         randomNumber = rand.nextInt(10) + 1;
 
@@ -427,16 +469,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // 10 choose random photo
         if (randomNumber >= 10) {
             // Select photolocation from photo_table where Released = 0
-            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7 + "= 0", null, null, null, null, null);
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, selection, null, null, null, null, null);
         } else if (randomNumber >= 7) {
 
             // Select phonelocation from photo_table where Released = 0 order by date desc limit 5
             // TODO
             // Select phonelocation from photo_table where Released = 0 AND (emailSenderID=fID OR emailSenderID=myID) order by date desc limit 5
-            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7 + "= 0", null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP5));
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, selection, null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP5));
         } else {
             // Select phonelocation from photo_table where Released = 0 order by dejapoint desc limit 5
-            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, COL_REL_7 + "= 0", null, null, null, COL_DEJA_6 + " DESC", String.valueOf(TOP5));
+            res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, selection, null, null, null, COL_DEJA_6 + " DESC", String.valueOf(TOP5));
 
         }
 
@@ -453,7 +495,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get the path of that photo
         pathToPhoto = res.getString(0);
 
-        Log.i(TAGDATABASE, "Getting a random path");
+        Log.i("Selecting photo", "Getting a random path "+ pathToPhoto);
         return pathToPhoto;
     }
 

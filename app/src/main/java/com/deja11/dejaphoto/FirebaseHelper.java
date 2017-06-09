@@ -268,7 +268,7 @@ public class FirebaseHelper {
 
         public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
-        File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
+        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
