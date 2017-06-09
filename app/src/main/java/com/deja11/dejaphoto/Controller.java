@@ -398,14 +398,14 @@ public class Controller implements Parcelable {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setTextSize(canvas.getHeight() / 40);
-        canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.9 * screenh), paint);
-        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.9 * screenh),paint);
+        canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.95 * screenh), paint);
+        canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.95 * screenh),paint);
     }
 
     /**
      * Private helper method to get the width of the photo
      *
-     * @param photoPath the string of the location of the photo
+      * @param photoPath the string of the location of the photo
      * @return the width of the photo
      */
     private int getWidthFromString(String photoPath) {
