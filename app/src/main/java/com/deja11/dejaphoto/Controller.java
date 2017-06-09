@@ -41,6 +41,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -631,9 +632,6 @@ public class Controller implements Parcelable {
         }
     }
     //sync should also look for karma, release, and name
-
-
-
 
 
 
