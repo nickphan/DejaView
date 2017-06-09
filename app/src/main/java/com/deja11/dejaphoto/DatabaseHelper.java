@@ -447,13 +447,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         selection = COL_REL_7 +"= 0";
 
         if(viewMyPhoto && !viewFriendPhoto){
-            //selection += " AND ";
-            //selection += COL_OWNER_10 + " == '"+ username +"'";
+            selection += " AND ";
+            selection += COL_OWNER_10 + " == '"+ username +"'";
             Log.d("View Status", "OWN is On, Friend is OFF");
         }
         else if(!viewMyPhoto && viewFriendPhoto){
-            //selection += " AND ";
-            //selection += COL_OWNER_10 + " != '"+ username +"'";
+            selection += " AND ";
+            selection += COL_OWNER_10 + " != '"+ username +"'";
 
             Log.d("View Status", "OWN is OFF, Friend is ON");
 
