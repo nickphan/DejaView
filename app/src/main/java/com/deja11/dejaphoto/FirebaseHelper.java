@@ -122,9 +122,12 @@ public class FirebaseHelper {
         String username = sharedPreferences.getString("username", "unknown");
         //insert into storage
         UploadTask uploadTask;
-        //Uri file = Uri.fromFile(new File(phoneLocation));
+
+        // Use file2 to get a correct name for firebase storage
+        Uri file2 = Uri.fromFile(new File(phoneLocation));
         Uri file = compress(phoneLocation);
-        StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file.getLastPathSegment());
+        Log.d("FIREBASE STORAGE",file2.getLastPathSegment() +" will be uploaded" );
+        StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file2.getLastPathSegment());
         uploadTask = photoRef.putFile(file);
     }
 
@@ -280,7 +283,7 @@ public class FirebaseHelper {
 
         public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
-        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");
+        File storagePath = new File(Controller.DEJAPHOTOFRIENDSPATH, photo.getOwner());
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {

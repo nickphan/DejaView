@@ -623,7 +623,7 @@ public class Controller implements Parcelable {
             for (Pair<String,String> currFriend : myFriends){
 
                 Log.d("SHOWING FRIEND ", currFriend.first);
-                //databaseMediator.deleteFriendPhotos("nick1");
+                //databaseMediator.deleteFriendPhotos("phoneketchup");
                 if(currFriend.second.equals("true")){
                     databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
