@@ -2,6 +2,7 @@ package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,6 +41,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -356,46 +359,40 @@ public class Controller implements Parcelable {
     private void writeBitmapOnMutable(Bitmap mutableBitmap, Bitmap bitmap, int photoWidth, int photoHeight) {
 
         Canvas canvas = new Canvas(mutableBitmap);
-        Matrix m = new Matrix();
 
         int x_difference = photoWidth - mutableBitmap.getWidth() ;
         int y_difference = photoHeight - mutableBitmap.getHeight() ;
         int width_after_resize;
         int height_after_resize;
-       /* if(x_difference <= 0 && y_difference <= 0){
-            m.setScale(1, 1);
+
+        float ratio;
+        float adjust_ratio = 1;
+
+        if(x_difference > y_difference){
+            ratio = (float) mutableBitmap.getWidth() / photoWidth;
         }
         else{
-            if(x_difference > 0 && y_difference > 0){*/
-                float ratio;
-                if(x_difference > y_difference){
-                    ratio = (float) mutableBitmap.getWidth() / photoWidth;
-                }
-                else{
-                    ratio = (float) mutableBitmap.getHeight() / photoHeight;
-                }
-                Log.d("current Ratio:", ratio+"");
-                width_after_resize = (int)(ratio * photoWidth);
-                height_after_resize = (int)(ratio* photoHeight);
+            ratio = (float) mutableBitmap.getHeight() / photoHeight;
+        }
+        Log.d("current Ratio:", ratio+"");
+        width_after_resize = (int)(ratio * photoWidth);
+        height_after_resize = (int)(ratio* photoHeight);
 
-                if(width_after_resize == mutableBitmap.getWidth() && height_after_resize > mutableBitmap.getHeight()){
-                    float second_ratio = mutableBitmap.getHeight() / height_after_resize;
-                    width_after_resize = (int)(second_ratio * width_after_resize );
-                    height_after_resize = (int)(second_ratio * height_after_resize);
-                }
-                if(height_after_resize == mutableBitmap.getHeight() && width_after_resize > mutableBitmap.getWidth()){float second_ratio = mutableBitmap.getHeight() / height_after_resize;
-                    float third_ratio = mutableBitmap.getHeight() / width_after_resize;
-                    width_after_resize = (int)(third_ratio * width_after_resize );
-                    height_after_resize = (int)(third_ratio * height_after_resize);
-                }
 
-                bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize,
-                        height_after_resize, true);
-                Log.i("photo width", bitmap.getWidth()+"");
-                Log.i("photo height", bitmap.getHeight()+"");
-            //}
-        //}
-        int cx = (canvas.getWidth() - bitmap.getWidth()) >> 1;
+        if(width_after_resize == mutableBitmap.getWidth() && height_after_resize > mutableBitmap.getHeight()){
+            adjust_ratio = (float) mutableBitmap.getHeight() / height_after_resize;
+        }
+        else if(height_after_resize == mutableBitmap.getHeight() && width_after_resize > mutableBitmap.getWidth()) {
+            adjust_ratio = (float) mutableBitmap.getWidth() / width_after_resize;
+        }
+        Log.d("current adjust_Ratio:", adjust_ratio +"");
+        width_after_resize = (int)(adjust_ratio * width_after_resize );
+        height_after_resize = (int)(adjust_ratio* height_after_resize);
+
+        bitmap = Bitmap.createScaledBitmap(bitmap, width_after_resize, height_after_resize, true);
+        Log.i("photo width", bitmap.getWidth()+"");
+        Log.i("photo height", bitmap.getHeight()+"");
+
         int cy = (canvas.getHeight() - bitmap.getHeight()) >> 1;
         canvas.drawBitmap(bitmap, 0,cy, new Paint());
     }
@@ -420,12 +417,13 @@ public class Controller implements Parcelable {
         paint.setTextSize(canvas.getHeight() / 40);
         canvas.drawText(cutText, canvas.getHeight() / 40, (int)(0.9 * mutableBitmap.getHeight()), paint);
         canvas.drawText(karma, canvas.getWidth()-3*canvas.getHeight()/40, (int)(0.9 * mutableBitmap.getHeight()),paint);
+
     }
 
     /**
      * Private helper method to get the width of the photo
      *
-     * @param photoPath the string of the location of the photo
+      * @param photoPath the string of the location of the photo
      * @return the width of the photo
      */
     private int getWidthFromString(String photoPath) {
@@ -610,28 +608,45 @@ public class Controller implements Parcelable {
 
     public void sync(){
 
+        // adds all the photos in the folder into the gallery (so the database can scan it)
+        for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
+            File[] files = new File(folderPath).listFiles();
+            String[] filePath = new String[files.length];
+
+            for (int i = 0; i < files.length; i++) {
+                filePath[i] = files[i].getAbsolutePath();
+            }
+
+            MediaScannerConnection.scanFile(context, filePath, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                @Override
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.i("Scan Completed", path);
+                }
+            });
+
+        }
         databaseMediator.initDatabase(context);
-        /*
+
         if(SettingPreference.viewFriendPhoto){
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             String username = sharedPreferences.getString("username", "unknown");
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
 
             for (Pair<String,String> currFriend : myFriends){
+
+                Log.d("SHOWING FRIEND ", currFriend.first);
                 if(currFriend.second.equals("true")){
-                    databaseMediator.downloadFriendPhotos(context);
+                    databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
                 else{
                     //delete
                 }
             }
 
-        }*/
+        }
     }
     //sync should also look for karma, release, and name
-
-
-
 
 
 

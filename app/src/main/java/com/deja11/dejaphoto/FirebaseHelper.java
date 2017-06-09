@@ -2,9 +2,12 @@ package com.deja11.dejaphoto;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,11 +114,16 @@ public class FirebaseHelper {
 
 
     public void insertFirebaseStorage(String phoneLocation){
+
+        Uri compressed = compress(phoneLocation);
+
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
         //insert into storage
         UploadTask uploadTask;
-        Uri file = Uri.fromFile(new File(phoneLocation));
+        //Uri file = Uri.fromFile(new File(phoneLocation));
+        Uri file = compress(phoneLocation);
         StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file.getLastPathSegment());
         uploadTask = photoRef.putFile(file);
     }
@@ -268,7 +277,7 @@ public class FirebaseHelper {
 
         public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
-        File storagePath = new File(Environment.getExternalStorageDirectory(), "/Deja/myfriends");
+        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
@@ -525,5 +534,17 @@ public class FirebaseHelper {
             }
         }
         return photoNames;
+    }
+
+    private Uri compress(String photoPath){
+        Bitmap bitmap = BitmapFactory.decodeFile(new File(photoPath).getAbsolutePath());
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byte[] byteArray = stream.toByteArray();
+        Bitmap compressedBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), compressedBitmap, "title", null);
+        return Uri.parse(path);
     }
 }

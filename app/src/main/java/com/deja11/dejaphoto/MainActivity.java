@@ -374,7 +374,6 @@ public class MainActivity extends Activity {
                         }
 
                         controller.copyPhotos(uriArrayList);
-
                     }
                 }
             }

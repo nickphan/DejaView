@@ -129,7 +129,6 @@ public class DatabaseMediator {
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);
                     databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, username, defaultLocation, 0);
-
                     firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,username,defaultLocation, "0");
 
                 }
@@ -164,6 +163,9 @@ public class DatabaseMediator {
         String username = sharedPreferences.getString("username", "unknown");
         databaseHelper.updateRelease(photoLocation);
         //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
+
+        Log.i("Release", "databaseHelper not the problem");
+
         if(owner.equals(username)) {
             //firebaseHelper.updateFirebase(currentUserName, photoLocation ,COL_REL_7,"1");
             firebaseHelper.updateRelease(username, photoLocation);
@@ -171,9 +173,9 @@ public class DatabaseMediator {
     }
 
 
-    public void downloadFriendPhotos(Context context) {
+    public void downloadFriendPhotos(Context context, String username) {
 
-        firebaseHelper.downloadFriendPhotos(context, "physicalDevice@teesphonecom");
+        firebaseHelper.downloadFriendPhotos(context, username);
     }
 
 
