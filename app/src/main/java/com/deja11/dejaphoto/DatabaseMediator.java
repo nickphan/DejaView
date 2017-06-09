@@ -132,7 +132,7 @@ public class DatabaseMediator {
                     firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,username,defaultLocation, "0");
 
                 }
-                }
+            }
         }
     }
 

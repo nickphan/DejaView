@@ -300,7 +300,9 @@ public class MainActivity extends Activity {
      */
     public void getSingleImageFromGallery(View view){
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
         String pictureDirectoryPath = pictureDirectory.getPath();
         Uri data = Uri.parse(pictureDirectoryPath);
         photoPickerIntent.setDataAndType(data, "image/*");

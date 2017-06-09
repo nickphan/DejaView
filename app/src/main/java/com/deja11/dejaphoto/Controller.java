@@ -120,7 +120,7 @@ public class Controller implements Parcelable {
         int height= context.getResources().getDisplayMetrics().heightPixels;
         screenh = height;
 
-        databaseMediator.createUser(user.getUsername());
+        //databaseMediator.createUser(user.getUsername());
     }
 
     /**
