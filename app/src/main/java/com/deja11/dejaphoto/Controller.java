@@ -609,6 +609,7 @@ public class Controller implements Parcelable {
 
     public void sync(){
 
+
         // adds all the photos in the folder into the gallery (so the database can scan it)
         for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
             File[] files = new File(folderPath).listFiles();
@@ -628,12 +629,12 @@ public class Controller implements Parcelable {
 
         }
         databaseMediator.initDatabase(context);
-
+        boolean sharing = SettingPreference.sharing;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        databaseMediator.setSharing(username, sharing);
         if(SettingPreference.viewFriendPhoto){
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String username = sharedPreferences.getString("username", "unknown");
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
-
             for (Pair<String,String> currFriend : myFriends){
 
                 Log.d("SHOWING FRIEND ", currFriend.first);

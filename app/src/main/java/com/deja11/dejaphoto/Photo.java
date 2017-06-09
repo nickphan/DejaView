@@ -21,7 +21,7 @@ public class Photo {
     private String owner;
     private String locationName;
 
-    public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
+    /*public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma) {
         this.phoneLocation = phoneLocation;
         this.geoLocation = geoLocation;
         this.date = date;
@@ -37,7 +37,7 @@ public class Photo {
         this.released = released;
         this.mykarma = karma;
         this.totalKarma = totalKarma;
-    }
+    }*/
 
     public Photo(String phoneLocation, GeoLocation geoLocation, Date date, int dejaPoints, boolean released, boolean karma, int totalKarma, String dateString, String fileName, String owner, String locationName ){
         this.phoneLocation = phoneLocation;

@@ -147,11 +147,12 @@ public class FirebaseHelper {
                 String dateString;
                 String owner;
                 String locationName;
-
                 String photoName;
+                boolean released;
+                boolean karma;
 
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                    Photo toBedl = new Photo(null,null,null,0,false,false);
+
 
                     photoName = eventSnapshot.child(COL_FILE_NAME_9).getValue().toString();
                     locationName = eventSnapshot.child(COL_LOC_NAME_11).getValue().toString();
@@ -159,16 +160,19 @@ public class FirebaseHelper {
                     owner = eventSnapshot.child(COL_OWNER_10).getValue().toString();
                     dateString= eventSnapshot.child(COL_DATE_5).getValue().toString();
                     totalKarma = Integer.valueOf(eventSnapshot.child(COL_TOTAL_KARMA_12).getValue().toString());
+                    released = Boolean.valueOf(eventSnapshot.child(COL_KARMA_8).getValue().toString());
 
 
 
 
-                    toBedl.setFileName(photoName);
-                    toBedl.setLocationName(locationName);
-                    toBedl.setGeoLocation(geoLocation);
-                    toBedl.setOwner(owner);
-                    toBedl.setDateString(dateString);
-                    toBedl.setTotalKarma(totalKarma);
+                    Photo toBedl = new Photo(null, geoLocation, null, 0, released, false, totalKarma, dateString, photoName, owner, locationName);
+
+                    //toBedl.setFileName(photoName);
+                    //toBedl.setLocationName(locationName);
+                    //toBedl.setGeoLocation(geoLocation);
+                    //toBedl.setOwner(owner);
+                    //toBedl.setDateString(dateString);
+                    //toBedl.setTotalKarma(totalKarma);
                     downloadAPhoto(friendUserName, photoName,context, toBedl);
                     //
                     //Toast.makeText(context,"Downloading "+photoName,Toast.LENGTH_LONG).show();
@@ -460,6 +464,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("waiting", "getFriends");
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -490,6 +495,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
+                Log.i("waiting", "getusername");
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -517,7 +523,7 @@ public class FirebaseHelper {
         while(!check[0]){
             try{
                 Thread.sleep(500);
-                Log.d("Testing", "Sleeping");
+                Log.d("waiting", "getPhotos");
             }catch (Exception e){
                 e.printStackTrace();
             }
