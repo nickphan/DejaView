@@ -287,37 +287,42 @@ public class FirebaseHelper {
         else {
             //Toast.makeText(context, "storage already created",Toast.LENGTH_LONG).show();
         }
-
-        final File myFile = new File(storagePath,photoName);
-
-
+try {
+    final File myFile = new File(storagePath, photoName);
 
 
+    StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
+    riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        @Override
+        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+            // Local temp file has been created
+            //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            // Handle any errors
+            //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
 
-
-        StorageReference riversRef = mdejaStorage.child("images").child(userName +"/"+photoName);
-        riversRef.getFile(myFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                // Local temp file has been created
-                //Toast.makeText(context, "file created " + myFile.getPath(),Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                //Toast.makeText(context,"not created",Toast.LENGTH_LONG).show();
-
-            }
-        });
-        //Toast.makeText(context, listOfPhotosToDownload.get(i++), Toast.LENGTH_SHORT).show();
+        }
+    });
+    //Toast.makeText(context, listOfPhotosToDownload.get(i++), Toast.LENGTH_SHORT).show();
 
 
 
-            DatabaseHelper databaseHelper = new DatabaseHelper(context);
-            //tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
+    DatabaseHelper databaseHelper = new DatabaseHelper(context);
+    //tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
 
-                databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
+    databaseHelper.tryToInsertData(myFile.getPath(),photo.getGeoLocation().getLatitude(),photo.getGeoLocation().getLongitude(),photo.getDateString(),0,0,0,photoName,photo.getOwner(),photo.getLocationName(),photo.getTotalKarma());
+
+}
+catch (Exception e){
+    Log.e("Exception RejecTED", "file not found");
+
+}
+
+
+
 
 
     }
