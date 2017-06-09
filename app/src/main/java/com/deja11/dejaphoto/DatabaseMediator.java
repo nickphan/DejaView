@@ -123,14 +123,19 @@ public class DatabaseMediator {
                 longitude = cursor.getDouble(columnIndexLong); // longtitude
 
                 String test = "deja";
+                String test2 = "friends";
                 // Make sure it is in the camera album
                 if (absolutePath.toLowerCase().contains(test.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);
                     databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, username, defaultLocation, 0);
-                    firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName,username,defaultLocation, "0");
 
+                    if(!absolutePath.toLowerCase().contains(test2.toLowerCase())) {
+
+                        firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0, photoName, username, defaultLocation, "0");
+
+                    }
                 }
             }
         }
@@ -176,6 +181,10 @@ public class DatabaseMediator {
     public void downloadFriendPhotos(Context context, String username) {
 
         firebaseHelper.downloadFriendPhotos(context, username);
+    }
+
+    public void deleteFriendPhotos(String username){
+        databaseHelper.deleteAPhoto(username);
     }
 
 
@@ -254,6 +263,8 @@ public class DatabaseMediator {
         Log.i("location", "mediator updating location name");
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
     }
+
+
 
 
 
