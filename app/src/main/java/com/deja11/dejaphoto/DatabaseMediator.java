@@ -67,6 +67,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 
 /**
@@ -102,7 +103,7 @@ public class DatabaseMediator {
 
 
 
-            // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
+            // Delegate to gatherPhotoInfo to get raw information of all photos in the camera album
             Cursor cursor = gatherPhotoInfo(context);
 
             // Get columns of MediaStore object to get photos' information
@@ -126,6 +127,10 @@ public class DatabaseMediator {
                 String test = "deja";
                 String test2 = "friends";
                 // Make sure it is in the camera album
+                Log.i("absolutepath", absolutePath);
+                Log.i("dejaphoto", Pattern.compile(".*/DejaPhoto/.*").matcher(absolutePath).matches() + "");
+                Log.i("dejacopied", Pattern.compile(".*/DejaPhotoCopied/.*").matcher(absolutePath).matches() + "");
+                Log.i("dejafriends", Pattern.compile(".*/DejaPhotoFriends/.*").matcher(absolutePath).matches() + "");
                 if (absolutePath.toLowerCase().contains(test.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
@@ -154,11 +159,12 @@ public class DatabaseMediator {
         cursor.moveToFirst();
         while (cursor.moveToNext()) {
             absolutePath = cursor.getString(columnIndexPath); //path to the photo
-            Log.d("PHOTO FOUND", " " + absolutePath);
+
+            boolean isFriendsPhoto = Pattern.compile(".*/"+ owner +"/.*").matcher(absolutePath).matches();
 
             // Make sure it is in the camera album
-            if (absolutePath.toLowerCase().contains(owner.toLowerCase())) {
-                Log.d("PHOTO FOUND", "This should be deleted: " + absolutePath);
+            if (isFriendsPhoto) {
+                //Log.d("PHOTO FOUND", "This should be deleted: " + absolutePath);
                 data.add(absolutePath);
             }
         }
@@ -211,7 +217,7 @@ public class DatabaseMediator {
     }
 
     public void deleteFriendPhotos(String username){
-        databaseHelper.deleteAPhoto(username);
+        databaseHelper.deletePhotos(username);
     }
 
 
@@ -262,6 +268,15 @@ public class DatabaseMediator {
      *
      * */
 
+    public int getTotalKarma(String ownerName, String photoName){
+        int dot = photoName.indexOf('.');
+        String name;
+        if(dot != -1){
+            name = photoName.substring(0,dot) + photoName.substring(dot+1);
+            return firebaseHelper.getTotalKarma(ownerName, name);
+        }
+        return  firebaseHelper.getTotalKarma(ownerName, photoName);
+    }
 
     public boolean getSharing(String username){
         return firebaseHelper.getSharing(username);
@@ -278,8 +293,13 @@ public class DatabaseMediator {
         return firebaseHelper.getPhotos();
     }
     public void setLocationName(String photoPath, String locationName) {
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
+
+
+        Log.i("location", "mediator updating location name");
+
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
         firebaseHelper.updateFirebase(username,photoPath,COL_LOC_NAME_11,locationName);
 

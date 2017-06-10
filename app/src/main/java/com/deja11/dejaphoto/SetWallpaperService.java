@@ -38,6 +38,7 @@ public class SetWallpaperService extends IntentService {
         if(order == CODE_NEXT_PHOTO) {
             Photo nextPhoto = controller.getNextPhoto();
             if(nextPhoto != null) {
+                Log.i("getNextPhoto", "setting wallpaper");
                 controller.setWallpaper(nextPhoto);
             }else{
                 Log.i("getNextPhoto", "photo is null");
