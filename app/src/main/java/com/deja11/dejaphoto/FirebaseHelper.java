@@ -5,13 +5,12 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,21 +30,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_DATE_5;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_FILE_NAME_9;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LAT_3;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LONG_4;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_OWNER_10;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
-import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
 import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_LAT_3;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_LONG_4;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_DATE_5;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_DEJA_6;
 
 /**
  * Created by Tee on 6/4/17.

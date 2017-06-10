@@ -2,19 +2,15 @@ package com.deja11.dejaphoto;
 
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.LauncherApps;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.Point;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -23,26 +19,17 @@ import android.os.Environment;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
-
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Toast;
 import android.util.Pair;
+import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -119,16 +106,6 @@ public class Controller implements Parcelable {
         myFirebaseRef = database.getReference();
 
         initialize();
-/*
-        int width= context.getResources().getSystem().getDisplayMetrics().widthPixels;
-        screenw = width;
-
-        int height= context.getResources().getSystem().getDisplayMetrics().heightPixels;
-        screenh = height;
-        Log.i("SCREENW", String.valueOf(screenw));
-        Log.i("SCREENH", String.valueOf(screenh));
-*/
-        //databaseMediator.createUser(user.getUsername());
     }
 
     /**
@@ -703,61 +680,5 @@ public class Controller implements Parcelable {
             AlbumUtils.deleteAllFriendPhotos();
         }
     }
-
-    //sync should also look for karma, release, and name
-
-
-
-
-
-
-    /*delete this?*/
-    /*public ArrayList<String> checkForRequests(){
-        ArrayList<String> localFriends = user.getFriends();
-        final ArrayList<String> firebaseFriends = new ArrayList<>();
-        ArrayList<String> friended = new ArrayList<>();
-
-        DatabaseReference databaseReference = myFirebaseRef.child(user.getUsername());
-        Query query = databaseReference;
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot friendSnapShot: dataSnapshot.child("friends").getChildren()){
-                    String key = friendSnapShot.getKey();
-                    String val = friendSnapShot.getValue().toString();
-                    firebaseFriends.add(key);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        while(firebaseFriends.size() < localFriends.size()){
-            try{
-                Thread.sleep(500);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        for(int i = 0; i < firebaseFriends.size(); i++){
-            String friend = firebaseFriends.get(i);
-            if(!localFriends.contains(friend)){
-                friended.add(friend);
-            }
-        }
-        return friended;
-
-    }
-
-
-    public void updateLocationName(Uri photoUri, String locationName) {
-        String directoryPath = photoUri.getPath();
-        databaseMediator.setLocationName(locationName, directoryPath);
-    }
-
-    
-    //sync should also look for karma, release, and name
-    }*/
 
 }

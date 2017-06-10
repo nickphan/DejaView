@@ -1,73 +1,27 @@
 package com.deja11.dejaphoto;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
-
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.io.File;
-import java.util.Calendar;
-import java.util.Objects;
-
-import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
-import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
-import static com.deja11.dejaphoto.DatabaseHelper.TABLE_NAME;
-import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
-
-import android.Manifest;
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import com.google.firebase.database.Query;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Random;
 import java.util.regex.Pattern;
+
+import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
+import static com.deja11.dejaphoto.DatabaseHelper.TAGDATABASE;
 
 
 /**

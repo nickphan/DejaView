@@ -19,48 +19,18 @@
 
 package com.deja11.dejaphoto;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import com.google.firebase.database.Query;
-
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Random;
-
-import static android.R.attr.value;
-import static com.deja11.dejaphoto.R.id.username;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -211,6 +181,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      *
+     * Update a particular field in the database
+     *
      * @param photoLocation
      * @param column
      * @param newValue
@@ -232,6 +204,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    /**
+     *  Delete all the photos of a particular owner
+     * @param owner
+     */
     public void deletePhotos(String owner) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DELETING FROM SQL", "delete owner " + owner);
@@ -271,8 +247,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Delegate to updated field
         updateField(id, COL_REL_7, 1);
 
-        //TODO FIREBASE
-
         Log.i(TAGDATABASE, photoLocation + " set to released");
     }
 
@@ -301,68 +275,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     /**
-     * Look through all the photo in the camera album and add any photos that are not in the database yet
-     * to the database
-     * <p>
-     * context the context to of the activity
+     * Check if data already exists before inserting
+     * @param absolutePath
+     * @param geoLat
+     * @param geoLong
+     * @param date
+     * @param dejapoints
+     * @param isReleased
+     * @param isKarma
+     * @param photoName
+     * @param owner
+     * @param locationName
+     * @param totalKarma
      */
-    /*public void initialize(Context context) {
-
-        // Ensure that app has permission to access the storage
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        } else {
-
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
-            Cursor cursor = gatherPhotoInfo(context);
-
-            // Get columns of MediaStore object to get photos' information
-            int columnIndexPath = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            int columnIndexDate = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN);
-            int columnIndexLat = cursor.getColumnIndex(MediaStore.Images.Media.LATITUDE);
-            int columnIndexLong = cursor.getColumnIndex(MediaStore.Images.Media.LONGITUDE);
-
-            String absolutePath = null;
-            String dateAdded = null;
-            double latitude = 0.0;
-            double longitude = 0.0;
-
-            // Loop through all rows then insert into database
-            while (cursor.moveToNext()) {
-                absolutePath = cursor.getString(columnIndexPath); //path to the photo
-                dateAdded = cursor.getString(columnIndexDate); //date in string format
-                latitude = cursor.getDouble(columnIndexLat); // latitude
-                longitude = cursor.getDouble(columnIndexLong); // longtitude
-
-                // Make sure it is in the camera album
-                if (absolutePath.toLowerCase().contains(ALBUMPREFIX.toLowerCase())) {
-
-                    // TODO Firebase
-
-
-
-
-                    // Check if it already exist before inserting to avoid duplicated
-                    try {
-                        Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
-
-                        if (res.getCount() == 0) {
-                            String photoName = Uri.fromFile(new File (absolutePath)).getLastPathSegment();
-                            this.insertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName);
-                            Log.i("Database insertion", absolutePath + " is now in the table");
-
-                        }
-
-                    } catch (Exception e) {
-                        Log.d(TAGDATABASE, absolutePath + "Already");
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }*/
     public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -373,8 +298,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (res.getCount() == 0) {
                 this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma, photoName, owner, locationName, totalKarma);
                 Log.i("Database insertion", absolutePath + " is now in the table");
-                //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
-                //insertFirebaseStorage(absolutePath);
             }
 
         } catch (Exception e) {
@@ -382,32 +305,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
-
-
-    /**
-     * Gather all the information in the photo.
-     * This method was based on the website
-     * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
-     *
-     * @param context the context to of the activity
-     * @return cursor containing information of photo
-     */
-    public Cursor gatherPhotoInfo(Context context) {
-        Uri uri;
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = {
-                MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.DATE_TAKEN,
-                MediaStore.Images.Media.LATITUDE,
-                MediaStore.Images.Media.LONGITUDE
-
-        };
-        Log.i(TAGDATABASE, "Successfully access storage");
-        return context.getContentResolver().query(uri, projection, null, null, null);
-
-    }
-
 
     /**
      * Choose the next path from the database.
@@ -447,6 +344,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         selection = COL_REL_7 + "= 0";
 
+
+        // Selecting from the database based on the settings
         if (viewMyPhoto && !viewFriendPhoto) {
             selection += " AND ";
             selection += COL_OWNER_10 + " == '" + username + "'";
@@ -479,8 +378,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, selection, null, null, null, null, null);
         } else if (randomNumber >= 7) {
 
-            // Select phonelocation from photo_table where Released = 0 order by date desc limit 5
-            // TODO
             // Select phonelocation from photo_table where Released = 0 AND (emailSenderID=fID OR emailSenderID=myID) order by date desc limit 5
             res = db.query(true, TABLE_NAME, new String[]{COL_PATH_2}, selection, null, null, null, COL_DATE_5 + " DESC", String.valueOf(TOP5));
         } else {
