@@ -65,6 +65,7 @@ public class ControllerTest {
     @Test
     public void TestRelease(){
         /*FILL CACHE*/
+        controller = new Controller(mainActivityActivityTestRule.getActivity());
         for(int i = 0; i < 10; i++){
             Photo photo = controller.getNextPhoto();
             controller.setWallpaper(photo);

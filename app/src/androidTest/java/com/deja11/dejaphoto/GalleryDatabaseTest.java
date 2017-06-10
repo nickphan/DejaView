@@ -30,6 +30,10 @@ public class GalleryDatabaseTest {
     int testPoint = 10;
     int testKarma = 0;
     int testRelease = 0;
+    String testPhotoName = "photoName";
+    String testOwner = "ownerName";
+    String testLocationName = "locationName";
+    int testTotalKarma = 0;
 
 
     Cursor res;         // Result from the query
@@ -93,8 +97,8 @@ public class GalleryDatabaseTest {
         SQLiteDatabase db = testDb.getWritableDatabase();
 
         // Insert data
-        db.delete(TABLE_NAME, null, null);
-        //testDb.insertData(testPath, testLat, testLong, testDate, 25, testRelease, testKarma);
+        //db.delete(TABLE_NAME, null, null);
+        testDb.insertData(testPath, testLat, testLong, testDate, 25, testRelease, testKarma, testPhotoName, testOwner, testLocationName, testTotalKarma);
 
         // Select ID from photo_table where phonelocation = testpath
         res = db.query(true,TABLE_NAME,new String[]{COL_ID_1},COL_PATH_2+"='"+testPath+"'",null,null,null,null,null);
