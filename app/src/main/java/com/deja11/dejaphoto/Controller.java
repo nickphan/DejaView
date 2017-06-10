@@ -4,6 +4,7 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.LauncherApps;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -243,6 +244,10 @@ public class Controller implements Parcelable {
      * @return true if the wallpaper was set. false otherwise
      */
     public boolean setWallpaper(Photo photo) {
+
+        //int totalKarma = databaseMediator.getTotalKarma(photo.getOwner(), photo.getFileName());
+        int totalKarma = 0;
+        Log.i("setWallpaper", "so far so good");
         if (photo == null) {
             return false;
         }
@@ -257,7 +262,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), String.valueOf(photo.getTotalKarma()));
+            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -266,10 +271,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), photo.getTotalKarma()+"");
+                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
             }
         }
     }
@@ -310,7 +315,7 @@ public class Controller implements Parcelable {
      * @param geoLocation the location of the photo to display
      * @return true if the wallpaper was set. false otherwise
      */
-    private boolean setWallpaper(String photoPath, String geoLocation, String totalKarma) {
+    private boolean setWallpaper(String photoPath, String geoLocation, int totalKarma) {
         WallpaperManager myWallpaperManager = WallpaperManager.getInstance(context);
         if (photoPath == null) {
             try {
@@ -339,7 +344,7 @@ public class Controller implements Parcelable {
             Log.i("Photosize width: ", bitmap.getWidth()+"");
             Log.i("Photosize height: ", bitmap.getHeight()+"");
 
-            writeTextOnWallpaper(mutableBitmap, geoLocation,totalKarma);
+            writeTextOnWallpaper(mutableBitmap, geoLocation, Integer.toString(totalKarma));
 
             myWallpaperManager.setBitmap(mutableBitmap);
             return true;
@@ -592,8 +597,28 @@ public class Controller implements Parcelable {
         }
     }
 
-    public void updateLocationName(String photoPath, String locationName) {
-        databaseMediator.setLocationName(photoPath, locationName);
+    public void updateLocationName(Uri imageData, String locationName) {
+        Log.i("location", "controller updating location name");
+        Uri uri;
+        String selection;
+        String[] id;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            selection = "_id=?";
+            id = new String[]{DocumentsContract.getDocumentId(imageData).split(":")[1]};
+        }
+
+        else {
+            uri = imageData;
+            selection = null;
+            id = null;
+        }
+
+        File source = new File(AlbumUtils.getPath(context, uri, selection, id));
+        Log.d("NEW LOCATION  NAME: ", locationName);
+
+        databaseMediator.setLocationName(source.getAbsolutePath(), locationName);
     }
 
     public void createUser(){
@@ -613,7 +638,10 @@ public class Controller implements Parcelable {
 
     public void sync(){
 
+
+
         // adds all the photos in the folder into the gallery (so the database can scan it)
+
         for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
             File[] files = new File(folderPath).listFiles();
             String[] filePath = new String[files.length];
@@ -632,15 +660,16 @@ public class Controller implements Parcelable {
 
         }
         databaseMediator.initDatabase(context);
-
+        boolean sharing = SettingPreference.sharing;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
+        databaseMediator.setSharing(username, sharing);
         if(SettingPreference.viewFriendPhoto){
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String username = sharedPreferences.getString("username", "unknown");
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
-
             for (Pair<String,String> currFriend : myFriends){
 
                 Log.d("SHOWING FRIEND ", currFriend.first);
+                //databaseMediator.deleteFriendPhotos("phoneketchup");
                 if(currFriend.second.equals("true")){
                     databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }

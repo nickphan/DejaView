@@ -306,7 +306,7 @@ public class MainActivity extends Activity {
      * @param view, the view that calls it
      */
     public void getSingleImageFromGallery(View view){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
 
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
@@ -347,39 +347,47 @@ public class MainActivity extends Activity {
     public void onActivityResult(int requestCode, int resultCode, final Intent data){
         if(resultCode == RESULT_OK){
             if(requestCode == Controller.PHOTO_PICKER_SINGLE_CODE){
+                Log.i("CHECK", "The Rename Location should be open ");
                 View v = getLayoutInflater().from(MainActivity.this).inflate(R.layout.rename_location_dialog, null);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 final EditText location = (EditText) v.findViewById(R.id.locationname);
                 builder.setView(v).setPositiveButton("update", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String newLocation = location.getText().toString();
                         Uri imageData = data.getData();
-                        String path = imageData.getPath();
-                        controller.updateLocationName(path,newLocation);
+                        String path = imageData.toString();
+                        Log.i("imagepath", path);
+                        controller.updateLocationName(imageData,newLocation);
+                        if(builder.create() != null && builder.create().isShowing()){
+                            builder.create().dismiss();
+                        }
                     }
                 });
+                builder.create().show();
 
             }
             if(requestCode == Controller.PHOTO_PICKER_MULTIPLE_CODE){
-                /* SINGLE RETURNED. SHOULD NEVER COME HERE */
+                /* SINGLE RETURNED. */
+                ArrayList<Uri> uriArrayList = new ArrayList<Uri>();
+
                 if(data.getData() != null){
-                    Uri imageData = data.getData();
+                    uriArrayList.add(data.getData());
+
                 }
-                /* MULTIPLE RETURNED. SHOULD ONLY EVER COME HERE */
+                /* MULTIPLE RETURNED. */
                 else{
                     if(data.getClipData() != null){
                         ClipData clipData = data.getClipData();
-                        ArrayList<Uri> uriArrayList = new ArrayList<Uri>();
                         for(int i = 0; i < clipData.getItemCount(); i++){
                             ClipData.Item item = clipData.getItemAt(i);
                             Uri uri = item.getUri();
                             uriArrayList.add(uri);
                         }
-
-                        controller.copyPhotos(uriArrayList);
                     }
                 }
+
+                controller.copyPhotos(uriArrayList);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
