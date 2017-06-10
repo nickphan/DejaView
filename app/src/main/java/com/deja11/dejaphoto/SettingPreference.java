@@ -12,13 +12,14 @@ import android.widget.ToggleButton;
 
 public class SettingPreference extends Activity {
 
-
-    final static int TIME_OFFSET = 5;
-    final int MAX_TIME = 25;
-    final String KEY_POSITION = "position";
-    final String KEY_INTERVAL = "interval";
-    public static int currentInterval = TIME_OFFSET;
+    final private static int TIME_OFFSET = 5;
+    final private int MAX_TIME = 25;
+    final private String KEY_POSITION = "position";
+    final private String KEY_INTERVAL = "interval";
     private static int currentPosition;
+
+    /*Used within the package: real-time time interval for switching photo*/
+    public static int currentInterval = TIME_OFFSET;
 
     //For testing purpose
     private static SettingPreference instance;
@@ -30,29 +31,34 @@ public class SettingPreference extends Activity {
     /*For toggles*/
     Switch switchPhoto;
     TextView switchStatus;
-    public static boolean showSwitch = true;
     private String KEY_SWITCH_PHOTO = "photoswtich";
+    /* Used within the package: current status for swtiching photos*/
+    public static boolean showSwitch = true;
+
 
     Switch switchLocation;
     TextView locationStatus;
-    public static boolean showLocation = true;
     private String KEY_LOCATION = "location";
+    /* Used within the package: current status for chnging location*/
+    public static boolean showLocation = true;
 
     Switch switchMine;
     TextView myStatus;
-    public static boolean viewMyPhoto = true;
     private String KEY_VIEW_MY_PHOTOS = "viewMyPhotos";
+    /* Used within the package: the status of the ability to view own photos*/
+    public static boolean viewMyPhoto = true;
 
     Switch switchFriends;
     TextView friendsStatus;
-    public static boolean viewFriendPhoto = true;
     private String KEY_VIEW_FRIENDS_PHOTOS = "viewFriendsPhotos";
+    /*Used within the package: the status of viewing friend's photos*/
+    public static boolean viewFriendPhoto = true;
 
     Switch switchSharing;
     TextView sharingStatus;
-    public static boolean sharing = true;
     private String KEY_SHARING = "sharing";
-
+    /*Used within the package: the status of sharing*/
+    public static boolean sharing = true;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -216,7 +222,7 @@ public class SettingPreference extends Activity {
     }
 
     /**
-     * For Testing purpose
+     *
      * @param seekBar  the seekbar object
      * @param interval the current time interval
      * @param fromUser true if the user updates the tme interval
