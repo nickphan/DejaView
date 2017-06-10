@@ -101,8 +101,6 @@ public class DatabaseMediator {
                 return;
             }
 
-
-
             // Delegate to gatherPhotoInfo to get raw information of all photos in the camera album
             Cursor cursor = gatherPhotoInfo(context);
 
@@ -127,17 +125,19 @@ public class DatabaseMediator {
                 String test = "deja";
                 String test2 = "friends";
                 // Make sure it is in the camera album
-                Log.i("absolutepath", absolutePath);
-                Log.i("dejaphoto", Pattern.compile(".*/DejaPhoto/.*").matcher(absolutePath).matches() + "");
-                Log.i("dejacopied", Pattern.compile(".*/DejaPhotoCopied/.*").matcher(absolutePath).matches() + "");
-                Log.i("dejafriends", Pattern.compile(".*/DejaPhotoFriends/.*").matcher(absolutePath).matches() + "");
-                if (absolutePath.toLowerCase().contains(test.toLowerCase())) {
+
+                boolean isInDejaPhoto = Pattern.compile(".*/DejaPhoto/.*").matcher(absolutePath).matches();
+                boolean isInDejaPhotoCopied = Pattern.compile(".*/DejaPhotoCopied/.*").matcher(absolutePath).matches();
+                boolean isInDejaPhotoFriends = Pattern.compile(".*/DejaPhotoFriends/.*").matcher(absolutePath).matches();
+
+
+                if (isInDejaPhoto || isInDejaPhotoCopied || isInDejaPhotoFriends) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
                     defaultLocation = tempLoc.getLocationName(context);
                     databaseHelper.tryToInsertData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0,photoName, username, defaultLocation, 0);
 
-                    if(!absolutePath.toLowerCase().contains(test2.toLowerCase())) {
+                    if(!isInDejaPhotoFriends) {
 
                         firebaseHelper.tryToInsertFirebase(absolutePath, latitude, longitude, dateAdded, 0, 0, 0, photoName, username, defaultLocation, "0");
 
