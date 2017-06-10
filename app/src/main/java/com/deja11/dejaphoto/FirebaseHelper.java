@@ -338,7 +338,7 @@ catch (Exception e){
         String photoName = Uri.fromFile(new File (photoLocation)).getLastPathSegment();
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
-        mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue("1");
+        mdejaRef.child("images").child(userName).child(photoNameFix).child(column).setValue(newValue);
         Log.d("Karma", "images/"+userName+"/"+photoNameFix+"/"+column+"/"+newValue);
         //mdejaRef.child("images").child(currentUserName).child(photoNameFix).child("test").setValue("testing");
 

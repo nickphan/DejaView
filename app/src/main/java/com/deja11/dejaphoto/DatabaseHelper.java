@@ -311,6 +311,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+
+
     /**
      * Look through all the photo in the camera album and add any photos that are not in the database yet
      * to the database

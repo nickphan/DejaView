@@ -141,6 +141,27 @@ public class DatabaseMediator {
         }
     }
 
+    public ArrayList<String> getFriendsPhoto(String owner){
+        ArrayList<String> data = new ArrayList<>();
+        // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
+        Cursor cursor = gatherPhotoInfo(context);
+
+        // Get columns of MediaStore object to get photos' information
+        int columnIndexPath = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        String absolutePath = null;
+        while (cursor.moveToNext()) {
+            absolutePath = cursor.getString(columnIndexPath); //path to the photo
+
+            // Make sure it is in the camera album
+            if (absolutePath.toLowerCase().contains(owner.toLowerCase())) {
+                Log.d("PHOTO FOUND", "This should be deleted: " + absolutePath);
+                data.add(absolutePath);
+            }
+        }
+        return data;
+
+    }
+
 
     public void updatePoint(GeoLocation deviceLocation, Calendar deviceCalendar) {
         databaseHelper.updatePoint(deviceLocation, deviceCalendar);
@@ -176,6 +197,8 @@ public class DatabaseMediator {
             firebaseHelper.updateRelease(username, photoLocation);
         }
     }
+
+
 
 
     public void downloadFriendPhotos(Context context, String username) {
@@ -252,6 +275,7 @@ public class DatabaseMediator {
     }
     public void setLocationName(String photoPath, String locationName) {
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
+
     }
 
 
