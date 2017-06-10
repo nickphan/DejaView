@@ -181,16 +181,22 @@ public class DatabaseMediator {
         return databaseHelper.getNextPhoto();
     }
 
-    public void updateKarma(String photoLocation, int totalKarma) {
+    public void updateKarma(String photoLocation, int totalKarma, String owner) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
 
 
         databaseHelper.updateKarma(photoLocation, totalKarma);
         //TODO FIREBASE
-        firebaseHelper.updateFirebase(username, photoLocation ,COL_KARMA_8,"1");
+
+        if(username.equals(owner)) {
+            firebaseHelper.updateFirebase(username, photoLocation, COL_KARMA_8, "1");
+        }
         int karma = totalKarma+1;
-        firebaseHelper.updateFirebase(username, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
+
+
+        firebaseHelper.updateFirebase(owner, photoLocation, COL_TOTAL_KARMA_12, String.valueOf(karma));
+
         Log.d("Karma", "database mediator username to be karma "+username+ " // " +photoLocation);
     }
 

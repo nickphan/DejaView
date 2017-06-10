@@ -3,6 +3,7 @@ package com.deja11.dejaphoto;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.test.rule.ActivityTestRule;
+import android.util.Log;
 import android.widget.SeekBar;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class seekBarTest {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(setting.getActivity());
         MainActivity.getInstance().settingsClicked(main.getActivity().findViewById(R.id.setting));
         int interval = 0;
-
+        Log.d("TEST:", "Start");
         SeekBar seekBar = (SeekBar)setting.getActivity().findViewById(R.id.seekBar);
         /* First enter*/
         SettingPreference.getInstance().onProgressChanged(seekBar,0,true);

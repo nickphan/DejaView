@@ -3,6 +3,7 @@ package com.deja11.dejaphoto;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.rule.ActivityTestRule;
+import android.util.Log;
 
 import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
@@ -53,16 +54,18 @@ public class GalleryDatabaseTest {
 
         //Create database
         testDb = new DatabaseHelper(mainActivity.getActivity());
+        assertTrue("Database created", true);
         SQLiteDatabase db = testDb.getWritableDatabase();
 
         // Insert data
-        db.delete(TABLE_NAME, null, null);
-        //assertEquals(testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma), true);
+        db.insert(TABLE_NAME, null, null);
+        assertEquals(testDb.insertData(testPath, testLat, testLong, testDate, testPoint, testRelease, testKarma, "hello","11", "hello", 11), true);
         //assertEquals(testDb.insertData("GenericPath2", 2.5454545, -6.822234, "99887766", 100, 1, 0), true);
 
         // Check if inserted properly, gives correct size, data is correct
         res = db.query(true, TABLE_NAME, null, null, null, null, null, null, null);
-        assertEquals(res.getCount(), 2);
+        System.err.println("res.getcount" + res.getCount()+"");
+        assertEquals(res.getCount(), 1);
         res.moveToNext();
         assertEquals(res.getString(1), testPath);
         assertEquals(res.getDouble(2), testLat, 1e-15);

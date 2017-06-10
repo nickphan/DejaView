@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -151,6 +152,7 @@ public class SettingPreference extends Activity {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             boolean status = mSharedPrefs.getBoolean(key, true);
+            Log.d("status "+key+":", Boolean.toString(status));
             return status;
         } catch (Exception e) {
             return true;
@@ -209,12 +211,15 @@ public class SettingPreference extends Activity {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.edit().putInt(KEY_INTERVAL, currentInterval).apply();
         mSharedPrefs.edit().putInt(KEY_POSITION, currentPosition).apply();
+        Log.d("current position slider", ""+currentPosition);
+        Log.d("current switch interval", ""+currentInterval);
     }
 
     private int getCurrentPosition() {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             int position = mSharedPrefs.getInt(KEY_POSITION, 0);
+            Log.d("current position slider", ""+position);
             return position;
         } catch (Exception e) {
             return 0;
