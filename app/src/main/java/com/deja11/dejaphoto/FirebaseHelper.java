@@ -459,22 +459,30 @@ public class FirebaseHelper {
     /*DO WE NEED THE METHODS UNDER HERE?*/
 
 
-    public ArrayList<Pair<String, String>> getFriends(String username){
+    public ArrayList<Pair<String, String>> getFriendsSharing(final String username){
         final ArrayList<Pair<String, String>> friends = new ArrayList<Pair<String, String>>();
         final boolean[] check = new boolean[1];
         DatabaseReference databaseReference = mdejaRef.child("users").child(username);
+        //DatabaseReference databaseReference = mdejaRef.child("users");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot == null || dataSnapshot.getValue() == null){
                     check[0] = true;
                 }else{
+                    //for(DataSnapshot friendSnapshot : dataSnapshot.child(username).child("friends").getChildren()) {
                     for(DataSnapshot friendSnapshot : dataSnapshot.child("friends").getChildren()){
                         String key = friendSnapshot.getKey();
                         String val = friendSnapshot.getValue().toString();
+
+                        if (val.equals("true")) {
+                            val = dataSnapshot.child(key).child("sharing").getValue().toString();
+                        }
+
                         Pair<String, String> pair = new Pair<String, String>(key, val);
                         friends.add(pair);
                     }
+
                     check[0] = true;
                 }
             }
