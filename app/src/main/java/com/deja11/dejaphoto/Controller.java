@@ -416,7 +416,10 @@ public class Controller implements Parcelable {
         paint.setColor(Color.GREEN);
         paint.setTextSize(canvas.getHeight() / 40);
         if(SettingPreference.showLocation) {
+            Log.d("Setting:", "the location is shown");
             canvas.drawText(cutText, canvas.getHeight() / 40, (int) (0.9 * mutableBitmap.getHeight()), paint);
+        }else {
+            Log.d("Setting:", "the location is not shown");
         }
         canvas.drawText(karma, canvas.getWidth() - 3 * canvas.getHeight() / 40, (int) (0.9 * mutableBitmap.getHeight()), paint);
 

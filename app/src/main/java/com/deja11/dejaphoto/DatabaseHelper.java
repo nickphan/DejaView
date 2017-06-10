@@ -442,7 +442,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
         boolean viewMyPhoto = SettingPreference.viewMyPhoto;
+        if(viewMyPhoto){
+            Log.d("Setting:", "YOU CAN VIEW UR OWN PHOTOS");
+        }
+        else{
+            Log.d("Setting:", "YOU CANNOT VIEW UR OWN PHOTOS");
+        }
         boolean viewFriendPhoto = SettingPreference.viewFriendPhoto;
+
+        if(viewFriendPhoto){
+            Log.d("Setting:", "YOU CAN VIEW UR FRIENDS' PHOTOS");
+        }
+        else{
+            Log.d("Setting:", "YOU CANNOT VIEW UR FRIENDS' PHOTOS");
+        }
 
         selection = COL_REL_7 +"= 0";
 
