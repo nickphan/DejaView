@@ -226,12 +226,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+
     public void deleteAPhoto(String owner){
         SQLiteDatabase db = this.getWritableDatabase();
+        Log.d("DELETING FROM SQL", "delete owner " + owner);
+        try {
 
-        db.delete(TABLE_NAME,COL_OWNER_10 +"="+ owner,null );
+            db.delete(TABLE_NAME, COL_OWNER_10 + "= '" + owner+"'", null);
 
-        Log.d("DELETING FROM SQL", "delete owner" + owner);
+
+        }catch (Exception e){
+            Log.e("DELETING FROM SQL", "ERROR Already deleted");
+        }
         /*
 
         // Select id from photo_table where column = value

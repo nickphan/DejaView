@@ -120,9 +120,13 @@ public class FirebaseHelper {
         String username = sharedPreferences.getString("username", "unknown");
         //insert into storage
         UploadTask uploadTask;
-        Uri file = Uri.fromFile(new File(phoneLocation));
-        //Uri file = compress(phoneLocation);
-        StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file.getLastPathSegment());
+
+        // Use file2 to get a correct name for firebase storage
+        Uri file2 = Uri.fromFile(new File(phoneLocation));
+        Uri file = compress(phoneLocation);
+        Log.d("FIREBASE STORAGE",file2.getLastPathSegment() +" will be uploaded" );
+        StorageReference photoRef = mdejaStorage.child("images/"+username+"/"+file2.getLastPathSegment());
+
         uploadTask = photoRef.putFile(file);
     }
 
@@ -239,10 +243,10 @@ public class FirebaseHelper {
     }
 
     public void tryToInsertFirebase(final String absolutePath, final double geoLat, final double geoLong, final String date, int dejapoints, int isReleased, int isKarma, final String photoName, final
-                                    String userName, final String locationName, final String totalKarma) {
+                                    String photouserName, final String locationName, final String totalKarma) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String username = sharedPreferences.getString("username", "unknown");
+        final String username = sharedPreferences.getString("username", "unknown");
         int period = photoName.indexOf('.');
         String photoNameFix = photoName.substring(0, period) + photoName.substring(period+1);
 
@@ -254,8 +258,11 @@ public class FirebaseHelper {
 
                 if (snapshot == null || snapshot.getValue() == null) {
                     //Toast.makeText(MainActivity.this, "No record found", Toast.LENGTH_SHORT).show();
-                    insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, userName,locationName, totalKarma);
-                    insertFirebaseStorage(absolutePath);
+
+
+                        insertFirebaseData(absolutePath, geoLat, geoLong, date, 0, 0, 0,photoName, username,locationName, totalKarma);
+                        insertFirebaseStorage(absolutePath);
+
 
                 }
                 else {
@@ -299,7 +306,7 @@ public class FirebaseHelper {
 
     public void downloadAPhoto(String userName, String photoName, final Context context, Photo photo){
 
-        File storagePath = new File(Environment.getExternalStorageDirectory(), "/DejaPhotoFriends");
+        File storagePath = new File(Controller.DEJAPHOTOFRIENDSPATH, photo.getOwner());
 
         // Create direcorty if not exists
         if(!storagePath.exists()) {
