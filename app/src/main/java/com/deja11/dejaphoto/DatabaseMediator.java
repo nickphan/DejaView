@@ -283,8 +283,8 @@ public class DatabaseMediator {
     }
 
 
-    public ArrayList<Pair<String, String>> getFriends(String username){
-        return firebaseHelper.getFriends(username);
+    public ArrayList<Pair<String, String>> getFriendsSharing(String username){
+        return firebaseHelper.getFriendsSharing(username);
     }
     public String getUsername(String username){
         return  firebaseHelper.getUsername(username);

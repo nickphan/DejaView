@@ -582,8 +582,8 @@ public class Controller implements Parcelable {
      *
      * */
     public void updateUser(){
-        user.setSharing(databaseMediator.getSharing(user.getUsername()));
-        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
+        user.setSharing(SettingPreference.sharing);
+        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriendsSharing(user.getUsername());
         for(int i = 0; i < friendsList.size(); i++){
             Pair<String, String> friend = friendsList.get(i);
             String name = friend.first;
@@ -632,9 +632,6 @@ public class Controller implements Parcelable {
     }
 
     public void sync(){
-
-
-
         // adds all the photos in the folder into the gallery (so the database can scan it)
         for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
             File[] files = new File(folderPath).listFiles();
@@ -656,12 +653,15 @@ public class Controller implements Parcelable {
 
         databaseMediator.initDatabase(context);
 
+        updateUser();
+
         boolean sharing = SettingPreference.sharing;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
         databaseMediator.setSharing(username, sharing);
+
         if(SettingPreference.viewFriendPhoto){
-            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriends(username);
+            ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriendsSharing(username);
             for (Pair<String,String> currFriend : myFriends){
 
                 if(currFriend.second.equals("true")){
@@ -670,11 +670,17 @@ public class Controller implements Parcelable {
                 else {
                     AlbumUtils.deleteAllPhotosOfFriend(currFriend.first);
                     databaseMediator.deleteFriendPhotos(currFriend.first);
+
                 }
             }
 
         }
+
+        else {
+            AlbumUtils.deleteAllFriendPhotos();
+        }
     }
+
     //sync should also look for karma, release, and name
 
 
@@ -720,16 +726,7 @@ public class Controller implements Parcelable {
         return friended;
 
     }
-    public void updateUser(){
-        user.setSharing(databaseMediator.getSharing(user.getUsername()));
-        ArrayList<Pair<String, String>> friendsList = databaseMediator.getFriends(user.getUsername());
-        for(int i = 0; i < friendsList.size(); i++){
-            Pair<String, String> friend = friendsList.get(i);
-            String name = friend.first;
-            String val = friend.second;
-            user.setFriend(name, val);
-        }
-    }
+
 
     public void updateLocationName(Uri photoUri, String locationName) {
         String directoryPath = photoUri.getPath();

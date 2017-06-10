@@ -26,12 +26,9 @@ import static junit.framework.Assert.assertEquals;
 
 public class User {
 
-    private boolean sharing;
     private String username;
+    private boolean sharing;
     private HashMap<String, String> friends;
-
-
-
 
     public User(){
         sharing = false;
