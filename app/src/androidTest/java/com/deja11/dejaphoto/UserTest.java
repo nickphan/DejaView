@@ -62,7 +62,7 @@ public class UserTest {
         assertEquals(username, testUser.getUsername());
 
     }
-
+/*
     @Test
     public void TestFirebaseIdeas(){
         final boolean[] check = new boolean[1];
@@ -105,15 +105,16 @@ public class UserTest {
         assertEquals(photoNames.size(), 8);
         assertEquals(date.size(), 8);
     }
-
+*/
     DatabaseMediator databaseMediator;
-    @Test
+
+   /* @Test
     public void TestFirebase(){
         databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
         ArrayList<String> returnedStrings = databaseMediator.testGetPhotoNamesFromFirebase();
         assertEquals(returnedStrings.size(), 8);
     }
-
+*/
     @Test
     public void TestCreateUser(){
         databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());

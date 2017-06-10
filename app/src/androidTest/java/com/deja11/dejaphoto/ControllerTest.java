@@ -14,20 +14,21 @@ import static junit.framework.Assert.assertTrue;
  */
 
 public class ControllerTest {
-    Controller controller;
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivityActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class);
 
+    Controller controller = new Controller(mainActivityActivityTestRule.getActivity());;
+
     @Test
     public void TestControllerInitialize(){
-        controller = new Controller(mainActivityActivityTestRule.getActivity());
-        assertTrue(controller.getCurrentWallpaper()!= null);
+        //we do not have photo teh first time when starting the controller
+        assertTrue(controller.getCurrentWallpaper()== null);
     }
 
     @Test
     public void TestNextPhoto(){
-        controller = new Controller(mainActivityActivityTestRule.getActivity());
+      //  controller = new Controller(mainActivityActivityTestRule.getActivity());
         assertEquals(1, controller.getCache().size());
         for(int i = 0; i < 9; i++){
             Photo photo = controller.getNextPhoto();
