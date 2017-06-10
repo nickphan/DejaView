@@ -83,7 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_KARMA_8 = "KARMA";
     public static final String COL_FILE_NAME_9 = "FILENAME";
     public static final String COL_OWNER_10 = "OWNER";
-    public static final String COL_LOC_NAME_11="LOCATIONNAME";
+    public static final String COL_LOC_NAME_11 = "LOCATIONNAME";
     public static final String COL_TOTAL_KARMA_12 = "TOTALKARMA";
 
     //public static final String currentUserName = "Teehee@heeheecom";
@@ -173,8 +173,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_REL_7, isReleased);
         contentValues.put(COL_KARMA_8, isKarma);
         contentValues.put(COL_FILE_NAME_9, photoName);
-        contentValues.put(COL_OWNER_10,owner);
-        contentValues.put(COL_LOC_NAME_11,locationName);
+        contentValues.put(COL_OWNER_10, owner);
+        contentValues.put(COL_LOC_NAME_11, locationName);
         contentValues.put(COL_TOTAL_KARMA_12, totalKarma);
 
 
@@ -205,11 +205,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         boolean status = db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)}) > 0;
 
-        return  status;
+        return status;
 
     }
 
-    public void updateField(String photoLocation, String column, String newValue){
+    /**
+     *
+     * @param photoLocation
+     * @param column
+     * @param newValue
+     */
+    public void updateField(String photoLocation, String column, String newValue) {
         int id = findIdByColumn(COL_PATH_2, photoLocation);
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -223,35 +229,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{Integer.toString(id)});
 
 
-
     }
 
 
-    public void deletePhotos(String owner){
+    public void deletePhotos(String owner) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DELETING FROM SQL", "delete owner " + owner);
         try {
+            db.delete(TABLE_NAME, COL_OWNER_10 + "= '" + owner + "'", null);
 
-            db.delete(TABLE_NAME, COL_OWNER_10 + "= '" + owner+"'", null);
-
-
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("DELETING FROM SQL", "ERROR Already deleted");
         }
-        /*
-
-        // Select id from photo_table where column = value
-        Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, column + "='" + value + "'", null, null, null, null, null);
-
-        if (res.getCount() >= 0) {
-            res.moveToNext();
-            Log.i(TAGDATABASE, value + " is found at id = " + res.getInt(0));
-            return res.getInt(0);
-        } else {
-            Log.d(TAGDATABASE, value + " is not found");
-            return -1;
-        }*/
-
     }
 
     /**
@@ -264,7 +253,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int id = findIdByColumn(COL_PATH_2, photoLocation);
         //Delegate to updated field
         updateField(id, COL_KARMA_8, 1);
-        updateField(id, COL_TOTAL_KARMA_12, totalKarma+1);
+        updateField(id, COL_TOTAL_KARMA_12, totalKarma + 1);
 
 
         Log.i(TAGDATABASE, photoLocation + " set to karma'd");
@@ -311,13 +300,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
     /**
      * Look through all the photo in the camera album and add any photos that are not in the database yet
      * to the database
-     *
-     *  context the context to of the activity
+     * <p>
+     * context the context to of the activity
      */
     /*public void initialize(Context context) {
 
@@ -376,7 +363,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
     }*/
-
     public void tryToInsertData(String absolutePath, double geoLat, double geoLong, String date, int dejapoints, int isReleased, int isKarma, String photoName, String owner, String locationName, int totalKarma) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -385,7 +371,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor res = db.query(true, TABLE_NAME, new String[]{COL_ID_1}, COL_PATH_2 + "='" + absolutePath + "'", null, null, null, null, null);
 
             if (res.getCount() == 0) {
-                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma,photoName, owner, locationName, totalKarma);
+                this.insertData(absolutePath, geoLat, geoLong, date, dejapoints, isReleased, isKarma, photoName, owner, locationName, totalKarma);
                 Log.i("Database insertion", absolutePath + " is now in the table");
                 //this.insertFirebaseData(absolutePath, latitude, longitude, dateAdded, 0, 0, 0);
                 //insertFirebaseStorage(absolutePath);
@@ -398,15 +384,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-        /**
-         * Gather all the information in the photo.
-         * This method was based on the website
-         * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
-         *
-         * @param context the context to of the activity
-         * @return cursor containing information of photo
-         */
+    /**
+     * Gather all the information in the photo.
+     * This method was based on the website
+     * http://stackoverflow.com/questions/18590514/loading-all-the-images-from-gallery-into-the-application-in-android
+     *
+     * @param context the context to of the activity
+     * @return cursor containing information of photo
+     */
     public Cursor gatherPhotoInfo(Context context) {
         Uri uri;
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -444,51 +429,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selection;
 
 
-
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");
         boolean viewMyPhoto = SettingPreference.viewMyPhoto;
-        if(viewMyPhoto){
+        if (viewMyPhoto) {
             Log.d("Setting:", "YOU CAN VIEW UR OWN PHOTOS");
-        }
-        else{
+        } else {
             Log.d("Setting:", "YOU CANNOT VIEW UR OWN PHOTOS");
         }
         boolean viewFriendPhoto = SettingPreference.viewFriendPhoto;
 
-        if(viewFriendPhoto){
+        if (viewFriendPhoto) {
             Log.d("Setting:", "YOU CAN VIEW UR FRIENDS' PHOTOS");
-        }
-        else{
+        } else {
             Log.d("Setting:", "YOU CANNOT VIEW UR FRIENDS' PHOTOS");
         }
 
-        selection = COL_REL_7 +"= 0";
+        selection = COL_REL_7 + "= 0";
 
-        if(viewMyPhoto && !viewFriendPhoto){
+        if (viewMyPhoto && !viewFriendPhoto) {
             selection += " AND ";
-            selection += COL_OWNER_10 + " == '"+ username +"'";
+            selection += COL_OWNER_10 + " == '" + username + "'";
             Log.d("View Status", "OWN is On, Friend is OFF");
-        }
-        else if(!viewMyPhoto && viewFriendPhoto){
+        } else if (!viewMyPhoto && viewFriendPhoto) {
             selection += " AND ";
-            selection += COL_OWNER_10 + " != '"+ username +"'";
+            selection += COL_OWNER_10 + " != '" + username + "'";
 
             Log.d("View Status", "OWN is OFF, Friend is ON");
 
-        }
-        else if(!viewMyPhoto && !viewFriendPhoto){
+        } else if (!viewMyPhoto && !viewFriendPhoto) {
 
             Log.d("View Status", "OWN is OFF, Friend is OFF");
             //return "empty";
-        }
-        else{
+        } else {
 
             Log.d("View Status", "OWN is ON, Friend is ON");
         }
-
-
 
 
         // Generate a random number
@@ -513,9 +489,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         }
 
-        if(res.getCount() == 0){
+        if (res.getCount() == 0) {
 
-            Log.d("CHOOSING PHOTO","database is empty");
+            Log.d("CHOOSING PHOTO", "database is empty");
             return "empty";
         }
 
@@ -526,7 +502,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get the path of that photo
         pathToPhoto = res.getString(0);
 
-        Log.i("Selecting photo", "Getting a random path "+ pathToPhoto);
+        Log.i("Selecting photo", "Getting a random path " + pathToPhoto);
         return pathToPhoto;
     }
 
@@ -541,9 +517,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String nextphotoLocation = chooseNextPath();
 
-        if(nextphotoLocation.equals("empty")){
+        if (nextphotoLocation.equals("empty")) {
 
-            Log.d("CHOOSING PHOTO","next photo returned is also empty");
+            Log.d("CHOOSING PHOTO", "next photo returned is also empty");
             return null;
         }
 
@@ -568,10 +544,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isKarma = res.getInt(7) > 0 ? true : false;
         int totalKarma = res.getInt(11);
 
-        //this.dateString = dateString;
-        //this.fileName = fileName;
-        //this.owner = owner;
-        //this.locationName = locationName;
 
         String dateString = res.getString(4);
         String fileName = res.getString(8);
