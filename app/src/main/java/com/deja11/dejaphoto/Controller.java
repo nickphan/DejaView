@@ -638,7 +638,7 @@ public class Controller implements Parcelable {
 
     public void sync(){
         // adds all the photos in the folder into the gallery (so the database can scan it)
-        for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
+        for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH}) {
             File[] files = new File(folderPath).listFiles();
             String[] filePath = new String[files.length];
 
@@ -648,12 +648,30 @@ public class Controller implements Parcelable {
 
             MediaScannerConnection.scanFile(context, filePath, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
-                @Override
-                public void onScanCompleted(String path, Uri uri) {
-                    Log.i("Scan Completed", path);
-                }
-            });
+                        @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("Scan Completed", path);
+                        }
+                    });
 
+        }
+
+        // adds all the photos of the user's friends into the gallery
+        for (File friendFolder : new File(DEJAPHOTOFRIENDSPATH).listFiles()) {
+            File[] files = friendFolder.listFiles();
+            String[] filePath = new String[files.length];
+
+            for (int i = 0; i < files.length; i++) {
+                filePath[i] = files[i].getAbsolutePath();
+            }
+
+            MediaScannerConnection.scanFile(context, filePath, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("Scan Completed", path);
+                        }
+                    });
         }
 
         databaseMediator.initDatabase(context);
