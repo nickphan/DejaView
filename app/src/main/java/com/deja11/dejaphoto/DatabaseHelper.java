@@ -227,7 +227,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public void deleteAPhoto(String owner){
+    public void deletePhotos(String owner){
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DELETING FROM SQL", "delete owner " + owner);
         try {
@@ -309,6 +309,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return -1;
         }
     }
+
+
 
 
     /**

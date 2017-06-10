@@ -664,13 +664,13 @@ public class Controller implements Parcelable {
             ArrayList<Pair<String,String>> myFriends = databaseMediator.getFriendsSharing(username);
             for (Pair<String,String> currFriend : myFriends){
 
-                Log.d("SHOWING FRIEND ", currFriend.first);
-                //databaseMediator.deleteFriendPhotos("phoneketchup");
                 if(currFriend.second.equals("true")){
                     databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
-                else{
+                else {
                     AlbumUtils.deleteAllPhotosOfFriend(currFriend.first);
+                    databaseMediator.deleteFriendPhotos(currFriend.first);
+
                 }
             }
 
