@@ -22,6 +22,7 @@ import java.util.Objects;
 import static com.deja11.dejaphoto.DatabaseHelper.ALBUMPREFIX;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_ID_1;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_KARMA_8;
+import static com.deja11.dejaphoto.DatabaseHelper.COL_LOC_NAME_11;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_PATH_2;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_REL_7;
 import static com.deja11.dejaphoto.DatabaseHelper.COL_TOTAL_KARMA_12;
@@ -146,11 +147,14 @@ public class DatabaseMediator {
         // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
         Cursor cursor = gatherPhotoInfo(context);
 
+
         // Get columns of MediaStore object to get photos' information
         int columnIndexPath = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         String absolutePath = null;
+        cursor.moveToFirst();
         while (cursor.moveToNext()) {
             absolutePath = cursor.getString(columnIndexPath); //path to the photo
+            Log.d("PHOTO FOUND", " " + absolutePath);
 
             // Make sure it is in the camera album
             if (absolutePath.toLowerCase().contains(owner.toLowerCase())) {
@@ -274,7 +278,10 @@ public class DatabaseMediator {
         return firebaseHelper.getPhotos();
     }
     public void setLocationName(String photoPath, String locationName) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = sharedPreferences.getString("username", "unknown");
         databaseHelper.updateField(photoPath, DatabaseHelper.COL_LOC_NAME_11, locationName);
+        firebaseHelper.updateFirebase(username,photoPath,COL_LOC_NAME_11,locationName);
 
     }
 

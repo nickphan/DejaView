@@ -624,8 +624,14 @@ public class Controller implements Parcelable {
 
                 Log.d("SHOWING FRIEND ", currFriend.first);
                 //databaseMediator.deleteFriendPhotos("phoneketchup");
+                ArrayList<String> test = databaseMediator.getFriendsPhoto("emulatorketchup");
+                Log.d("PHOTO FOUND", test.size()+" ");
+                for(String friend : test ){
+                    Log.d("PHOTO FOUND", friend);
+                }
+
                 if(currFriend.second.equals("true")){
-                    databaseMediator.downloadFriendPhotos(context, currFriend.first);
+                    //databaseMediator.downloadFriendPhotos(context, currFriend.first);
                 }
                 else{
                     //delete
