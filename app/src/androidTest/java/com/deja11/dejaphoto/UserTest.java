@@ -62,59 +62,9 @@ public class UserTest {
         assertEquals(username, testUser.getUsername());
 
     }
-/*
-    @Test
-    public void TestFirebaseIdeas(){
-        final boolean[] check = new boolean[1];
-        final ArrayList<String> photoNames = new ArrayList<>();
-        final ArrayList<String> date = new ArrayList<>();
-        final ArrayList<String> dejaPoints = new ArrayList<>();
-        final ArrayList<String> fileName = new ArrayList<>();
-        final ArrayList<String> geoLocationLat = new ArrayList<>();
-        final ArrayList<String> geoLocationLong = new ArrayList<>();
-        final ArrayList<String> karma = new ArrayList<>();
-        final ArrayList<String> locationName = new ArrayList<>();
-        final ArrayList<String> owner = new ArrayList<>();
-        final ArrayList<String> phoneLocation = new ArrayList<>();
-        final ArrayList<String> released = new ArrayList<>();
-        final ArrayList<String> totalKarma = new ArrayList<>();
-        final DatabaseReference databaseReference = myFirebaseRef.child("images").child("physicalDevice@teesphonecom");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot childrenSnapshot : dataSnapshot.getChildren()){
-                    photoNames.add(childrenSnapshot.getKey());
-                    date.add(childrenSnapshot.child("DATE").getValue().toString());
 
-                }
-                check[0] = true;
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        while(!check[0]){
-            try{
-                Thread.sleep(500);
-                Log.d("Testing", "Sleeping");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        assertEquals(photoNames.size(), 8);
-        assertEquals(date.size(), 8);
-    }
-*/
     DatabaseMediator databaseMediator;
 
-   /* @Test
-    public void TestFirebase(){
-        databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
-        ArrayList<String> returnedStrings = databaseMediator.testGetPhotoNamesFromFirebase();
-        assertEquals(returnedStrings.size(), 8);
-    }
-*/
     @Test
     public void TestCreateUser(){
         databaseMediator = new DatabaseMediator(mainActivityActivityTestRule.getActivity());
