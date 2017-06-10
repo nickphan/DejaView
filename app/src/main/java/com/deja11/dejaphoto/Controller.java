@@ -262,7 +262,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+            return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -271,10 +271,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+                return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+                return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
             }
         }
     }
