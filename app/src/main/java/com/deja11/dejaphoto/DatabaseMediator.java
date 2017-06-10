@@ -66,6 +66,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 
 /**
@@ -101,7 +102,7 @@ public class DatabaseMediator {
 
 
 
-            // Delegate to gattherPhotoInfo to gett raw information of all photos in the camera album
+            // Delegate to gatherPhotoInfo to get raw information of all photos in the camera album
             Cursor cursor = gatherPhotoInfo(context);
 
             // Get columns of MediaStore object to get photos' information
@@ -125,6 +126,10 @@ public class DatabaseMediator {
                 String test = "deja";
                 String test2 = "friends";
                 // Make sure it is in the camera album
+                Log.i("absolutepath", absolutePath);
+                Log.i("dejaphoto", Pattern.compile(".*/DejaPhoto/.*").matcher(absolutePath).matches() + "");
+                Log.i("dejacopied", Pattern.compile(".*/DejaPhotoCopied/.*").matcher(absolutePath).matches() + "");
+                Log.i("dejafriends", Pattern.compile(".*/DejaPhotoFriends/.*").matcher(absolutePath).matches() + "");
                 if (absolutePath.toLowerCase().contains(test.toLowerCase())) {
                     String photoName = Uri.fromFile(new File(absolutePath)).getLastPathSegment();
                     GeoLocation tempLoc = new GeoLocation(latitude,longitude);
@@ -250,8 +255,8 @@ public class DatabaseMediator {
     }
 
 
-    public ArrayList<Pair<String, String>> getFriends(String username){
-        return firebaseHelper.getFriends(username);
+    public ArrayList<Pair<String, String>> getFriendsSharing(String username){
+        return firebaseHelper.getFriendsSharing(username);
     }
     public String getUsername(String username){
         return  firebaseHelper.getUsername(username);

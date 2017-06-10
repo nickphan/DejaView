@@ -262,7 +262,7 @@ public class Controller implements Parcelable {
             } else {
                 currPhoto = photo;
             }
-            return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+            return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
         } else {
             int currIndex = cache.indexOf(currPhoto);
             if (currIndex == -1) {
@@ -271,10 +271,10 @@ public class Controller implements Parcelable {
                     cache.remove(0);
                 }
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+                return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
             } else {
                 currPhoto = photo;
-                return setWallpaper(photo.getPhotoLocation(), photo.getGeoLocation().getLocationName(context), totalKarma);
+                return setWallpaper(photo.getPhotoLocation(), photo.getLocationName(), totalKarma);
             }
         }
     }
@@ -636,7 +636,6 @@ public class Controller implements Parcelable {
 
 
         // adds all the photos in the folder into the gallery (so the database can scan it)
-
         for (String folderPath : new String[] {DEJAPHOTOPATH, DEJAPHOTOCOPIEDPATH, DEJAPHOTOFRIENDSPATH}) {
             File[] files = new File(folderPath).listFiles();
             String[] filePath = new String[files.length];
@@ -654,7 +653,9 @@ public class Controller implements Parcelable {
             });
 
         }
+
         databaseMediator.initDatabase(context);
+
         boolean sharing = SettingPreference.sharing;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = sharedPreferences.getString("username", "unknown");

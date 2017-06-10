@@ -357,7 +357,6 @@ public class MainActivity extends Activity {
                         String newLocation = location.getText().toString();
                         Uri imageData = data.getData();
                         String path = imageData.toString();
-                        Log.i("imagepath", path);
                         controller.updateLocationName(imageData,newLocation);
                         if(builder.create() != null && builder.create().isShowing()){
                             builder.create().dismiss();
