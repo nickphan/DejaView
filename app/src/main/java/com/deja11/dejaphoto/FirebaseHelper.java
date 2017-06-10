@@ -161,8 +161,9 @@ public class FirebaseHelper {
                     released = Boolean.valueOf(eventSnapshot.child(COL_KARMA_8).getValue().toString());
 
 
-                    Photo toBedl = new Photo(null, geoLocation, null, 0, released, false, totalKarma, dateString, photoName, owner, locationName);
-                    downloadAPhoto(friendUserName, photoName, context, toBedl);
+
+                    Photo toBeDownloadedPhoto = new Photo(null, geoLocation, null, 0, released, false, totalKarma, dateString, photoName, owner, locationName);
+                    downloadAPhoto(friendUserName, photoName, context, toBeDownloadedPhoto);
                 }
             }
 

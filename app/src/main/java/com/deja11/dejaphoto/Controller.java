@@ -201,8 +201,8 @@ public class Controller implements Parcelable {
         Photo photo = getCurrentWallpaper();
         if (!photo.isKarma()) {
             photo.setKarma(true);
+            databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma(),photo.getOwner());
             photo.incrementKarma();
-            databaseMediator.updateKarma(photo.getPhotoLocation(), photo.getTotalKarma());
             Log.d("Karma", "controller username to be karma "+username+ " // " +photo.getPhotoLocation());
             return true;
         } else {
